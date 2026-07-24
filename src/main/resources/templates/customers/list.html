@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('客戶列表')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-people"></i> 客戶列表</h4>
+        <a class="btn btn-primary" th:href="@{/customers/new}"><i class="bi bi-person-plus"></i> 新增客戶</a>
+    </div>
+
+    <!-- 搜尋列 -->
+    <form class="card card-body mb-3" method="get" th:action="@{/customers}">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label small text-muted">關鍵字(公司名稱 / 客戶編號 / 聯絡人)</label>
+                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="輸入關鍵字搜尋">
+            </div>
+            <div class="col-md-3">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="activeOnly" value="true"
+                           id="activeOnly" th:checked="${activeOnly}">
+                    <label class="form-check-label" for="activeOnly">只顯示啟用中</label>
+                </div>
+            </div>
+            <div class="col-md-3 text-end">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> 搜尋</button>
+                <a class="btn btn-outline-secondary" th:href="@{/customers}">清除</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>客戶編號</th>
+                    <th>公司名稱</th>
+                    <th>類型</th>
+                    <th>電話</th>
+                    <th>最後聯絡</th>
+                    <th>狀態</th>
+                    <th class="text-end">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${customers}">
+                    <td th:text="${c.customerCode}">C001</td>
+                    <td>
+                        <a th:href="@{/customers/{id}(id=${c.id})}" th:text="${c.companyName}"
+                           class="text-decoration-none fw-semibold">公司</a>
+                    </td>
+                    <td th:text="${c.customerType != null ? c.customerType.label : ''}">一般客戶</td>
+                    <td th:text="${c.phone}">02-1234</td>
+                    <td>
+                        <span th:if="${c.lastContactedAt != null}"
+                              th:text="${#temporals.format(c.lastContactedAt,'yyyy-MM-dd')}">2026-07-01</span>
+                        <span th:unless="${c.lastContactedAt != null}" class="text-muted">—</span>
+                    </td>
+                    <td>
+                        <span th:if="${c.active}" class="badge text-bg-success">啟用</span>
+                        <span th:unless="${c.active}" class="badge text-bg-secondary">停用</span>
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/customers/{id}(id=${c.id})}">
+                            <i class="bi bi-eye"></i></a>
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/customers/{id}/edit(id=${c.id})}">
+                            <i class="bi bi-pencil"></i></a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(customers)}">
+                    <td colspan="7" class="text-center text-muted py-4">查無客戶資料</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="text-muted small mt-2">共 <span th:text="${#lists.size(customers)}">0</span> 筆</p>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

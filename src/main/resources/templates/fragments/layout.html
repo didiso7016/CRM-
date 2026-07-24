@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<!--
+  共用版型片段:head / nav / scripts。
+  各頁面以 th:replace 套用,維持一致外觀且避免重複程式碼。
+-->
+
+<!-- ===== HEAD ===== -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - 客戶與報價管理系統'">客戶與報價管理系統</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+
+<!-- ===== 導覽列 ===== -->
+<nav th:fragment="nav" class="navbar navbar-expand-lg navbar-dark bg-dark no-print sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" th:href="@{/}">
+            <i class="bi bi-box-seam"></i> 報價管理系統
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeMenu=='home'}?'active'" th:href="@{/}">
+                        <i class="bi bi-speedometer2"></i> 首頁
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeMenu=='customers'}?'active'" th:href="@{/customers}">
+                        <i class="bi bi-people"></i> 客戶
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeMenu=='products'}?'active'" th:href="@{/products}">
+                        <i class="bi bi-gear-wide-connected"></i> 零件
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeMenu=='quotations'}?'active'" th:href="@{/quotations}">
+                        <i class="bi bi-file-earmark-text"></i> 報價單
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeMenu=='settings'}?'active'" th:href="@{/settings}">
+                        <i class="bi bi-sliders"></i> 設定
+                    </a>
+                </li>
+            </ul>
+            <div class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-light" th:href="@{/customers/new}">
+                    <i class="bi bi-person-plus"></i> 新增客戶
+                </a>
+                <a class="btn btn-sm btn-primary" th:href="@{/quotations/new}">
+                    <i class="bi bi-plus-lg"></i> 新增報價單
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== 全域訊息(成功/失敗提示) ===== -->
+<div th:fragment="flash" class="no-print">
+    <div th:if="${flashSuccess}" class="container-fluid mt-3">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${flashSuccess}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+    <div th:if="${flashError}" class="container-fluid mt-3">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${flashError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 共用 JS ===== -->
+<th:block th:fragment="scripts">
+    <script th:src="@{/vendor/bootstrap/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+</body>
+</html>

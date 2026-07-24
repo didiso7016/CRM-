@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  客戶歷史報價片段。第四階段由 CustomerController 傳入 quotationHistory 後顯示清單;
+  尚無資料時顯示提示文字。
+-->
+<div th:fragment="history">
+    <div th:if="${quotationHistory == null}">
+        <p class="text-muted mb-0">報價功能將於第四階段提供。</p>
+    </div>
+    <div th:if="${quotationHistory != null and #lists.isEmpty(quotationHistory)}">
+        <p class="text-muted mb-0">此客戶尚無報價紀錄。</p>
+    </div>
+    <div class="table-responsive" th:if="${quotationHistory != null and !#lists.isEmpty(quotationHistory)}">
+        <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr><th>報價單號</th><th>版本</th><th>報價日期</th><th>狀態</th><th class="text-end amount">含稅總計</th><th></th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="q : ${quotationHistory}">
+                <td th:text="${q.quotationNumber}">QT-202607-0001</td>
+                <td>Ver.<span th:text="${q.version}">1</span></td>
+                <td th:text="${#temporals.format(q.quotationDate,'yyyy-MM-dd')}">2026-07-01</td>
+                <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
+                <td class="text-end amount" th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/quotations/{id}(id=${q.id})}">
+                        <i class="bi bi-eye"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# ---- 建置產生物 ----
+target/
+dist/
+*.class
+
+# ---- 打包用的精簡 Java(由 build 腳本產生,不進版控) ----
+jre/
+
+# ---- 敏感資料:客戶/報價資料庫與備份,永不上傳 GitHub ----
+data/
+backup/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ---- 使用者上傳(公司 Logo 等) ----
+uploads/
+
+# ---- Claude Code 本機設定 ----
+.claude/
+
+# ---- IDE / 系統 ----
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

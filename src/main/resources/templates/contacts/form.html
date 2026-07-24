@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${editId != null ? '編輯聯絡人' : '新增聯絡人'})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container py-4" style="max-width: 720px;">
+    <h4 class="mb-3">
+        <i class="bi bi-person-lines-fill"></i>
+        <span th:text="${editId != null ? '編輯聯絡人' : '新增聯絡人'}">新增聯絡人</span>
+    </h4>
+
+    <form method="post"
+          th:action="${editId != null} ? @{/contacts/{id}(id=${editId})} : @{/contacts}"
+          th:object="${contactForm}">
+        <input type="hidden" th:field="*{customerId}">
+
+        <div class="card card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label required">姓名</label>
+                    <input type="text" class="form-control" th:field="*{name}"
+                           th:classappend="${#fields.hasErrors('name')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">部門</label>
+                    <input type="text" class="form-control" th:field="*{department}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">職稱</label>
+                    <input type="text" class="form-control" th:field="*{jobTitle}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">公司電話</label>
+                    <input type="text" class="form-control" th:field="*{phone}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">分機</label>
+                    <input type="text" class="form-control" th:field="*{extensionNumber}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">手機</label>
+                    <input type="text" class="form-control" th:field="*{mobile}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">備註</label>
+                    <textarea class="form-control" rows="2" th:field="*{notes}"></textarea>
+                </div>
+                <div class="col-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" th:field="*{primaryContact}" id="primaryContact">
+                        <label class="form-check-label" for="primaryContact">設為主要聯絡人(同公司僅一位)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> 儲存</button>
+            <a class="btn btn-outline-secondary" th:href="@{/customers/{id}(id=*{customerId})}">取消</a>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

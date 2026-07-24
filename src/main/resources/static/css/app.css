@@ -1,0 +1,39 @@
+/* ===== 全站樣式 ===== */
+body {
+    background-color: #f5f6f8;
+    font-size: 15px;
+}
+
+.stat-card {
+    transition: transform .1s ease;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.required::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* 金額置右、等寬,方便對齊 */
+.amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* 表單分區標題 */
+.form-section-title {
+    font-weight: 600;
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: .3rem;
+    margin: 1.5rem 0 1rem;
+}
+
+/* ===== 列印:隱藏導覽列與按鈕 ===== */
+@media print {
+    .no-print { display: none !important; }
+    body { background: #fff; font-size: 12px; }
+    .container-print { width: 100%; max-width: 100%; }
+}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('首頁')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <h4 class="mb-4"><i class="bi bi-speedometer2"></i> 首頁 Dashboard</h4>
+
+    <!-- 統計卡片 -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a th:href="@{/customers}" class="text-decoration-none">
+                <div class="card stat-card border-start border-4 border-primary">
+                    <div class="card-body">
+                        <div class="text-muted small">客戶總數(啟用)</div>
+                        <div class="fs-3 fw-bold text-dark" th:text="${stats.customerCount}">0</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-start border-4 border-success">
+                <div class="card-body">
+                    <div class="text-muted small">本月報價單</div>
+                    <div class="fs-3 fw-bold" th:text="${stats.monthlyQuotationCount}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-start border-4 border-warning">
+                <div class="card-body">
+                    <div class="text-muted small">報價中</div>
+                    <div class="fs-3 fw-bold" th:text="${stats.inProgressCount}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-start border-4 border-info">
+                <div class="card-body">
+                    <div class="text-muted small">已接受</div>
+                    <div class="fs-3 fw-bold" th:text="${stats.acceptedCount}">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速按鈕 -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a class="btn btn-primary" th:href="@{/customers/new}"><i class="bi bi-person-plus"></i> 新增客戶</a>
+        <a class="btn btn-success" th:href="@{/quotations/new}"><i class="bi bi-plus-lg"></i> 新增報價單</a>
+        <a class="btn btn-outline-secondary" th:href="@{/customers}"><i class="bi bi-people"></i> 查看所有客戶</a>
+        <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i class="bi bi-file-earmark-text"></i> 查看所有報價單</a>
+    </div>
+
+    <!-- 客戶關懷提醒:超過 N 天未聯絡 -->
+    <div class="card mb-4 border-danger" th:if="${!#lists.isEmpty(stats.followUpCustomers)}">
+        <div class="card-header bg-danger-subtle">
+            <i class="bi bi-bell text-danger"></i>
+            <strong>客戶關懷提醒</strong>
+            — 以下客戶已超過 <span th:text="${stats.reminderDays}">30</span> 天未聯絡
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr><th>客戶編號</th><th>公司名稱</th><th>最後聯絡</th><th>已間隔</th><th class="text-end">操作</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${stats.followUpCustomers}">
+                    <td th:text="${c.customerCode}"></td>
+                    <td><a th:href="@{/customers/{id}(id=${c.id})}" th:text="${c.companyName}"></a></td>
+                    <td>
+                        <span th:if="${c.lastContactedAt != null}"
+                              th:text="${#temporals.format(c.lastContactedAt,'yyyy-MM-dd')}"></span>
+                        <span th:unless="${c.lastContactedAt != null}" class="text-muted">從未聯絡</span>
+                    </td>
+                    <td>
+                        <span th:if="${c.lastContactedAt != null}" class="text-danger"
+                              th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(c.lastContactedAt, T(java.time.LocalDateTime).now())} + ' 天'"></span>
+                        <span th:unless="${c.lastContactedAt != null}" class="text-danger">—</span>
+                    </td>
+                    <td class="text-end">
+                        <form method="post" th:action="@{/customers/{id}/record-contact(id=${c.id})}" class="d-inline">
+                            <button class="btn btn-sm btn-outline-success" type="submit">
+                                <i class="bi bi-telephone-outbound"></i> 記錄聯絡</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- 最近建立的報價單 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-clock-history"></i> 最近建立的報價單</div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr><th>報價單號</th><th>客戶</th><th>狀態</th><th class="text-end amount">含稅總計</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.recentQuotations}">
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}"
+                                   th:text="${q.quotationNumber} + ' v' + ${q.version}"></a></td>
+                            <td th:text="${q.customer.companyName}"></td>
+                            <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.recentQuotations)}">
+                            <td colspan="4" class="text-center text-muted py-3">尚無報價單</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 即將到期的報價單 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-hourglass-split"></i> 即將到期的報價單(7 天內)</div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr><th>報價單號</th><th>客戶</th><th>有效期限</th><th>狀態</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.expiringQuotations}">
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}" th:text="${q.quotationNumber}"></a></td>
+                            <td th:text="${q.customer.companyName}"></td>
+                            <td class="text-danger" th:text="${#temporals.format(q.validUntil,'yyyy-MM-dd')}"></td>
+                            <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.expiringQuotations)}">
+                            <td colspan="4" class="text-center text-muted py-3">近期無到期報價單</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近更新的客戶 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i class="bi bi-people"></i> 最近更新的客戶</div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr><th>客戶編號</th><th>公司名稱</th><th>更新時間</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c : ${stats.recentlyUpdatedCustomers}">
+                            <td th:text="${c.customerCode}"></td>
+                            <td><a th:href="@{/customers/{id}(id=${c.id})}" th:text="${c.companyName}"></a></td>
+                            <td th:text="${#temporals.format(c.updatedAt,'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.recentlyUpdatedCustomers)}">
+                            <td colspan="3" class="text-center text-muted py-3">尚無客戶</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

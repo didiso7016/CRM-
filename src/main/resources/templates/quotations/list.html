@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('報價單列表')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-file-earmark-text"></i> 報價單列表</h4>
+        <a class="btn btn-primary" th:href="@{/quotations/new}"><i class="bi bi-plus-lg"></i> 新增報價單</a>
+    </div>
+
+    <!-- 搜尋列:客戶 / 單號 / 狀態 / 日期區間 -->
+    <form class="card card-body mb-3" method="get" th:action="@{/quotations}">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted">客戶</label>
+                <select class="form-select" name="customerId">
+                    <option value="">全部客戶</option>
+                    <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.companyName}"
+                            th:selected="${fCustomerId != null and fCustomerId == c.id}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">報價單號</label>
+                <input type="text" class="form-control" name="number" th:value="${fNumber}" placeholder="QT-...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">狀態</label>
+                <select class="form-select" name="status">
+                    <option value="">全部狀態</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}"
+                            th:selected="${fStatus != null and fStatus == s}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">起始日期</label>
+                <input type="date" class="form-control" name="from" th:value="${fFrom}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">結束日期</label>
+                <input type="date" class="form-control" name="to" th:value="${fTo}">
+            </div>
+            <div class="col-md-1 text-end">
+                <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>報價單號</th><th>版本</th><th>客戶</th><th>報價日期</th>
+                    <th>有效期限</th><th>狀態</th><th class="text-end amount">含稅總計</th><th class="text-end">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="q : ${quotations}">
+                    <td class="fw-semibold">
+                        <a th:href="@{/quotations/{id}(id=${q.id})}" class="text-decoration-none"
+                           th:text="${q.quotationNumber}">QT-202607-0001</a>
+                    </td>
+                    <td>Ver.<span th:text="${q.version}">1</span></td>
+                    <td th:text="${q.customer.companyName}">客戶</td>
+                    <td th:text="${#temporals.format(q.quotationDate,'yyyy-MM-dd')}"></td>
+                    <td th:text="${q.validUntil != null ? #temporals.format(q.validUntil,'yyyy-MM-dd') : '—'}"></td>
+                    <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
+                    <td class="text-end amount"
+                        th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/quotations/{id}(id=${q.id})}">
+                            <i class="bi bi-eye"></i></a>
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/quotations/{id}/edit(id=${q.id})}">
+                            <i class="bi bi-pencil"></i></a>
+                        <a class="btn btn-sm btn-outline-dark" th:href="@{/quotations/{id}/print(id=${q.id})}" target="_blank">
+                            <i class="bi bi-printer"></i></a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(quotations)}">
+                    <td colspan="8" class="text-center text-muted py-4">查無報價單</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="text-muted small mt-2">共 <span th:text="${#lists.size(quotations)}">0</span> 筆</p>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

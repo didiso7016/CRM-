@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('報價單 ' + ${quotation.quotationNumber})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+        <h4 class="mb-0">
+            <i class="bi bi-file-earmark-text"></i>
+            <span th:text="${quotation.quotationNumber}">QT-202607-0001</span>
+            <span class="text-muted">Ver.<span th:text="${quotation.version}">1</span></span>
+            <span th:replace="~{fragments/status :: badge(${quotation.status})}"></span>
+        </h4>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i class="bi bi-arrow-left"></i> 列表</a>
+            <a class="btn btn-outline-primary" th:href="@{/quotations/{id}/edit(id=${quotation.id})}">
+                <i class="bi bi-pencil"></i> 編輯</a>
+            <form method="post" th:action="@{/quotations/{id}/copy(id=${quotation.id})}" class="d-inline">
+                <button class="btn btn-outline-info" type="submit"><i class="bi bi-files"></i> 複製</button>
+            </form>
+            <form method="post" th:action="@{/quotations/{id}/new-version(id=${quotation.id})}" class="d-inline">
+                <button class="btn btn-outline-warning" type="submit"><i class="bi bi-layers"></i> 建立新版</button>
+            </form>
+            <a class="btn btn-dark" th:href="@{/quotations/{id}/print(id=${quotation.id})}" target="_blank">
+                <i class="bi bi-printer"></i> 列印 / PDF</a>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- 表頭資訊 -->
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header"><i class="bi bi-info-circle"></i> 報價資訊</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr><th class="text-muted" style="width:40%">客戶</th>
+                                    <td><a th:href="@{/customers/{id}(id=${quotation.customer.id})}"
+                                           th:text="${quotation.customer.companyName}"></a></td></tr>
+                                <tr><th class="text-muted">聯絡人</th>
+                                    <td th:text="${quotation.contact != null ? quotation.contact.name : '—'}"></td></tr>
+                                <tr><th class="text-muted">報價日期</th>
+                                    <td th:text="${#temporals.format(quotation.quotationDate,'yyyy-MM-dd')}"></td></tr>
+                                <tr><th class="text-muted">有效期限</th>
+                                    <td th:text="${quotation.validUntil != null ? #temporals.format(quotation.validUntil,'yyyy-MM-dd') : '—'}"></td></tr>
+                                <tr><th class="text-muted">客戶詢價單號</th>
+                                    <td th:text="${quotation.customerInquiryNumber}"></td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-sm">
+                                <tr><th class="text-muted" style="width:40%">幣別 / 稅別</th>
+                                    <td><span th:text="${quotation.currency}"></span> / <span th:text="${quotation.taxType}"></span>
+                                        (<span th:text="${quotation.taxRate}"></span>%)</td></tr>
+                                <tr><th class="text-muted">付款條件</th><td th:text="${quotation.paymentTerms}"></td></tr>
+                                <tr><th class="text-muted">交貨條件</th><td th:text="${quotation.deliveryTerms}"></td></tr>
+                                <tr><th class="text-muted">預計交期</th><td th:text="${quotation.estimatedDelivery}"></td></tr>
+                                <tr><th class="text-muted">建立時間</th>
+                                    <td th:text="${#temporals.format(quotation.createdAt,'yyyy-MM-dd HH:mm')}"></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 品項 -->
+            <div class="card">
+                <div class="card-header"><i class="bi bi-list-ol"></i> 報價品項</div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th><th>料號</th><th>品名 / 規格</th><th class="text-end">數量</th>
+                            <th>單位</th><th class="text-end amount">單價</th><th class="text-end">折扣%</th>
+                            <th class="text-end amount">金額</th><th>交期</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="it : ${quotation.items}">
+                            <td th:text="${it.sequenceNumber}">1</td>
+                            <td>
+                                <div th:text="${it.internalPartNumber}"></div>
+                                <div class="text-muted small" th:if="${it.customerPartNumber}"
+                                     th:text="'客:' + ${it.customerPartNumber}"></div>
+                            </td>
+                            <td>
+                                <div th:text="${it.productName}"></div>
+                                <div class="text-muted small" th:text="${it.specification}"></div>
+                                <div class="text-muted small"
+                                     th:if="${!#strings.isEmpty(it.material) or !#strings.isEmpty(it.surfaceTreatment)}"
+                                     th:text="${it.material} + ' ' + ${it.surfaceTreatment}"></div>
+                            </td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(it.quantity,1,'COMMA',0,'POINT')}"></td>
+                            <td th:text="${it.unit}"></td>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(it.unitPrice,1,'COMMA',2,'POINT')}"></td>
+                            <td class="text-end" th:text="${it.discountRate}"></td>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(it.amount,1,'COMMA',2,'POINT')}"></td>
+                            <td th:text="${it.leadTime}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 側欄:金額 + 狀態 -->
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header"><i class="bi bi-calculator"></i> 金額</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="text-muted">未稅小計</th>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(quotation.subtotal,1,'COMMA',2,'POINT')}"></td></tr>
+                        <tr><th class="text-muted">折扣</th>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(quotation.overallDiscount,1,'COMMA',2,'POINT')}"></td></tr>
+                        <tr><th class="text-muted">運費</th>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(quotation.freight,1,'COMMA',2,'POINT')}"></td></tr>
+                        <tr><th class="text-muted">其他費用</th>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(quotation.otherFee,1,'COMMA',2,'POINT')}"></td></tr>
+                        <tr><th class="text-muted">稅額</th>
+                            <td class="text-end amount" th:text="${#numbers.formatDecimal(quotation.taxAmount,1,'COMMA',2,'POINT')}"></td></tr>
+                        <tr class="table-primary"><th>含稅總計</th>
+                            <td class="text-end amount fw-bold fs-5" th:text="${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><i class="bi bi-flag"></i> 變更狀態</div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/quotations/{id}/status(id=${quotation.id})}" class="d-flex gap-2">
+                        <select class="form-select" name="status">
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}"
+                                    th:selected="${s == quotation.status}"></option>
+                        </select>
+                        <button class="btn btn-primary" type="submit">更新</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card" th:if="${!#strings.isEmpty(quotation.quotationNotes) or !#strings.isEmpty(quotation.internalNotes)}">
+                <div class="card-header"><i class="bi bi-sticky"></i> 備註</div>
+                <div class="card-body">
+                    <div th:if="${quotation.quotationNotes}">
+                        <div class="text-muted small">報價備註</div>
+                        <p th:text="${quotation.quotationNotes}"></p>
+                    </div>
+                    <div th:if="${quotation.internalNotes}">
+                        <div class="text-muted small">內部備註</div>
+                        <p class="mb-0" th:text="${quotation.internalNotes}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

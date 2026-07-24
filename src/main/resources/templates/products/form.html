@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${editId != null ? '編輯零件' : '新增零件'})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container py-4" style="max-width: 860px;">
+    <h4 class="mb-3">
+        <i class="bi bi-gear"></i>
+        <span th:text="${editId != null ? '編輯零件' : '新增零件'}">新增零件</span>
+    </h4>
+
+    <form method="post"
+          th:action="${editId != null} ? @{/products/{id}(id=${editId})} : @{/products}"
+          th:object="${productForm}">
+
+        <div class="card card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label required">內部料號</label>
+                    <input type="text" class="form-control" th:field="*{internalPartNumber}"
+                           th:classappend="${#fields.hasErrors('internalPartNumber')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('internalPartNumber')}"
+                         th:errors="*{internalPartNumber}"></div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">客戶料號</label>
+                    <input type="text" class="form-control" th:field="*{customerPartNumber}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label required">零件名稱</label>
+                    <input type="text" class="form-control" th:field="*{name}"
+                           th:classappend="${#fields.hasErrors('name')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">規格</label>
+                    <input type="text" class="form-control" th:field="*{specification}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">材質</label>
+                    <input type="text" class="form-control" th:field="*{material}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">表面處理</label>
+                    <input type="text" class="form-control" th:field="*{surfaceTreatment}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">單位</label>
+                    <input type="text" class="form-control" th:field="*{unit}" list="unitList">
+                    <datalist id="unitList">
+                        <option th:each="u : ${unitOptions}" th:value="${u}"></option>
+                    </datalist>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">預設單價</label>
+                    <input type="number" step="0.0001" min="0" class="form-control" th:field="*{defaultUnitPrice}"
+                           th:classappend="${#fields.hasErrors('defaultUnitPrice')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('defaultUnitPrice')}"
+                         th:errors="*{defaultUnitPrice}"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">最低訂購量 MOQ</label>
+                    <input type="number" min="0" class="form-control" th:field="*{moq}"
+                           th:classappend="${#fields.hasErrors('moq')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('moq')}" th:errors="*{moq}"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">預設交期(天)</label>
+                    <input type="number" min="0" class="form-control" th:field="*{defaultLeadTimeDays}"
+                           th:classappend="${#fields.hasErrors('defaultLeadTimeDays')}?'is-invalid'">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('defaultLeadTimeDays')}"
+                         th:errors="*{defaultLeadTimeDays}"></div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">備註</label>
+                    <textarea class="form-control" rows="2" th:field="*{notes}"></textarea>
+                </div>
+                <div class="col-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" th:field="*{active}" id="active">
+                        <label class="form-check-label" for="active">啟用此零件</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> 儲存</button>
+            <a class="btn btn-outline-secondary" th:href="@{/products}">取消</a>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

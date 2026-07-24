@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${editId != null ? '編輯報價單' : '新增報價單'})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+
+<main class="container-fluid py-4">
+    <h4 class="mb-3">
+        <i class="bi bi-file-earmark-plus"></i>
+        <span th:text="${editId != null ? '編輯報價單' : '新增報價單'}">新增報價單</span>
+    </h4>
+
+    <!-- 驗證錯誤總覽 -->
+    <div class="alert alert-danger" th:if="${#fields.hasErrors('global') or #fields.hasErrors('*')}">
+        <div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle"></i> 請修正以下問題:</div>
+        <ul class="mb-0">
+            <li th:each="e : ${#fields.errors('global')}" th:text="${e}"></li>
+            <li th:each="e : ${#fields.errors('customerId')}" th:text="${e}"></li>
+            <li th:each="e : ${#fields.errors('quotationDate')}" th:text="${e}"></li>
+        </ul>
+    </div>
+
+    <form method="post" id="quotationForm"
+          th:action="${editId != null} ? @{/quotations/{id}(id=${editId})} : @{/quotations}"
+          th:object="${quotationForm}">
+
+        <!-- ===== 報價單表頭 ===== -->
+        <div class="card card-body mb-3">
+            <div class="form-section-title">報價資訊</div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label required">客戶</label>
+                    <select class="form-select" th:field="*{customerId}" id="customerSelect">
+                        <option value="">請選擇客戶</option>
+                        <option th:each="c : ${activeCustomers}" th:value="${c.id}" th:text="${c.companyName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">聯絡人</label>
+                    <select class="form-select" th:field="*{contactId}" id="contactSelect">
+                        <option value="">(未指定)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label required">報價日期</label>
+                    <input type="date" class="form-control" th:field="*{quotationDate}" id="quotationDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">客戶詢價單號</label>
+                    <input type="text" class="form-control" th:field="*{customerInquiryNumber}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">報價有效期限</label>
+                    <input type="date" class="form-control" th:field="*{validUntil}" id="validUntil">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">幣別</label>
+                    <select class="form-select" th:field="*{currency}">
+                        <option th:each="c : ${currencyOptions}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">稅別</label>
+                    <select class="form-select" th:field="*{taxType}">
+                        <option th:each="t : ${taxTypeOptions}" th:value="${t}" th:text="${t}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">稅率(%)</label>
+                    <input type="number" step="0.01" min="0" class="form-control" th:field="*{taxRate}" id="taxRate">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">付款條件</label>
+                    <input type="text" class="form-control" th:field="*{paymentTerms}" placeholder="例:月結 30 天">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">交貨條件</label>
+                    <input type="text" class="form-control" th:field="*{deliveryTerms}" placeholder="例:工廠交貨">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">預計交期</label>
+                    <input type="text" class="form-control" th:field="*{estimatedDelivery}" placeholder="例:訂單後 30 天">
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 品項 ===== -->
+        <div class="card card-body mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="form-section-title mb-0">報價品項</div>
+                <button type="button" class="btn btn-sm btn-success" id="addRowBtn">
+                    <i class="bi bi-plus-lg"></i> 新增品項
+                </button>
+            </div>
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-bordered align-middle" id="itemsTable" style="min-width: 1400px;">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width:40px;">#</th>
+                        <th style="width:150px;">帶入零件</th>
+                        <th style="width:110px;">內部料號</th>
+                        <th style="width:110px;">客戶料號</th>
+                        <th style="width:160px;">品名</th>
+                        <th style="width:120px;">規格</th>
+                        <th style="width:90px;">材質</th>
+                        <th style="width:90px;">表面處理</th>
+                        <th style="width:90px;">數量</th>
+                        <th style="width:80px;">單位</th>
+                        <th style="width:100px;">單價</th>
+                        <th style="width:80px;">折扣%</th>
+                        <th style="width:110px;">金額</th>
+                        <th style="width:100px;">交期</th>
+                        <th style="width:120px;">備註</th>
+                        <th style="width:50px;"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="itemsBody"><!-- 由 quotation.js 動態產生 --></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== 金額區 ===== -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-7">
+                <div class="card card-body h-100">
+                    <div class="mb-2">
+                        <label class="form-label">報價備註(顯示於報價單)</label>
+                        <textarea class="form-control" rows="2" th:field="*{quotationNotes}"></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label">內部備註(不顯示於報價單)</label>
+                        <textarea class="form-control" rows="2" th:field="*{internalNotes}"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <th class="text-muted">未稅小計</th>
+                            <td class="text-end amount fw-bold" id="subtotalCell">0</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">整體折扣金額</th>
+                            <td class="text-end">
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end"
+                                       th:field="*{overallDiscount}" id="overallDiscount">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">運費</th>
+                            <td class="text-end">
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end"
+                                       th:field="*{freight}" id="freight">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">其他費用</th>
+                            <td class="text-end">
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end"
+                                       th:field="*{otherFee}" id="otherFee">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">稅額</th>
+                            <td class="text-end amount" id="taxCell">0</td>
+                        </tr>
+                        <tr class="table-primary">
+                            <th>含稅總計</th>
+                            <td class="text-end amount fs-5 fw-bold" id="totalCell">0</td>
+                        </tr>
+                    </table>
+                    <p class="text-muted small mb-0 mt-2">
+                        <i class="bi bi-info-circle"></i> 金額由系統即時試算,儲存時後端會重新計算為準。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> 儲存報價單</button>
+            <a class="btn btn-outline-secondary"
+               th:href="${editId != null} ? @{/quotations/{id}(id=${editId})} : @{/quotations}">取消</a>
+        </div>
+    </form>
+</main>
+
+<!-- 傳給前端 JS 的資料 -->
+<script th:inline="javascript">
+    window.QUOTATION_DATA = {
+        items:    /*[[${quotationForm.items}]]*/ [],
+        products: /*[[${productOptions}]]*/ [],
+        contacts: /*[[${contactOptions}]]*/ [],
+        units:    /*[[${unitOptions}]]*/ [],
+        selectedContactId: /*[[${quotationForm.contactId}]]*/ null
+    };
+</script>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script th:src="@{/js/quotation.js}"></script>
+</body>
+</html>

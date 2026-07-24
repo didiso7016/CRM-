@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'報價單 ' + ${quotation.quotationNumber}">報價單</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+    <style>
+        /* A4 列印版面 */
+        @page { size: A4; margin: 12mm; }
+        body { font-size: 12px; color: #000; background: #fff; }
+        .a4 { width: 186mm; margin: 0 auto; }
+        .quote-title { font-size: 22px; font-weight: 700; letter-spacing: 4px; }
+        table.items th, table.items td { padding: 4px 6px; }
+        .totals th { text-align: right; color: #333; }
+        .totals td { text-align: right; }
+        .sign-box { height: 70px; border: 1px solid #999; }
+        .company-logo { max-height: 60px; max-width: 200px; }
+        .toolbar { text-align: right; margin-bottom: 10px; }
+        @media print {
+            .no-print { display: none !important; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="a4">
+    <!-- 列印工具列(列印時隱藏) -->
+    <div class="toolbar no-print">
+        <button class="btn btn-primary btn-sm" onclick="window.print()">
+            <i></i> 列印 / 另存 PDF
+        </button>
+        <a class="btn btn-outline-secondary btn-sm" th:href="@{/quotations/{id}(id=${quotation.id})}">返回</a>
+    </div>
+
+    <!-- 抬頭:公司資訊 -->
+    <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-3">
+        <div>
+            <img th:if="${company.logoPath}" class="company-logo mb-1"
+                 th:src="@{/uploads/{f}(f=${company.logoPath})}" alt="logo">
+            <div class="fs-5 fw-bold" th:text="${company.companyName}">公司名稱</div>
+            <div th:if="${company.taxId}">統一編號:<span th:text="${company.taxId}"></span></div>
+            <div th:if="${company.address}" th:text="${company.address}"></div>
+            <div>
+                <span th:if="${company.phone}">電話:<span th:text="${company.phone}"></span>&nbsp;</span>
+                <span th:if="${company.fax}">傳真:<span th:text="${company.fax}"></span></span>
+            </div>
+            <div th:if="${company.email}">Email:<span th:text="${company.email}"></span></div>
+        </div>
+        <div class="text-end">
+            <div class="quote-title">報價單</div>
+            <div class="mt-2">
+                <table class="table table-sm table-borderless mb-0" style="font-size:12px;">
+                    <tr><th class="text-end pe-2">報價單號</th>
+                        <td class="text-start" th:text="${quotation.quotationNumber} + ' Ver.' + ${quotation.version}"></td></tr>
+                    <tr><th class="text-end pe-2">報價日期</th>
+                        <td class="text-start" th:text="${#temporals.format(quotation.quotationDate,'yyyy-MM-dd')}"></td></tr>
+                    <tr><th class="text-end pe-2">有效期限</th>
+                        <td class="text-start" th:text="${quotation.validUntil != null ? #temporals.format(quotation.validUntil,'yyyy-MM-dd') : '—'}"></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客戶資訊 -->
+    <div class="row mb-3">
+        <div class="col-7">
+            <table class="table table-sm table-borderless mb-0">
+                <tr><th style="width:70px;">客戶</th><td th:text="${quotation.customer.companyName}"></td></tr>
+                <tr><th>地址</th><td th:text="${quotation.customer.address}"></td></tr>
+                <tr><th>聯絡人</th><td th:text="${quotation.contact != null ? quotation.contact.name : ''}"></td></tr>
+            </table>
+        </div>
+        <div class="col-5">
+            <table class="table table-sm table-borderless mb-0">
+                <tr><th style="width:80px;">電話</th>
+                    <td th:text="${quotation.contact != null and quotation.contact.phone != null ? quotation.contact.phone : quotation.customer.phone}"></td></tr>
+                <tr><th>Email</th>
+                    <td th:text="${quotation.contact != null and quotation.contact.email != null ? quotation.contact.email : quotation.customer.email}"></td></tr>
+                <tr><th>客戶詢價單號</th><td th:text="${quotation.customerInquiryNumber}"></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 品項表格 -->
+    <table class="table table-sm table-bordered items">
+        <thead class="table-light">
+        <tr>
+            <th style="width:32px;">#</th>
+            <th style="width:90px;">料號</th>
+            <th>品名 / 規格</th>
+            <th style="width:60px;" class="text-end">數量</th>
+            <th style="width:50px;">單位</th>
+            <th style="width:80px;" class="text-end">單價</th>
+            <th style="width:90px;" class="text-end">金額</th>
+            <th style="width:70px;">交期</th>
+            <th style="width:80px;">備註</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="it : ${quotation.items}">
+            <td class="text-center" th:text="${it.sequenceNumber}"></td>
+            <td>
+                <div th:text="${it.internalPartNumber}"></div>
+                <div class="text-muted" th:if="${it.customerPartNumber}" th:text="${it.customerPartNumber}"></div>
+            </td>
+            <td>
+                <div th:text="${it.productName}"></div>
+                <div class="text-muted" th:text="${it.specification}"></div>
+                <div class="text-muted" th:if="${!#strings.isEmpty(it.material) or !#strings.isEmpty(it.surfaceTreatment)}"
+                     th:text="${it.material} + ' ' + ${it.surfaceTreatment}"></div>
+            </td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(it.quantity,1,'COMMA',0,'POINT')}"></td>
+            <td th:text="${it.unit}"></td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(it.unitPrice,1,'COMMA',2,'POINT')}"></td>
+            <td class="text-end" th:text="${#numbers.formatDecimal(it.amount,1,'COMMA',2,'POINT')}"></td>
+            <td th:text="${it.leadTime}"></td>
+            <td th:text="${it.notes}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 金額區 -->
+    <div class="row">
+        <div class="col-7">
+            <div class="small">
+                <div><strong>付款條件:</strong><span th:text="${quotation.paymentTerms}"></span></div>
+                <div><strong>交貨條件:</strong><span th:text="${quotation.deliveryTerms}"></span></div>
+                <div><strong>預計交期:</strong><span th:text="${quotation.estimatedDelivery}"></span></div>
+                <div><strong>幣別:</strong><span th:text="${quotation.currency}"></span></div>
+            </div>
+        </div>
+        <div class="col-5">
+            <table class="table table-sm totals mb-0">
+                <tr><th>未稅小計</th><td th:text="${#numbers.formatDecimal(quotation.subtotal,1,'COMMA',2,'POINT')}"></td></tr>
+                <tr><th>折扣</th><td th:text="${#numbers.formatDecimal(quotation.overallDiscount,1,'COMMA',2,'POINT')}"></td></tr>
+                <tr><th>運費</th><td th:text="${#numbers.formatDecimal(quotation.freight,1,'COMMA',2,'POINT')}"></td></tr>
+                <tr><th>其他費用</th><td th:text="${#numbers.formatDecimal(quotation.otherFee,1,'COMMA',2,'POINT')}"></td></tr>
+                <tr><th th:text="'稅額 (' + ${quotation.taxRate} + '%)'">稅額</th>
+                    <td th:text="${#numbers.formatDecimal(quotation.taxAmount,1,'COMMA',2,'POINT')}"></td></tr>
+                <tr class="table-light"><th class="fw-bold">含稅總計</th>
+                    <td class="fw-bold" th:text="${quotation.currency} + ' ' + ${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 報價備註 -->
+    <div class="mt-3 small" th:if="${quotation.quotationNotes}">
+        <strong>備註:</strong>
+        <div th:text="${quotation.quotationNotes}"></div>
+    </div>
+
+    <!-- 頁尾:簽章欄 -->
+    <div class="row mt-4">
+        <div class="col-6">
+            <div class="small mb-1">客戶確認簽章</div>
+            <div class="sign-box"></div>
+        </div>
+        <div class="col-6">
+            <div class="small mb-1">報價公司簽章</div>
+            <div class="sign-box"></div>
+        </div>
+    </div>
+    <div class="text-center text-muted mt-3 small" th:if="${company.contactName}">
+        業務聯絡:<span th:text="${company.contactName}"></span>
+        <span th:if="${company.phone}"> / <span th:text="${company.phone}"></span></span>
+        <span th:if="${company.email}"> / <span th:text="${company.email}"></span></span>
+    </div>
+</div>
+</body>
+</html>

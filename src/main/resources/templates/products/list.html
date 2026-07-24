@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('零件列表')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i class="bi bi-gear-wide-connected"></i> 零件列表</h4>
+        <a class="btn btn-primary" th:href="@{/products/new}"><i class="bi bi-plus-lg"></i> 新增零件</a>
+    </div>
+
+    <form class="card card-body mb-3" method="get" th:action="@{/products}">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label small text-muted">關鍵字(內部料號 / 客戶料號 / 名稱)</label>
+                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="輸入料號或名稱">
+            </div>
+            <div class="col-md-3">
+                <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" name="activeOnly" value="true"
+                           id="activeOnly" th:checked="${activeOnly}">
+                    <label class="form-check-label" for="activeOnly">只顯示啟用中</label>
+                </div>
+            </div>
+            <div class="col-md-3 text-end">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> 搜尋</button>
+                <a class="btn btn-outline-secondary" th:href="@{/products}">清除</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>內部料號</th><th>客戶料號</th><th>名稱</th><th>規格</th>
+                    <th>材質</th><th>單位</th><th class="text-end amount">預設單價</th>
+                    <th>狀態</th><th class="text-end">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${products}">
+                    <td class="fw-semibold" th:text="${p.internalPartNumber}"></td>
+                    <td th:text="${p.customerPartNumber}"></td>
+                    <td th:text="${p.name}"></td>
+                    <td th:text="${p.specification}"></td>
+                    <td th:text="${p.material}"></td>
+                    <td th:text="${p.unit}"></td>
+                    <td class="text-end amount"
+                        th:text="${p.defaultUnitPrice != null ? #numbers.formatDecimal(p.defaultUnitPrice,1,'COMMA',2,'POINT') : '0.00'}"></td>
+                    <td>
+                        <span th:if="${p.active}" class="badge text-bg-success">啟用</span>
+                        <span th:unless="${p.active}" class="badge text-bg-secondary">停用</span>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/products/{id}/edit(id=${p.id})}">
+                            <i class="bi bi-pencil"></i></a>
+                        <form th:if="${p.active}" method="post" class="d-inline confirm-action"
+                              data-confirm-message="確定要停用此零件嗎?"
+                              th:action="@{/products/{id}/deactivate(id=${p.id})}">
+                            <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-slash-circle"></i></button>
+                        </form>
+                        <form th:unless="${p.active}" method="post" class="d-inline"
+                              th:action="@{/products/{id}/activate(id=${p.id})}">
+                            <button class="btn btn-sm btn-outline-success" type="submit"><i class="bi bi-check-circle"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(products)}">
+                    <td colspan="9" class="text-center text-muted py-4">查無零件資料</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="text-muted small mt-2">共 <span th:text="${#lists.size(products)}">0</span> 筆</p>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
