@@ -79,6 +79,7 @@ public class SettingsController {
         s.setDefaultPaymentTerms(form.getDefaultPaymentTerms());
         s.setDefaultDeliveryTerms(form.getDefaultDeliveryTerms());
         s.setContactReminderDays(form.getContactReminderDays());
+        s.setQuotationFollowupDays(form.getQuotationFollowupDays());
 
         // 處理 Logo 上傳
         if (logoFile != null && !logoFile.isEmpty()) {
@@ -146,6 +147,7 @@ public class SettingsController {
         f.setDefaultPaymentTerms(s.getDefaultPaymentTerms());
         f.setDefaultDeliveryTerms(s.getDefaultDeliveryTerms());
         f.setContactReminderDays(s.getContactReminderDays());
+        f.setQuotationFollowupDays(s.getQuotationFollowupDays());
         return f;
     }
 }

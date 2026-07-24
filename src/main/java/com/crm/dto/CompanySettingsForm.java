@@ -35,6 +35,9 @@ public class CompanySettingsForm {
     @Min(value = 1, message = "提醒天數至少為 1")
     private Integer contactReminderDays = 30;
 
+    @Min(value = 1, message = "報價跟進天數至少為 1")
+    private Integer quotationFollowupDays = 14;
+
     // ===== Getter / Setter =====
     public String getCompanyName() { return companyName; }
     public void setCompanyName(String companyName) { this.companyName = companyName; }
@@ -71,4 +74,7 @@ public class CompanySettingsForm {
 
     public Integer getContactReminderDays() { return contactReminderDays; }
     public void setContactReminderDays(Integer contactReminderDays) { this.contactReminderDays = contactReminderDays; }
+
+    public Integer getQuotationFollowupDays() { return quotationFollowupDays; }
+    public void setQuotationFollowupDays(Integer quotationFollowupDays) { this.quotationFollowupDays = quotationFollowupDays; }
 }

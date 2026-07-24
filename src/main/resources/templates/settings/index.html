@@ -77,6 +77,12 @@
                                    th:classappend="${#fields.hasErrors('contactReminderDays')}?'is-invalid'">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('contactReminderDays')}" th:errors="*{contactReminderDays}"></div>
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label">報價跟進提醒(天)</label>
+                            <input type="number" min="1" class="form-control" th:field="*{quotationFollowupDays}"
+                                   th:classappend="${#fields.hasErrors('quotationFollowupDays')}?'is-invalid'">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('quotationFollowupDays')}" th:errors="*{quotationFollowupDays}"></div>
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label">預設付款條件</label>
                             <input class="form-control" th:field="*{defaultPaymentTerms}">

@@ -51,9 +51,13 @@ public class CompanySettings {
     @Column(name = "default_delivery_terms", length = 200)
     private String defaultDeliveryTerms;
 
-    /** 客戶關懷提醒天數:超過此天數未聯絡的客戶會出現在首頁提醒 */
+    /** 客戶關懷提醒天數:超過此天數未聯絡的客戶會出現在提醒 */
     @Column(name = "contact_reminder_days")
     private Integer contactReminderDays = 30;
+
+    /** 報價跟進提醒天數:報價後超過此天數仍未成交的報價單會出現在通知 */
+    @Column(name = "quotation_followup_days")
+    private Integer quotationFollowupDays = 14;
 
     // ===== Getter / Setter =====
     public Long getId() { return id; }
@@ -97,4 +101,7 @@ public class CompanySettings {
 
     public Integer getContactReminderDays() { return contactReminderDays; }
     public void setContactReminderDays(Integer contactReminderDays) { this.contactReminderDays = contactReminderDays; }
+
+    public Integer getQuotationFollowupDays() { return quotationFollowupDays; }
+    public void setQuotationFollowupDays(Integer quotationFollowupDays) { this.quotationFollowupDays = quotationFollowupDays; }
 }

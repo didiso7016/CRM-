@@ -27,10 +27,10 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM ---- 2. Prepare dist folder ----
+REM ---- 2. Prepare dist folder (keep data/backup/uploads so user data is NOT wiped) ----
 echo [2/4] Preparing dist folder...
-if exist dist rmdir /s /q dist
-mkdir dist
+if not exist dist mkdir dist
+if exist "dist\crm.jar" del /q "dist\crm.jar"
 for %%f in (target\crm-*.jar) do copy /y "%%f" "dist\crm.jar" >nul
 
 REM ---- 3. jlink slim JRE ----

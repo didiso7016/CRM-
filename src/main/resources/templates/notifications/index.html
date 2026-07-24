@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('通知')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <h4 class="mb-3"><i class="bi bi-bell"></i> 通知中心</h4>
+
+    <div class="row g-3">
+        <!-- 左:需要跟進的提醒 -->
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-exclamation-circle text-danger"></i> 需要跟進</span>
+                    <span class="badge text-bg-danger" th:text="${#lists.size(items)} + ' 則'">0 則</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"
+                        th:each="n : ${items}">
+                        <span>
+                            <i class="bi bi-person-badge text-primary" th:if="${n.kind == 'CUSTOMER'}"></i>
+                            <i class="bi bi-file-earmark-text text-warning" th:if="${n.kind == 'QUOTATION'}"></i>
+                            <a th:href="@{${n.linkUrl}}" class="text-decoration-none" th:text="${n.message}">提醒訊息</a>
+                        </span>
+                        <span>
+                            <!-- 客戶類提醒:可直接記錄通知 -->
+                            <button th:if="${n.customerId != null}" type="button"
+                                    class="btn btn-sm btn-outline-success"
+                                    th:attr="data-customer-id=${n.customerId}"
+                                    onclick="fillLogCustomer(this)">
+                                <i class="bi bi-check2"></i> 記錄通知
+                            </button>
+                        </span>
+                    </li>
+                    <li class="list-group-item text-center text-muted py-4" th:if="${#lists.isEmpty(items)}">
+                        <i class="bi bi-check2-circle text-success"></i> 目前沒有需要跟進的項目
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 最近的聯絡紀錄 -->
+            <div class="card mt-3">
+                <div class="card-header"><i class="bi bi-journal-text"></i> 最近的聯絡紀錄</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:each="log : ${recentLogs}">
+                        <span class="text-muted small" th:text="${#temporals.format(log.logDate,'yyyy-MM-dd')}">2026-07-23</span>
+                        已以 <span class="badge text-bg-light border" th:text="${log.type.label}">Email</span>
+                        通知 <a th:href="@{/customers/{id}(id=${log.customer.id})}"
+                                th:text="${log.customer.companyName}">Airspec</a>
+                        <span th:if="${log.note}" class="text-muted" th:text="'— ' + ${log.note}"></span>
+                    </li>
+                    <li class="list-group-item text-center text-muted py-3" th:if="${#lists.isEmpty(recentLogs)}">
+                        尚無聯絡紀錄
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 右:記錄一筆通知 -->
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header"><i class="bi bi-pencil-square"></i> 記錄通知 / 聯絡</div>
+                <div class="card-body">
+                    <p class="text-muted small">例如:今天發信給客戶,填好按「記錄」,系統會記下並清除該客戶的未聯絡提醒。</p>
+                    <form method="post" th:action="@{/notifications/log}" th:object="${logForm}">
+                        <div class="mb-2">
+                            <label class="form-label required">客戶</label>
+                            <select class="form-select" th:field="*{customerId}" id="logCustomer"
+                                    th:classappend="${#fields.hasErrors('customerId')}?'is-invalid'">
+                                <option value="">請選擇客戶</option>
+                                <option th:each="c : ${activeCustomers}" th:value="${c.id}" th:text="${c.companyName}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6 mb-2">
+                                <label class="form-label required">日期</label>
+                                <input type="date" class="form-control" th:field="*{logDate}"
+                                       th:classappend="${#fields.hasErrors('logDate')}?'is-invalid'">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('logDate')}" th:errors="*{logDate}"></div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label class="form-label">方式</label>
+                                <select class="form-select" th:field="*{type}">
+                                    <option th:each="t : ${contactTypes}" th:value="${t}" th:text="${t.label}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">內容摘要</label>
+                            <input class="form-control" th:field="*{note}" placeholder="例:已寄報價單 QT-202607-0001">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-lg"></i> 記錄
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // 點「記錄通知」時,把客戶帶入右側表單並捲動過去
+    function fillLogCustomer(btn) {
+        const id = btn.getAttribute('data-customer-id');
+        const sel = document.getElementById('logCustomer');
+        if (sel) {
+            sel.value = id;
+            sel.scrollIntoView({behavior: 'smooth', block: 'center'});
+            sel.focus();
+        }
+    }
+</script>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

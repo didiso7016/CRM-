@@ -57,6 +57,19 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
                                      @Param("statuses") List<QuotationStatus> statuses);
 
     /**
+     * 尚在進行中(狀態屬 statuses)且報價日期早於 cutoff 的報價單,
+     * 用於「報價後已 N 天未成交」通知。
+     */
+    @EntityGraph(attributePaths = {"customer"})
+    @Query("""
+            select q from Quotation q
+            where q.status in :statuses and q.quotationDate <= :cutoff
+            order by q.quotationDate asc
+            """)
+    List<Quotation> findOpenBefore(@Param("statuses") List<QuotationStatus> statuses,
+                                   @Param("cutoff") LocalDate cutoff);
+
+    /**
      * 報價單搜尋:可依客戶、單號、狀態、日期區間篩選。條件為 null 時忽略。
      */
     @EntityGraph(attributePaths = {"customer"})

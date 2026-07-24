@@ -3,6 +3,7 @@ package com.crm.controller;
 import com.crm.dto.CustomerForm;
 import com.crm.entity.Customer;
 import com.crm.enums.CustomerType;
+import com.crm.service.ContactLogService;
 import com.crm.service.ContactService;
 import com.crm.service.CustomerService;
 import com.crm.service.QuotationService;
@@ -23,12 +24,14 @@ public class CustomerController {
     private final CustomerService customerService;
     private final ContactService contactService;
     private final QuotationService quotationService;
+    private final ContactLogService contactLogService;
 
     public CustomerController(CustomerService customerService, ContactService contactService,
-                             QuotationService quotationService) {
+                             QuotationService quotationService, ContactLogService contactLogService) {
         this.customerService = customerService;
         this.contactService = contactService;
         this.quotationService = quotationService;
+        this.contactLogService = contactLogService;
     }
 
     /** 客戶列表 + 搜尋 */
@@ -79,6 +82,7 @@ public class CustomerController {
         model.addAttribute("customer", customerService.getById(id));
         model.addAttribute("contacts", contactService.listByCustomer(id));
         model.addAttribute("quotationHistory", quotationService.historyByCustomer(id));
+        model.addAttribute("contactLogs", contactLogService.listByCustomer(id));
         return "customers/detail";
     }
 

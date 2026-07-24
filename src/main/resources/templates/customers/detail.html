@@ -133,14 +133,33 @@
                 </div>
             </div>
 
-            <!-- 歷史報價單:第四階段接上 -->
-            <div class="card">
+            <!-- 歷史報價單 -->
+            <div class="card mb-3">
                 <div class="card-header"><i class="bi bi-file-earmark-text"></i> 歷史報價單</div>
                 <div class="card-body">
                     <div th:replace="~{customers/quotation-history :: history}">
-                        <p class="text-muted mb-0">報價功能將於第四階段提供。</p>
+                        <p class="text-muted mb-0">尚無報價紀錄。</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- 聯絡 / 通知紀錄 -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-journal-text"></i> 聯絡 / 通知紀錄</span>
+                    <a class="btn btn-sm btn-success" th:href="@{/notifications(customerId=${customer.id})}">
+                        <i class="bi bi-plus-lg"></i> 記錄通知</a>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item" th:each="log : ${contactLogs}">
+                        <span class="text-muted small" th:text="${#temporals.format(log.logDate,'yyyy-MM-dd')}">2026-07-23</span>
+                        <span class="badge text-bg-light border" th:text="${log.type.label}">Email</span>
+                        <span th:if="${log.note}" th:text="${log.note}"></span>
+                    </li>
+                    <li class="list-group-item text-center text-muted py-3" th:if="${#lists.isEmpty(contactLogs)}">
+                        尚無聯絡紀錄
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
