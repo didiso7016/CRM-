@@ -23,7 +23,9 @@
                 <td>Ver.<span th:text="${q.version}">1</span></td>
                 <td th:text="${#temporals.format(q.quotationDate,'yyyy-MM-dd')}">2026-07-01</td>
                 <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
-                <td class="text-end amount" th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</td>
+                <td class="text-end amount text-nowrap">
+                    <span class="text-muted small me-1" th:text="${q.currency}">USD</span><span
+                        th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</span></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-secondary" th:href="@{/quotations/{id}(id=${q.id})}">
                         <i data-lucide="eye"></i></a>

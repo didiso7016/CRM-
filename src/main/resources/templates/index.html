@@ -58,13 +58,14 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <span><i data-lucide="bar-chart-3"></i> 成交金額
-                <span class="text-muted fw-normal" style="font-size:.75rem">(付清尾款)</span></span>
+                <span class="text-muted fw-normal" style="font-size:.75rem">(付清尾款・僅計美金報價)</span></span>
             <span class="text-muted small">本年度合計
-                <span class="fw-bold fs-5 ms-1" style="color:var(--green-ink);font-family:var(--mono)"
-                      th:text="${#numbers.formatDecimal(stats.yearlyRevenue,1,'COMMA',0,'POINT')}">0</span></span>
+                <span class="fw-bold fs-5 ms-1" style="color:var(--green-ink);font-family:var(--mono)">
+                    <span style="font-size:.7em" class="text-muted">USD</span>
+                    <span th:text="${#numbers.formatDecimal(stats.yearlyRevenue,1,'COMMA',0,'POINT')}">0</span></span></span>
         </div>
         <div class="card-body">
-            <div class="text-muted small mb-2">近 6 個月每月成交金額</div>
+            <div class="text-muted small mb-2">近 6 個月每月成交金額(USD)</div>
             <div class="bar-chart">
                 <div class="bar-col" th:each="b : ${stats.monthlyRevenue}">
                     <div class="bar-track">
@@ -128,8 +129,9 @@
                                    th:text="${q.customer.companyName}">公司</a></td>
                             <td><a th:href="@{/quotations/{id}(id=${q.id})}"
                                    th:text="${q.quotationNumber}">QT-</a></td>
-                            <td class="text-end amount"
-                                th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</td>
+                            <td class="text-end amount text-nowrap">
+                                <span class="text-muted small me-1" th:text="${q.currency}">USD</span><span
+                                    th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</span></td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(stats.depositQuotations)}">
                             <td colspan="3" class="text-center text-muted py-3">目前沒有收訂中的訂單</td>

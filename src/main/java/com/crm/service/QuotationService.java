@@ -55,10 +55,14 @@ public class QuotationService {
     }
 
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<Quotation> search(Long customerId, String number, QuotationStatus status,
-                                  LocalDate from, LocalDate to, org.springframework.data.domain.Pageable pageable) {
+    public org.springframework.data.domain.Page<Quotation> search(Long customerId, String number, String keyword,
+                                  QuotationStatus status, LocalDate from, LocalDate to,
+                                  java.math.BigDecimal minAmount, java.math.BigDecimal maxAmount,
+                                  org.springframework.data.domain.Pageable pageable) {
         return quotationRepository.search(customerId,
-                number == null ? "" : number.trim(), status, from, to, pageable);
+                number == null ? "" : number.trim(),
+                keyword == null ? "" : keyword.trim(),
+                status, from, to, minAmount, maxAmount, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -98,9 +102,13 @@ public class QuotationService {
         for (QuotationItemForm item : validItems) {
             if (item.getQuantity() == null || item.getQuantity().signum() <= 0) {
                 errors.add("第 " + row + " 列:數量必須大於 0");
+            } else if (item.getQuantity().remainder(BigDecimal.ONE).signum() != 0) {
+                errors.add("第 " + row + " 列:數量必須是整數(不可有小數)");
             }
             if (item.getUnitPrice() != null && item.getUnitPrice().signum() < 0) {
                 errors.add("第 " + row + " 列:單價不得小於 0");
+            } else if (item.getUnitPrice() != null && item.getUnitPrice().stripTrailingZeros().scale() > 1) {
+                errors.add("第 " + row + " 列:單價最多只能到小數點後 1 位");
             }
             BigDecimal disc = item.getDiscountRate();
             if (disc != null && (disc.compareTo(BigDecimal.ZERO) < 0 || disc.compareTo(new BigDecimal("100")) > 0)) {

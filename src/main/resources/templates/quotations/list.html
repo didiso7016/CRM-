@@ -11,9 +11,14 @@
         <a class="btn btn-primary" th:href="@{/quotations/new}"><i data-lucide="plus"></i> 新增報價單</a>
     </div>
 
-    <!-- 搜尋列:客戶 / 單號 / 狀態 / 日期區間 -->
+    <!-- 搜尋列:關鍵字 / 客戶 / 單號 / 狀態 / 日期區間 / 金額區間 -->
     <form class="card card-body mb-3" method="get" th:action="@{/quotations}">
         <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small text-muted">關鍵字</label>
+                <input type="text" class="form-control" name="keyword" th:value="${fKeyword}"
+                       placeholder="客戶名稱/編號、料號、品名">
+            </div>
             <div class="col-md-3">
                 <label class="form-label small text-muted">客戶</label>
                 <select class="form-select" name="customerId">
@@ -22,7 +27,7 @@
                             th:selected="${fCustomerId != null and fCustomerId == c.id}"></option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label small text-muted">報價單號</label>
                 <input type="text" class="form-control" name="number" th:value="${fNumber}" placeholder="QT-...">
             </div>
@@ -42,8 +47,17 @@
                 <label class="form-label small text-muted">結束日期</label>
                 <input type="date" class="form-control" name="to" th:value="${fTo}">
             </div>
-            <div class="col-md-1 text-end">
-                <button class="btn btn-outline-primary w-100" type="submit"><i data-lucide="search"></i></button>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">金額(含稅)從</label>
+                <input type="number" step="0.01" min="0" class="form-control" name="minAmount" th:value="${fMinAmount}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">到</label>
+                <input type="number" step="0.01" min="0" class="form-control" name="maxAmount" th:value="${fMaxAmount}">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-primary w-100" type="submit"><i data-lucide="search"></i> 搜尋</button>
+                <a class="btn btn-outline-secondary" th:href="@{/quotations}" title="清除條件"><i data-lucide="x"></i></a>
             </div>
         </div>
     </form>
@@ -68,8 +82,9 @@
                     <td th:text="${#temporals.format(q.quotationDate,'yyyy-MM-dd')}"></td>
                     <td th:text="${q.validUntil != null ? #temporals.format(q.validUntil,'yyyy-MM-dd') : '—'}"></td>
                     <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
-                    <td class="text-end amount"
-                        th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</td>
+                    <td class="text-end amount text-nowrap">
+                        <span class="text-muted small me-1" th:text="${q.currency}">USD</span><span
+                            th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</span></td>
                     <td class="text-end text-nowrap">
                         <a class="btn btn-sm btn-outline-secondary" th:href="@{/quotations/{id}(id=${q.id})}">
                             <i data-lucide="eye"></i></a>
@@ -91,9 +106,12 @@
         <form method="get" th:action="@{/quotations}" class="d-flex align-items-center gap-2">
             <input type="hidden" name="customerId" th:if="${fCustomerId != null}" th:value="${fCustomerId}">
             <input type="hidden" name="number" th:value="${fNumber}">
+            <input type="hidden" name="keyword" th:value="${fKeyword}">
             <input type="hidden" name="status" th:if="${fStatus != null}" th:value="${fStatus}">
             <input type="hidden" name="from" th:if="${fFrom != null}" th:value="${fFrom}">
             <input type="hidden" name="to" th:if="${fTo != null}" th:value="${fTo}">
+            <input type="hidden" name="minAmount" th:if="${fMinAmount != null}" th:value="${fMinAmount}">
+            <input type="hidden" name="maxAmount" th:if="${fMaxAmount != null}" th:value="${fMaxAmount}">
             <span class="text-muted small">共 <span th:text="${page.totalElements}">0</span> 筆</span>
             <label class="text-muted small mb-0">每頁</label>
             <select class="form-select form-select-sm" style="width:auto" name="size" onchange="this.form.submit()">
@@ -104,12 +122,12 @@
         </form>
         <ul class="pagination pagination-sm mb-0" th:if="${page.totalPages > 1}">
             <li class="page-item" th:classappend="${page.first}?'disabled'">
-                <a class="page-link" th:href="@{/quotations(page=${page.number-1},size=${pageSize},customerId=${fCustomerId},number=${fNumber},status=${fStatus},from=${fFrom},to=${fTo})}">上一頁</a>
+                <a class="page-link" th:href="@{/quotations(page=${page.number-1},size=${pageSize},customerId=${fCustomerId},number=${fNumber},keyword=${fKeyword},status=${fStatus},from=${fFrom},to=${fTo},minAmount=${fMinAmount},maxAmount=${fMaxAmount})}">上一頁</a>
             </li>
             <li class="page-item disabled"><span class="page-link"
                 th:text="'第 ' + (${page.number+1}) + ' / ' + ${page.totalPages} + ' 頁'">第 1 頁</span></li>
             <li class="page-item" th:classappend="${page.last}?'disabled'">
-                <a class="page-link" th:href="@{/quotations(page=${page.number+1},size=${pageSize},customerId=${fCustomerId},number=${fNumber},status=${fStatus},from=${fFrom},to=${fTo})}">下一頁</a>
+                <a class="page-link" th:href="@{/quotations(page=${page.number+1},size=${pageSize},customerId=${fCustomerId},number=${fNumber},keyword=${fKeyword},status=${fStatus},from=${fFrom},to=${fTo},minAmount=${fMinAmount},maxAmount=${fMaxAmount})}">下一頁</a>
             </li>
         </ul>
     </nav>

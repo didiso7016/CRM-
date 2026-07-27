@@ -74,8 +74,11 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th><th>料號</th><th>品名 / 規格</th><th class="text-end">數量</th>
-                            <th>單位</th><th class="text-end amount">單價</th><th class="text-end">折扣%</th>
-                            <th class="text-end amount">金額</th><th>交期</th>
+                            <th>單位</th>
+                            <th class="text-end amount">單價 <span class="fw-normal text-muted" th:text="'(' + ${quotation.currency} + ')'">(USD)</span></th>
+                            <th class="text-end">折扣%</th>
+                            <th class="text-end amount">金額 <span class="fw-normal text-muted" th:text="'(' + ${quotation.currency} + ')'">(USD)</span></th>
+                            <th>交期</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -109,7 +112,8 @@
         <!-- 側欄:金額 + 狀態 -->
         <div class="col-lg-4">
             <div class="card mb-3">
-                <div class="card-header"><i data-lucide="calculator"></i> 金額</div>
+                <div class="card-header"><i data-lucide="calculator"></i> 金額
+                    <span class="fw-normal text-muted small" th:text="'(' + ${quotation.currency} + ')'">(USD)</span></div>
                 <div class="card-body">
                     <table class="table table-sm mb-0">
                         <tr><th class="text-muted">未稅小計</th>
@@ -123,7 +127,9 @@
                         <tr><th class="text-muted">稅額</th>
                             <td class="text-end amount" th:text="${#numbers.formatDecimal(quotation.taxAmount,1,'COMMA',2,'POINT')}"></td></tr>
                         <tr class="table-primary"><th>含稅總計</th>
-                            <td class="text-end amount fw-bold fs-5" th:text="${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></td></tr>
+                            <td class="text-end amount fw-bold fs-5">
+                                <span class="text-muted small me-1" th:text="${quotation.currency}">USD</span>
+                                <span th:text="${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></span></td></tr>
                     </table>
                 </div>
             </div>

@@ -60,7 +60,10 @@ public class DashboardService {
         d.setReminderDays(reminderDays);
 
         // ===== 成交金額(基準 = 付清尾款)=====
-        List<Quotation> paid = quotationService.paidQuotations();
+        // 幣別統一:各報價幣別不同,直接相加會失真;此處只統計 USD 報價,以美金呈現。
+        List<Quotation> paid = quotationService.paidQuotations().stream()
+                .filter(q -> "USD".equalsIgnoreCase(q.getCurrency()))
+                .toList();
         d.setMonthlyRevenue(buildMonthlyRevenue(paid));
         d.setYearlyRevenue(buildYearlyRevenue(paid));
         // 收訂中的公司(已收訂,尚未付清尾款)

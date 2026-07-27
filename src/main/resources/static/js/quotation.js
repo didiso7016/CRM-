@@ -6,6 +6,13 @@
     const units = data.units || [];
     const customerDefaults = data.customerDefaults || [];
 
+    // 金額試算區顯示目前幣別
+    const currencyEl = document.getElementById('currency');
+    const totalsCurrencyEl = document.getElementById('totalsCurrency');
+    function syncTotalsCurrency() {
+        if (totalsCurrencyEl && currencyEl) totalsCurrencyEl.textContent = currencyEl.value || '—';
+    }
+
     let rowIndex = 0; // 持續遞增的索引,刪除列後不重用(後端會忽略空列)
 
     const body = document.getElementById('itemsBody');
@@ -65,9 +72,9 @@
             </div>
             <hr class="qitem-divider">
             <div class="row g-2 align-items-end">
-                <div class="col-md-2 col-6"><label class="form-label">數量</label><input type="number" step="0.0001" min="0" class="form-control form-control-sm text-end qty" name="items[${i}].quantity"></div>
+                <div class="col-md-2 col-6"><label class="form-label">數量</label><input type="number" step="1" min="0" class="form-control form-control-sm text-end qty" name="items[${i}].quantity"></div>
                 <div class="col-md-2 col-6"><label class="form-label">單位</label><input class="form-control form-control-sm" list="${unitDatalistId}" name="items[${i}].unit"></div>
-                <div class="col-md-2 col-6"><label class="form-label">單價</label><input type="number" step="0.0001" min="0" class="form-control form-control-sm text-end price" name="items[${i}].unitPrice"></div>
+                <div class="col-md-2 col-6"><label class="form-label">單價</label><input type="number" step="0.1" min="0" class="form-control form-control-sm text-end price" name="items[${i}].unitPrice"></div>
                 <div class="col-md-2 col-6"><label class="form-label">折扣 %</label><input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-end disc" name="items[${i}].discountRate"></div>
                 <div class="col-md-4 col-12"><label class="form-label">金額</label><div class="qitem-amount amount-cell">0.00</div></div>
             </div>
@@ -130,9 +137,22 @@
             recalcTotals();
         });
 
-        // 事件:數量/單價/折扣變更 → 重算
+        // 數量只能整數:擋掉小數點/科學記號等輸入
+        tr.querySelector('.qty').addEventListener('keydown', function (e) {
+            if (['.', ',', 'e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
+        });
+
+        // 事件:數量/單價/折扣變更 → 即時修正格式 + 重算
         tr.querySelectorAll('.qty, .price, .disc').forEach(inp => {
             inp.addEventListener('input', function () {
+                if (this.classList.contains('qty') && this.value.indexOf('.') !== -1) {
+                    // 數量:去掉小數(整數)
+                    this.value = this.value.split('.')[0];
+                } else if (this.classList.contains('price')) {
+                    // 單價:最多保留 1 位小數
+                    const p = this.value.split('.');
+                    if (p[1] && p[1].length > 1) this.value = p[0] + '.' + p[1].slice(0, 1);
+                }
                 recalcRow(tr);
                 recalcTotals();
             });
@@ -201,6 +221,7 @@
         setFieldIfValue('currency', d.currency);
         setFieldIfValue('deliveryTerms', d.deliveryTerms);
         setFieldIfValue('paymentTerms', d.paymentTerms);
+        syncTotalsCurrency();
     }
 
     // 設定欄位值;若為 <select> 且值不在選項中,先補一個 option 再選取
@@ -244,6 +265,10 @@
     document.getElementById('addRowBtn').addEventListener('click', function () {
         addRow(null);
     });
+
+    // 幣別:金額試算區同步顯示
+    if (currencyEl) currencyEl.addEventListener('change', syncTotalsCurrency);
+    syncTotalsCurrency();
 
     ['overallDiscount', 'freight', 'otherFee', 'taxRate'].forEach(id => {
         const el = document.getElementById(id);

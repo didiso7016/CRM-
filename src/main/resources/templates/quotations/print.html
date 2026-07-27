@@ -168,8 +168,7 @@
                 <span class="num" th:text="${#numbers.formatDecimal(quotation.subtotal,1,'COMMA',2,'POINT')}"></span></td>
             <td style="width:34%"><span class="lbl">TAX</span> :&nbsp;
                 <span class="num" th:text="${quotation.taxAmount != null and quotation.taxAmount.signum() > 0 ? #numbers.formatDecimal(quotation.taxAmount,1,'COMMA',2,'POINT') : ''}"></span></td>
-            <td><span class="lbl">TOTAL AMOUNT</span> :&nbsp;
-                <span class="num" th:text="${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+            <td><span class="lbl">TOTAL AMOUNT</span> :&nbsp;<span class="num" th:text="${quotation.currency}"></span>&nbsp;<span class="num" th:text="${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
         </tr>
     </table>
 

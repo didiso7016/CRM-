@@ -65,14 +65,17 @@ public class QuotationController {
     @GetMapping
     public String list(@RequestParam(required = false) Long customerId,
                        @RequestParam(required = false) String number,
+                       @RequestParam(required = false) String keyword,
                        @RequestParam(required = false) QuotationStatus status,
                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+                       @RequestParam(required = false) java.math.BigDecimal minAmount,
+                       @RequestParam(required = false) java.math.BigDecimal maxAmount,
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "20") int size,
                        Model model) {
         model.addAttribute("activeMenu", "quotations");
-        var result = quotationService.search(customerId, number, status, from, to,
+        var result = quotationService.search(customerId, number, keyword, status, from, to, minAmount, maxAmount,
                 org.springframework.data.domain.PageRequest.of(page, size));
         model.addAttribute("quotations", result.getContent());
         model.addAttribute("page", result);
@@ -82,9 +85,12 @@ public class QuotationController {
         // 回填搜尋條件
         model.addAttribute("fCustomerId", customerId);
         model.addAttribute("fNumber", number);
+        model.addAttribute("fKeyword", keyword);
         model.addAttribute("fStatus", status);
         model.addAttribute("fFrom", from);
         model.addAttribute("fTo", to);
+        model.addAttribute("fMinAmount", minAmount);
+        model.addAttribute("fMaxAmount", maxAmount);
         return "quotations/list";
     }
 

@@ -25,7 +25,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<String> findCodesByPrefix(@Param("prefix") String prefix);
 
     /**
-     * 綜合搜尋:可依公司名稱、客戶編號或聯絡人姓名模糊比對。
+     * 綜合搜尋:關鍵字可比對 公司名稱 / 客戶編號 / 公司 Email / 備註 / 聯絡人姓名。
      * onlyActive 為 true 時只回傳啟用中的客戶。
      */
     @Query(value = """
@@ -34,6 +34,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             where (:keyword is null or :keyword = ''
                    or lower(c.companyName) like lower(concat('%', :keyword, '%'))
                    or lower(c.customerCode) like lower(concat('%', :keyword, '%'))
+                   or lower(c.email) like lower(concat('%', :keyword, '%'))
+                   or lower(c.notes) like lower(concat('%', :keyword, '%'))
                    or lower(ct.name) like lower(concat('%', :keyword, '%')))
               and (:onlyActive = false or c.active = true)
             order by c.updatedAt desc
@@ -44,6 +46,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             where (:keyword is null or :keyword = ''
                    or lower(c.companyName) like lower(concat('%', :keyword, '%'))
                    or lower(c.customerCode) like lower(concat('%', :keyword, '%'))
+                   or lower(c.email) like lower(concat('%', :keyword, '%'))
+                   or lower(c.notes) like lower(concat('%', :keyword, '%'))
                    or lower(ct.name) like lower(concat('%', :keyword, '%')))
               and (:onlyActive = false or c.active = true)
             """)

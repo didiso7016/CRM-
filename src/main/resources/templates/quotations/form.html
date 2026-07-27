@@ -85,7 +85,8 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">預計交期</label>
-                    <input type="text" class="form-control" th:field="*{estimatedDelivery}" placeholder="例:訂單後 30 天">
+                    <input type="text" class="form-control" th:field="*{estimatedDelivery}" placeholder="例:收到訂金後 30 天">
+                    <div class="form-text">交期自「收到訂金日」起算</div>
                 </div>
             </div>
         </div>
@@ -117,6 +118,10 @@
             </div>
             <div class="col-md-5">
                 <div class="card card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold">金額試算</span>
+                        <span class="badge text-bg-light border">幣別:<span id="totalsCurrency">—</span></span>
+                    </div>
                     <table class="table table-sm mb-0">
                         <tr>
                             <th class="text-muted">未稅小計</th>
