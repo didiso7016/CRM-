@@ -4,6 +4,7 @@ import com.crm.dto.CompanySettingsForm;
 import com.crm.entity.CompanySettings;
 import com.crm.service.BackupService;
 import com.crm.service.CompanySettingsService;
+import com.crm.support.Currencies;
 import com.crm.support.DeliveryTerms;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,6 @@ import java.util.List;
 @Controller
 public class SettingsController {
 
-    private static final List<String> CURRENCY_OPTIONS = List.of("USD", "TWD", "CNY", "EUR", "JPY", "GBP");
     private final CompanySettingsService settingsService;
     private final BackupService backupService;
 
@@ -49,7 +49,7 @@ public class SettingsController {
             model.addAttribute("settingsForm", toForm(s));
         }
         model.addAttribute("currentLogo", s.getLogoPath());
-        model.addAttribute("currencyOptions", CURRENCY_OPTIONS);
+        model.addAttribute("currencyOptions", Currencies.OPTIONS);
         model.addAttribute("deliveryTermsOptions", DeliveryTerms.OPTIONS);
         addBackupInfo(model);
         return "settings/index";
@@ -64,7 +64,7 @@ public class SettingsController {
         if (result.hasErrors()) {
             model.addAttribute("activeMenu", "settings");
             model.addAttribute("currentLogo", settingsService.getOrCreate().getLogoPath());
-            model.addAttribute("currencyOptions", CURRENCY_OPTIONS);
+            model.addAttribute("currencyOptions", Currencies.OPTIONS);
         model.addAttribute("deliveryTermsOptions", DeliveryTerms.OPTIONS);
             addBackupInfo(model);
             return "settings/index";

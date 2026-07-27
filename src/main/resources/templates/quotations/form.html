@@ -98,31 +98,7 @@
                     <i data-lucide="plus"></i> 新增品項
                 </button>
             </div>
-            <div class="table-responsive mt-2">
-                <table class="table table-sm table-bordered align-middle" id="itemsTable" style="min-width: 1400px;">
-                    <thead class="table-light">
-                    <tr>
-                        <th style="width:40px;">#</th>
-                        <th style="width:150px;">帶入零件</th>
-                        <th style="width:110px;">內部料號</th>
-                        <th style="width:110px;">客戶料號</th>
-                        <th style="width:160px;">品名</th>
-                        <th style="width:120px;">規格</th>
-                        <th style="width:90px;">材質</th>
-                        <th style="width:90px;">表面處理</th>
-                        <th style="width:90px;">數量</th>
-                        <th style="width:80px;">單位</th>
-                        <th style="width:100px;">單價</th>
-                        <th style="width:80px;">折扣%</th>
-                        <th style="width:110px;">金額</th>
-                        <th style="width:100px;">交期</th>
-                        <th style="width:120px;">備註</th>
-                        <th style="width:50px;"></th>
-                    </tr>
-                    </thead>
-                    <tbody id="itemsBody"><!-- 由 quotation.js 動態產生 --></tbody>
-                </table>
-            </div>
+            <div class="mt-2" id="itemsBody"><!-- 由 quotation.js 動態產生品項卡片 --></div>
         </div>
 
         <!-- ===== 金額區 ===== -->
@@ -198,7 +174,9 @@
         products: /*[[${productOptions}]]*/ [],
         contacts: /*[[${contactOptions}]]*/ [],
         units:    /*[[${unitOptions}]]*/ [],
-        selectedContactId: /*[[${quotationForm.contactId}]]*/ null
+        customerDefaults: /*[[${customerDefaults}]]*/ [],
+        selectedContactId: /*[[${quotationForm.contactId}]]*/ null,
+        isEdit: /*[[${editId != null}]]*/ false
     };
 </script>
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>

@@ -1,6 +1,7 @@
 package com.crm.controller;
 
 import com.crm.dto.ContactOption;
+import com.crm.dto.CustomerDefaultsOption;
 import com.crm.dto.ProductOption;
 import com.crm.dto.QuotationForm;
 import com.crm.dto.QuotationItemForm;
@@ -16,6 +17,7 @@ import com.crm.repository.ProductRepository;
 import com.crm.service.CompanySettingsService;
 import com.crm.service.CustomerService;
 import com.crm.service.QuotationService;
+import com.crm.support.Currencies;
 import com.crm.support.DeliveryTerms;
 import com.crm.support.Units;
 import jakarta.validation.Valid;
@@ -36,7 +38,6 @@ import java.util.List;
 @RequestMapping("/quotations")
 public class QuotationController {
 
-    private static final List<String> CURRENCY_OPTIONS = List.of("USD", "TWD", "CNY", "EUR", "JPY", "GBP");
     private static final List<String> TAX_TYPE_OPTIONS = List.of("應稅", "免稅", "零稅率");
 
     private final QuotationService quotationService;
@@ -204,16 +205,21 @@ public class QuotationController {
     private void prepareFormModel(Model model, Long editId) {
         model.addAttribute("activeMenu", "quotations");
         model.addAttribute("editId", editId);
-        model.addAttribute("activeCustomers",
-                customerRepository.findAll().stream()
-                        .filter(Customer::isActive).toList());
+        List<Customer> active = customerRepository.findAll().stream()
+                .filter(Customer::isActive).toList();
+        model.addAttribute("activeCustomers", active);
+        // 選定客戶時,供 JS 自動帶入的交易預設值
+        model.addAttribute("customerDefaults", active.stream()
+                .map(c -> new CustomerDefaultsOption(c.getId(), c.getDefaultCurrency(),
+                        c.getDefaultPaymentTerms(), c.getDefaultDeliveryTerms()))
+                .toList());
         model.addAttribute("contactOptions", contactRepository.findAll().stream()
                 .map(c -> new ContactOption(c.getId(), c.getName(), c.getCustomer().getId(), c.isPrimaryContact()))
                 .toList());
         model.addAttribute("productOptions", productRepository.findByActiveTrueOrderByInternalPartNumberAsc().stream()
                 .map(this::toProductOption).toList());
         model.addAttribute("unitOptions", Units.OPTIONS);
-        model.addAttribute("currencyOptions", CURRENCY_OPTIONS);
+        model.addAttribute("currencyOptions", Currencies.OPTIONS);
         model.addAttribute("taxTypeOptions", TAX_TYPE_OPTIONS);
         model.addAttribute("deliveryTermsOptions", DeliveryTerms.OPTIONS);
     }

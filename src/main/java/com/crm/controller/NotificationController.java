@@ -3,6 +3,7 @@ package com.crm.controller;
 import com.crm.dto.ContactLogForm;
 import com.crm.entity.Customer;
 import com.crm.enums.ContactType;
+import com.crm.service.CompanySettingsService;
 import com.crm.service.ContactLogService;
 import com.crm.service.CustomerService;
 import com.crm.service.NotificationService;
@@ -26,13 +27,22 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final ContactLogService contactLogService;
     private final CustomerService customerService;
+    private final CompanySettingsService companySettingsService;
 
     public NotificationController(NotificationService notificationService,
                                  ContactLogService contactLogService,
-                                 CustomerService customerService) {
+                                 CustomerService customerService,
+                                 CompanySettingsService companySettingsService) {
         this.notificationService = notificationService;
         this.contactLogService = contactLogService;
         this.customerService = customerService;
+        this.companySettingsService = companySettingsService;
+    }
+
+    /** 目前設定的「客戶未聯絡」提醒天數(供畫面顯示「依預設(N 天)」) */
+    private int reminderDays() {
+        Integer d = companySettingsService.getOrCreate().getContactReminderDays();
+        return d == null ? 30 : d;
     }
 
     @GetMapping("/notifications")
@@ -42,6 +52,7 @@ public class NotificationController {
         model.addAttribute("recentLogs", contactLogService.recent());
         model.addAttribute("activeCustomers", customerService.listActiveForSelect());
         model.addAttribute("contactTypes", ContactType.values());
+        model.addAttribute("reminderDays", reminderDays());
         if (!model.containsAttribute("logForm")) {
             ContactLogForm form = new ContactLogForm();
             form.setCustomerId(customerId);
@@ -69,6 +80,7 @@ public class NotificationController {
             model.addAttribute("recentLogs", contactLogService.recent());
             model.addAttribute("activeCustomers", customerService.listActiveForSelect());
             model.addAttribute("contactTypes", ContactType.values());
+            model.addAttribute("reminderDays", reminderDays());
             return "notifications/index";
         }
         Customer c = contactLogService.record(form);

@@ -118,7 +118,7 @@
                         <div class="mb-3">
                             <label class="form-label">下次追蹤(到期會提醒你再追一次)</label>
                             <select class="form-select" th:field="*{nextFollowUp}">
-                                <option value="">依預設(超過設定天數才提醒)</option>
+                                <option value="" th:text="'依預設(超過 ' + ${reminderDays} + ' 天沒聯絡才提醒)'">依預設</option>
                                 <option value="3">3 天後</option>
                                 <option value="7">7 天後</option>
                                 <option value="14">14 天後</option>

@@ -20,10 +20,9 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">客戶編號</label>
-                    <input type="text" class="form-control bg-light" th:field="*{customerCode}" readonly
+                    <input type="text" class="form-control" th:field="*{customerCode}"
                            th:classappend="${#fields.hasErrors('customerCode')}?'is-invalid'">
-                    <div class="form-text"
-                         th:text="${editId != null} ? '系統編號,不可修改' : '系統自動產生,儲存後即固定'">系統自動產生</div>
+                    <div class="form-text">系統已自動產生,可自行修改;不可與其他客戶重複(留空則沿用系統編號)</div>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('customerCode')}"
                          th:errors="*{customerCode}"></div>
                 </div>
@@ -74,6 +73,38 @@
                 <div class="col-md-3">
                     <label class="form-label">城市</label>
                     <input type="text" class="form-control" th:field="*{city}" placeholder="例:Los Angeles">
+                </div>
+            </div>
+
+            <div class="form-section-title">交易預設</div>
+            <div class="text-muted small mb-2" style="margin-top:-.4rem">建立報價單選到此客戶時,可作為預設帶入(仍可於報價單上調整)</div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">預設幣別</label>
+                    <select class="form-select" th:field="*{defaultCurrency}">
+                        <option value="">(未指定)</option>
+                        <option th:each="c : ${currencyOptions}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">預設交貨條件</label>
+                    <select class="form-select" th:field="*{defaultDeliveryTerms}">
+                        <option value="">(未指定)</option>
+                        <option th:each="d : ${deliveryTermsOptions}" th:value="${d}" th:text="${d}"></option>
+                        <option th:if="${customerForm.defaultDeliveryTerms != null and !customerForm.defaultDeliveryTerms.isEmpty() and !#lists.contains(deliveryTermsOptions, customerForm.defaultDeliveryTerms)}"
+                                th:value="${customerForm.defaultDeliveryTerms}" th:text="${customerForm.defaultDeliveryTerms}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">預設付款條件</label>
+                    <input type="text" class="form-control" th:field="*{defaultPaymentTerms}"
+                           list="paymentList" placeholder="例:T/T 30% 訂金 70% 出貨前">
+                    <datalist id="paymentList">
+                        <option value="T/T in advance"></option>
+                        <option value="T/T 30% 訂金 70% 出貨前"></option>
+                        <option value="L/C at sight"></option>
+                        <option value="預付"></option>
+                    </datalist>
                 </div>
             </div>
 

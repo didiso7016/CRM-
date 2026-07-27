@@ -36,6 +36,10 @@ public class CustomerForm {
     private CustomerType customerType = CustomerType.GENERAL;
     private String industry;
     private String source;
+    /** 交易預設值(建報價時可帶入) */
+    private String defaultCurrency;
+    private String defaultPaymentTerms;
+    private String defaultDeliveryTerms;
     private String notes;
     private boolean active = true;
     /** 納入跟進提醒(預設不提醒) */
@@ -80,6 +84,15 @@ public class CustomerForm {
 
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
+
+    public String getDefaultCurrency() { return defaultCurrency; }
+    public void setDefaultCurrency(String defaultCurrency) { this.defaultCurrency = defaultCurrency; }
+
+    public String getDefaultPaymentTerms() { return defaultPaymentTerms; }
+    public void setDefaultPaymentTerms(String defaultPaymentTerms) { this.defaultPaymentTerms = defaultPaymentTerms; }
+
+    public String getDefaultDeliveryTerms() { return defaultDeliveryTerms; }
+    public void setDefaultDeliveryTerms(String defaultDeliveryTerms) { this.defaultDeliveryTerms = defaultDeliveryTerms; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

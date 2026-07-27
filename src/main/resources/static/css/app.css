@@ -158,6 +158,42 @@ main.container-fluid,main.container{max-width:1280px}
 .table>tbody>tr>td{border-color:var(--border);padding:.5rem .8rem;vertical-align:middle}
 .table-hover>tbody>tr:hover>*{background:var(--surface-2);color:var(--ink)}
 
+/* ---------- 報價品項卡片 ---------- */
+.qitem{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;
+  margin-bottom:12px;background:var(--surface)}
+.qitem-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.qitem-seq{background:var(--accent-ink);color:#fff;width:26px;height:26px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;flex-shrink:0}
+.qitem-title{font-weight:600;color:var(--ink)}
+.qitem-pick{margin-left:auto;display:flex;align-items:center;gap:8px}
+.qitem-pick .form-label{margin:0;white-space:nowrap}
+.qitem .form-label{font-size:.72rem;color:var(--muted);margin-bottom:2px;font-weight:600;letter-spacing:.02em}
+.qitem-divider{border:0;border-top:1px dashed var(--border);margin:10px 0;opacity:1}
+.qitem-amount{background:var(--green-weak);border:1px solid var(--border);color:var(--green-ink);
+  font-weight:700;text-align:right;font-variant-numeric:tabular-nums;border-radius:var(--radius-sm);
+  padding:.25rem .5rem;display:flex;align-items:center;justify-content:flex-end;min-height:31px}
+
+/* ---------- 設定頁:左側分類(Google 後台式)---------- */
+.settings-shell{display:grid;grid-template-columns:236px 1fr;gap:22px;align-items:start}
+.settings-side{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:8px;position:sticky;top:18px}
+.settings-side .side-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;color:var(--muted);
+  text-transform:uppercase;padding:10px 12px 6px}
+.settings-nav{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;
+  color:var(--text);cursor:pointer;font-weight:600;font-size:.92rem;border:0;background:transparent;
+  width:100%;text-align:left;font-family:inherit;margin-bottom:2px}
+.settings-nav:hover{background:var(--surface-2);color:var(--ink)}
+.settings-nav.active{background:var(--accent);color:#fff}
+.settings-nav svg{width:18px;height:18px;flex-shrink:0}
+.settings-nav small{display:block;font-weight:400;font-size:.72rem;color:var(--muted);margin-top:1px}
+.settings-nav.active small{color:rgba(255,255,255,.78)}
+.settings-panel{display:none}
+.settings-panel.show{display:block}
+.reminder-box{border:1px solid var(--border);border-radius:var(--radius-sm);padding:15px;background:var(--surface-2);height:100%}
+.reminder-box .rb-top{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.reminder-box .rb-desc{font-size:.78rem;color:var(--muted);margin-top:10px;line-height:1.5}
+@media(max-width:720px){.settings-shell{grid-template-columns:1fr}.settings-side{position:static}}
+
 /* ---------- 表單 ---------- */
 .form-label{font-weight:600;color:var(--ink);font-size:.9rem;margin-bottom:.3rem}
 .form-control,.form-select{background-color:var(--surface);color:var(--ink);

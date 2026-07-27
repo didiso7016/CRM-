@@ -3,11 +3,14 @@ package com.crm.controller;
 import com.crm.dto.CustomerForm;
 import com.crm.entity.Customer;
 import com.crm.enums.CustomerType;
+import com.crm.service.CompanySettingsService;
 import com.crm.service.ContactLogService;
 import com.crm.service.ContactService;
 import com.crm.service.CustomerNumberService;
 import com.crm.service.CustomerService;
 import com.crm.service.QuotationService;
+import com.crm.support.Currencies;
+import com.crm.support.DeliveryTerms;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,15 +30,18 @@ public class CustomerController {
     private final QuotationService quotationService;
     private final ContactLogService contactLogService;
     private final CustomerNumberService customerNumberService;
+    private final CompanySettingsService companySettingsService;
 
     public CustomerController(CustomerService customerService, ContactService contactService,
                              QuotationService quotationService, ContactLogService contactLogService,
-                             CustomerNumberService customerNumberService) {
+                             CustomerNumberService customerNumberService,
+                             CompanySettingsService companySettingsService) {
         this.customerService = customerService;
         this.contactService = contactService;
         this.quotationService = quotationService;
         this.contactLogService = contactLogService;
         this.customerNumberService = customerNumberService;
+        this.companySettingsService = companySettingsService;
     }
 
     /** 客戶列表 + 搜尋 + 分頁 */
@@ -67,6 +73,7 @@ public class CustomerController {
             model.addAttribute("customerForm", form);
         }
         model.addAttribute("customerTypes", CustomerType.values());
+        addTransactionOptions(model);
         return "customers/form";
     }
 
@@ -74,12 +81,15 @@ public class CustomerController {
     @PostMapping
     public String create(@Valid @ModelAttribute("customerForm") CustomerForm form,
                          BindingResult result, Model model, RedirectAttributes ra) {
-        // 客戶編號由系統自動產生,不需驗證重複
+        // 使用者可自行填寫編號;若有填且與他人重複則擋下(留空則由系統自動產生)
+        if (form.getCustomerCode() != null && !form.getCustomerCode().isBlank()
+                && customerService.isCodeDuplicate(form.getCustomerCode(), null)) {
+            result.rejectValue("customerCode", "duplicate", "客戶編號已存在,請改用其他編號");
+        }
         if (result.hasErrors()) {
             model.addAttribute("activeMenu", "customers");
             model.addAttribute("customerTypes", CustomerType.values());
-            // 重新產生預覽編號供畫面顯示
-            form.setCustomerCode(customerNumberService.generate());
+            addTransactionOptions(model);
             return "customers/form";
         }
         Customer saved = customerService.create(form);
@@ -95,6 +105,8 @@ public class CustomerController {
         model.addAttribute("contacts", contactService.listByCustomer(id));
         model.addAttribute("quotationHistory", quotationService.historyByCustomer(id));
         model.addAttribute("contactLogs", contactLogService.listByCustomer(id));
+        Integer rd = companySettingsService.getOrCreate().getContactReminderDays();
+        model.addAttribute("reminderDays", rd == null ? 30 : rd);
         return "customers/detail";
     }
 
@@ -107,6 +119,7 @@ public class CustomerController {
         }
         model.addAttribute("customerTypes", CustomerType.values());
         model.addAttribute("editId", id);
+        addTransactionOptions(model);
         return "customers/form";
     }
 
@@ -115,11 +128,16 @@ public class CustomerController {
     public String update(@PathVariable Long id,
                          @Valid @ModelAttribute("customerForm") CustomerForm form,
                          BindingResult result, Model model, RedirectAttributes ra) {
-        // 客戶編號不可修改,無需重複驗證
+        // 允許修改編號;若改成與其他客戶重複則擋下(排除自己)
+        if (form.getCustomerCode() != null && !form.getCustomerCode().isBlank()
+                && customerService.isCodeDuplicate(form.getCustomerCode(), id)) {
+            result.rejectValue("customerCode", "duplicate", "客戶編號已存在,請改用其他編號");
+        }
         if (result.hasErrors()) {
             model.addAttribute("activeMenu", "customers");
             model.addAttribute("customerTypes", CustomerType.values());
             model.addAttribute("editId", id);
+            addTransactionOptions(model);
             return "customers/form";
         }
         Customer saved = customerService.update(id, form);
@@ -140,14 +158,6 @@ public class CustomerController {
     public String activate(@PathVariable Long id, RedirectAttributes ra) {
         customerService.activate(id);
         ra.addFlashAttribute("flashSuccess", "客戶已重新啟用");
-        return "redirect:/customers/" + id;
-    }
-
-    /** 記錄一次聯絡(更新最後聯絡時間,清除未聯絡提醒) */
-    @PostMapping("/{id}/record-contact")
-    public String recordContact(@PathVariable Long id, RedirectAttributes ra) {
-        customerService.recordContact(id);
-        ra.addFlashAttribute("flashSuccess", "已記錄本次聯絡時間");
         return "redirect:/customers/" + id;
     }
 
@@ -173,6 +183,12 @@ public class CustomerController {
         return (redirect != null && !redirect.isBlank()) ? redirect : "/customers/" + id;
     }
 
+    /** 交易預設下拉選項:與報價單/公司設定共用同一份清單 */
+    private void addTransactionOptions(Model model) {
+        model.addAttribute("currencyOptions", Currencies.OPTIONS);
+        model.addAttribute("deliveryTermsOptions", DeliveryTerms.OPTIONS);
+    }
+
     /** Entity 轉表單(編輯時回填) */
     private CustomerForm toForm(Customer c) {
         CustomerForm f = new CustomerForm();
@@ -189,6 +205,9 @@ public class CustomerController {
         f.setCustomerType(c.getCustomerType());
         f.setIndustry(c.getIndustry());
         f.setSource(c.getSource());
+        f.setDefaultCurrency(c.getDefaultCurrency());
+        f.setDefaultPaymentTerms(c.getDefaultPaymentTerms());
+        f.setDefaultDeliveryTerms(c.getDefaultDeliveryTerms());
         f.setNotes(c.getNotes());
         f.setActive(c.isActive());
         f.setFollowUpEnabled(c.isFollowUpEnabled());

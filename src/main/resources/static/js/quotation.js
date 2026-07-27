@@ -4,6 +4,7 @@
     const products = data.products || [];
     const contacts = data.contacts || [];
     const units = data.units || [];
+    const customerDefaults = data.customerDefaults || [];
 
     let rowIndex = 0; // 持續遞增的索引,刪除列後不重用(後端會忽略空列)
 
@@ -38,27 +39,41 @@
         document.body.appendChild(dl);
     })();
 
-    // 建立一列品項
+    // 建立一張品項卡片
     function addRow(item) {
         const i = rowIndex++;
-        const tr = document.createElement('tr');
+        const tr = document.createElement('div');
+        tr.className = 'qitem';
         tr.innerHTML = `
-            <td class="text-center seq"></td>
-            <td><select class="form-select form-select-sm product-picker">${productOptionsHtml}</select></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].internalPartNumber"></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].customerPartNumber"></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].productName"></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].specification"></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].material"></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].surfaceTreatment"></td>
-            <td><input type="number" step="0.0001" min="0" class="form-control form-control-sm text-end qty" name="items[${i}].quantity"></td>
-            <td><input class="form-control form-control-sm" list="${unitDatalistId}" name="items[${i}].unit"></td>
-            <td><input type="number" step="0.0001" min="0" class="form-control form-control-sm text-end price" name="items[${i}].unitPrice"></td>
-            <td><input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-end disc" name="items[${i}].discountRate"></td>
-            <td class="text-end amount amount-cell">0.00</td>
-            <td><input class="form-control form-control-sm" name="items[${i}].leadTime"></td>
-            <td><input class="form-control form-control-sm" name="items[${i}].notes"></td>
-            <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger del-btn"><i data-lucide="trash-2"></i></button></td>
+            <div class="qitem-head">
+                <span class="qitem-seq seq"></span>
+                <span class="qitem-title">新品項</span>
+                <span class="qitem-pick">
+                    <label class="form-label">帶入零件</label>
+                    <select class="form-select form-select-sm product-picker" style="min-width:220px">${productOptionsHtml}</select>
+                    <button type="button" class="btn btn-sm btn-outline-danger del-btn" title="刪除此品項"><i data-lucide="trash-2"></i></button>
+                </span>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-5 col-12"><label class="form-label">品名</label><input class="form-control form-control-sm pname" name="items[${i}].productName"></div>
+                <div class="col-md-4 col-6"><label class="form-label">內部料號</label><input class="form-control form-control-sm" name="items[${i}].internalPartNumber"></div>
+                <div class="col-md-3 col-6"><label class="form-label">客戶料號</label><input class="form-control form-control-sm" name="items[${i}].customerPartNumber"></div>
+                <div class="col-md-3 col-6"><label class="form-label">規格</label><input class="form-control form-control-sm" name="items[${i}].specification"></div>
+                <div class="col-md-3 col-6"><label class="form-label">材質</label><input class="form-control form-control-sm" name="items[${i}].material"></div>
+                <div class="col-md-3 col-6"><label class="form-label">表面處理</label><input class="form-control form-control-sm" name="items[${i}].surfaceTreatment"></div>
+                <div class="col-md-3 col-6"><label class="form-label">交期</label><input class="form-control form-control-sm" name="items[${i}].leadTime"></div>
+            </div>
+            <hr class="qitem-divider">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2 col-6"><label class="form-label">數量</label><input type="number" step="0.0001" min="0" class="form-control form-control-sm text-end qty" name="items[${i}].quantity"></div>
+                <div class="col-md-2 col-6"><label class="form-label">單位</label><input class="form-control form-control-sm" list="${unitDatalistId}" name="items[${i}].unit"></div>
+                <div class="col-md-2 col-6"><label class="form-label">單價</label><input type="number" step="0.0001" min="0" class="form-control form-control-sm text-end price" name="items[${i}].unitPrice"></div>
+                <div class="col-md-2 col-6"><label class="form-label">折扣 %</label><input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-end disc" name="items[${i}].discountRate"></div>
+                <div class="col-md-4 col-12"><label class="form-label">金額</label><div class="qitem-amount amount-cell">0.00</div></div>
+            </div>
+            <div class="row g-2 mt-0">
+                <div class="col-12"><label class="form-label">備註</label><input class="form-control form-control-sm" name="items[${i}].notes"></div>
+            </div>
         `;
         // 隱藏的 productId
         const hidden = document.createElement('input');
@@ -68,6 +83,12 @@
         tr.appendChild(hidden);
 
         body.appendChild(tr);
+
+        // 卡片標題跟著品名走
+        const titleEl = tr.querySelector('.qitem-title');
+        const pnameEl = tr.querySelector('.pname');
+        const syncTitle = () => { titleEl.textContent = (pnameEl.value || '').trim() || '新品項'; };
+        pnameEl.addEventListener('input', syncTitle);
 
         // 回填既有值
         if (item) {
@@ -88,6 +109,7 @@
             setVal(tr, 'unit', 'PCS');
             setVal(tr, 'discountRate', 0);
         }
+        syncTitle();
 
         // 事件:帶入零件
         tr.querySelector('.product-picker').addEventListener('change', function () {
@@ -103,6 +125,7 @@
             setVal(tr, 'unit', p.unit || 'PCS');
             setVal(tr, 'unitPrice', p.unitPrice);
             if (p.leadTime) setVal(tr, 'leadTime', p.leadTime);
+            syncTitle();
             recalcRow(tr);
             recalcTotals();
         });
@@ -145,7 +168,7 @@
     // 報價單總計
     function recalcTotals() {
         let subtotal = 0;
-        body.querySelectorAll('tr').forEach(tr => {
+        body.querySelectorAll('.qitem').forEach(tr => {
             subtotal += tr._amount || 0;
         });
         const discount = parseFloat(document.getElementById('overallDiscount').value) || 0;
@@ -165,9 +188,33 @@
     // 重新編號項次
     function renumber() {
         let n = 1;
-        body.querySelectorAll('tr').forEach(tr => {
+        body.querySelectorAll('.qitem').forEach(tr => {
             tr.querySelector('.seq').textContent = n++;
         });
+    }
+
+    // 選定客戶時,自動帶入該客戶的交易預設值(幣別 / 交貨條件 / 付款條件)
+    function applyCustomerDefaults() {
+        const cid = customerSelect ? customerSelect.value : '';
+        const d = customerDefaults.find(x => String(x.id) === String(cid));
+        if (!d) return;
+        setFieldIfValue('currency', d.currency);
+        setFieldIfValue('deliveryTerms', d.deliveryTerms);
+        setFieldIfValue('paymentTerms', d.paymentTerms);
+    }
+
+    // 設定欄位值;若為 <select> 且值不在選項中,先補一個 option 再選取
+    function setFieldIfValue(id, value) {
+        if (value === null || value === undefined || value === '') return;
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.tagName === 'SELECT' && !Array.from(el.options).some(o => o.value === value)) {
+            const opt = document.createElement('option');
+            opt.value = value;
+            opt.textContent = value;
+            el.appendChild(opt);
+        }
+        el.value = value;
     }
 
     // 依客戶篩選聯絡人下拉
@@ -189,6 +236,7 @@
     if (customerSelect) {
         customerSelect.addEventListener('change', function () {
             refreshContacts(null);
+            applyCustomerDefaults();
         });
         refreshContacts(data.selectedContactId);
     }

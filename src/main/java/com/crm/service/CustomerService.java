@@ -18,13 +18,11 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final ContactLogService contactLogService;
     private final CustomerNumberService customerNumberService;
 
-    public CustomerService(CustomerRepository customerRepository, ContactLogService contactLogService,
+    public CustomerService(CustomerRepository customerRepository,
                            CustomerNumberService customerNumberService) {
         this.customerRepository = customerRepository;
-        this.contactLogService = contactLogService;
         this.customerNumberService = customerNumberService;
     }
 
@@ -60,14 +58,20 @@ public class CustomerService {
     public Customer create(CustomerForm form) {
         Customer c = new Customer();
         apply(form, c);
-        // 客戶編號由系統自動產生(CUS-YYYY-NNN),不由使用者輸入
-        c.setCustomerCode(customerNumberService.generate());
+        // 客戶編號:預設由系統自動產生(CUS-YYYY-NNN),但使用者可自行填寫/修改
+        String code = trim(form.getCustomerCode());
+        c.setCustomerCode((code == null || code.isBlank()) ? customerNumberService.generate() : code);
         return customerRepository.save(c);
     }
 
     public Customer update(Long id, CustomerForm form) {
         Customer c = getById(id);
         apply(form, c);
+        // 允許修改客戶編號;若清空則沿用原編號(不自動改號)
+        String code = trim(form.getCustomerCode());
+        if (code != null && !code.isBlank()) {
+            c.setCustomerCode(code);
+        }
         return customerRepository.save(c);
     }
 
@@ -83,16 +87,6 @@ public class CustomerService {
         Customer c = getById(id);
         c.setActive(true);
         customerRepository.save(c);
-    }
-
-    /** 記錄一次聯絡:建立一筆聯絡紀錄(最後聯絡時間以紀錄為準) */
-    public void recordContact(Long id) {
-        com.crm.dto.ContactLogForm f = new com.crm.dto.ContactLogForm();
-        f.setCustomerId(id);
-        f.setLogDate(LocalDate.now());
-        f.setType(com.crm.enums.ContactType.OTHER);
-        f.setNote("記錄聯絡");
-        contactLogService.record(f);
     }
 
     @Transactional(readOnly = true)
@@ -142,6 +136,9 @@ public class CustomerService {
         c.setCustomerType(form.getCustomerType());
         c.setIndustry(trim(form.getIndustry()));
         c.setSource(trim(form.getSource()));
+        c.setDefaultCurrency(trim(form.getDefaultCurrency()));
+        c.setDefaultPaymentTerms(trim(form.getDefaultPaymentTerms()));
+        c.setDefaultDeliveryTerms(trim(form.getDefaultDeliveryTerms()));
         c.setNotes(form.getNotes());
         c.setActive(form.isActive());
         c.setFollowUpEnabled(form.isFollowUpEnabled());

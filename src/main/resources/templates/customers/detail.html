@@ -33,8 +33,6 @@
                 </button>
             </form>
             <a class="btn btn-outline-secondary" th:href="@{/customers}"><i data-lucide="arrow-left"></i> 返回列表</a>
-            <a class="btn btn-outline-primary" th:href="@{/customers/{id}/edit(id=${customer.id})}">
-                <i data-lucide="pencil"></i> 編輯</a>
             <a class="btn btn-success" th:href="@{/quotations/new(customerId=${customer.id})}">
                 <i data-lucide="plus"></i> 建立報價單</a>
         </div>
@@ -46,12 +44,8 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i data-lucide="info"></i> 基本資料</span>
-                    <!-- 記錄聯絡:更新最後聯絡時間,清除未聯絡提醒 -->
-                    <form method="post" th:action="@{/customers/{id}/record-contact(id=${customer.id})}">
-                        <button class="btn btn-sm btn-outline-success" type="submit">
-                            <i data-lucide="phone-outgoing"></i> 記錄聯絡
-                        </button>
-                    </form>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/customers/{id}/edit(id=${customer.id})}">
+                        <i data-lucide="pencil"></i> 編輯</a>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm mb-0">
@@ -69,6 +63,9 @@
                                 <span th:if="${customer.city}" th:text="' · ' + ${customer.city}"></span>
                             </td></tr>
                         <tr><th class="text-muted">地址</th><td th:text="${customer.address}"></td></tr>
+                        <tr><th class="text-muted">預設幣別</th><td th:text="${customer.defaultCurrency}"></td></tr>
+                        <tr><th class="text-muted">預設付款條件</th><td th:text="${customer.defaultPaymentTerms}"></td></tr>
+                        <tr><th class="text-muted">預設交貨條件</th><td th:text="${customer.defaultDeliveryTerms}"></td></tr>
                         <tr><th class="text-muted">備註</th><td th:text="${customer.notes}"></td></tr>
                         <tr><th class="text-muted">最後聯絡</th>
                             <td class="text-nowrap" th:with="days=${customer.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(customer.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
@@ -84,7 +81,8 @@
                             <td>
                                 <span th:if="${customer.nextFollowUpDate != null}" class="fw-semibold"
                                       th:text="${#temporals.format(customer.nextFollowUpDate,'yyyy-MM-dd')}"></span>
-                                <span th:unless="${customer.nextFollowUpDate != null}" class="text-muted">依預設規則(未聯絡達設定天數才提醒)</span>
+                                <span th:unless="${customer.nextFollowUpDate != null}" class="text-muted"
+                                      th:text="'依預設(超過 ' + ${reminderDays} + ' 天沒聯絡才提醒)'">依預設</span>
                             </td>
                         </tr>
                         <tr><th class="text-muted">建立 / 更新</th>

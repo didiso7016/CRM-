@@ -64,6 +64,19 @@ public class Customer {
     @Column(length = 100)
     private String source;
 
+    // ===== 交易預設值:建立報價單選到此客戶時,可作為預設帶入 =====
+    /** 預設幣別(如 USD、TWD) */
+    @Column(name = "default_currency", length = 10)
+    private String defaultCurrency;
+
+    /** 預設付款條件(如 T/T 30% 訂金、L/C at sight) */
+    @Column(name = "default_payment_terms", length = 200)
+    private String defaultPaymentTerms;
+
+    /** 預設交貨條件(如 EXW、FOB Keelung) */
+    @Column(name = "default_delivery_terms", length = 200)
+    private String defaultDeliveryTerms;
+
     @Column(length = 1000)
     private String notes;
 
@@ -144,6 +157,15 @@ public class Customer {
 
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
+
+    public String getDefaultCurrency() { return defaultCurrency; }
+    public void setDefaultCurrency(String defaultCurrency) { this.defaultCurrency = defaultCurrency; }
+
+    public String getDefaultPaymentTerms() { return defaultPaymentTerms; }
+    public void setDefaultPaymentTerms(String defaultPaymentTerms) { this.defaultPaymentTerms = defaultPaymentTerms; }
+
+    public String getDefaultDeliveryTerms() { return defaultDeliveryTerms; }
+    public void setDefaultDeliveryTerms(String defaultDeliveryTerms) { this.defaultDeliveryTerms = defaultDeliveryTerms; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

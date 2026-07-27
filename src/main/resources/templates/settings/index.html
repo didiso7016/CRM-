@@ -5,149 +5,239 @@
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <div th:replace="~{fragments/layout :: flash}"></div>
 
-<main class="container py-4" style="max-width: 960px;">
+<main class="container py-4" style="max-width: 1040px;">
     <h4 class="mb-3"><i data-lucide="sliders-horizontal"></i> 系統設定</h4>
 
-    <div class="row g-3">
-        <!-- 公司資料與預設值 -->
-        <div class="col-lg-7">
+    <div class="settings-shell">
+        <!-- 左側分類 -->
+        <nav class="settings-side">
+            <div class="side-label">設定分類</div>
+            <button type="button" class="settings-nav active" data-target="panel-company">
+                <i data-lucide="building-2"></i>
+                <span>公司資訊<small>抬頭、Logo</small></span>
+            </button>
+            <button type="button" class="settings-nav" data-target="panel-quote">
+                <i data-lucide="file-text"></i>
+                <span>報價單預設<small>幣別、稅率、條件</small></span>
+            </button>
+            <button type="button" class="settings-nav" data-target="panel-remind">
+                <i data-lucide="bell"></i>
+                <span>提醒設定<small>幾天才提醒</small></span>
+            </button>
+            <button type="button" class="settings-nav" data-target="panel-backup">
+                <i data-lucide="hard-drive"></i>
+                <span>資料備份<small>備份與還原</small></span>
+            </button>
+        </nav>
+
+        <!-- 右內容 -->
+        <div style="min-width:0">
+            <!-- 公司 / 報價 / 提醒 共用同一張表單 -->
             <form method="post" th:action="@{/settings}" th:object="${settingsForm}" enctype="multipart/form-data">
-                <div class="card card-body">
-                    <div class="form-section-title">公司資訊(顯示於報價單抬頭)</div>
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <label class="form-label required">公司名稱</label>
-                            <input class="form-control" th:field="*{companyName}"
-                                   th:classappend="${#fields.hasErrors('companyName')}?'is-invalid'">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">統一編號</label>
-                            <input class="form-control" th:field="*{taxId}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">公司地址</label>
-                            <input class="form-control" th:field="*{address}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">電話</label>
-                            <input class="form-control" th:field="*{phone}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">傳真</label>
-                            <input class="form-control" th:field="*{fax}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Email</label>
-                            <input class="form-control" th:field="*{email}"
-                                   th:classappend="${#fields.hasErrors('email')}?'is-invalid'">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">業務聯絡人</label>
-                            <input class="form-control" th:field="*{contactName}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">公司 Logo</label>
-                            <input type="file" class="form-control" name="logoFile" accept="image/*">
-                            <div class="mt-2" th:if="${currentLogo}">
-                                <img th:src="@{/uploads/{f}(f=${currentLogo})}" alt="logo" style="max-height:50px;">
-                                <span class="text-muted small">目前 Logo</span>
+
+                <!-- 公司資訊 -->
+                <section class="settings-panel show" id="panel-company">
+                    <div class="card">
+                        <div class="card-header"><i data-lucide="building-2"></i> 公司資訊
+                            <span class="text-muted small fw-normal ms-1">顯示於報價單抬頭與列印版</span></div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label required">公司名稱</label>
+                                    <input class="form-control" th:field="*{companyName}"
+                                           th:classappend="${#fields.hasErrors('companyName')}?'is-invalid'">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">統一編號</label>
+                                    <input class="form-control" th:field="*{taxId}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">公司地址</label>
+                                    <input class="form-control" th:field="*{address}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">電話</label>
+                                    <input class="form-control" th:field="*{phone}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">傳真</label>
+                                    <input class="form-control" th:field="*{fax}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Email</label>
+                                    <input class="form-control" th:field="*{email}"
+                                           th:classappend="${#fields.hasErrors('email')}?'is-invalid'">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">業務聯絡人</label>
+                                    <input class="form-control" th:field="*{contactName}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">公司 Logo</label>
+                                    <input type="file" class="form-control" name="logoFile" accept="image/*">
+                                    <div class="mt-2" th:if="${currentLogo}">
+                                        <img th:src="@{/uploads/{f}(f=${currentLogo})}" alt="logo" style="max-height:50px;">
+                                        <span class="text-muted small">目前 Logo</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> 儲存設定</button>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <div class="form-section-title">報價單預設值</div>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">預設幣別</label>
-                            <select class="form-select" th:field="*{defaultCurrency}">
-                                <option th:each="c : ${currencyOptions}" th:value="${c}" th:text="${c}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">預設稅率(%)</label>
-                            <input type="number" step="0.01" min="0" class="form-control" th:field="*{defaultTaxRate}"
-                                   th:classappend="${#fields.hasErrors('defaultTaxRate')}?'is-invalid'">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('defaultTaxRate')}" th:errors="*{defaultTaxRate}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">客戶未聯絡提醒(天)</label>
-                            <input type="number" min="1" class="form-control" th:field="*{contactReminderDays}"
-                                   th:classappend="${#fields.hasErrors('contactReminderDays')}?'is-invalid'">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('contactReminderDays')}" th:errors="*{contactReminderDays}"></div>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">報價跟進提醒(天)</label>
-                            <input type="number" min="1" class="form-control" th:field="*{quotationFollowupDays}"
-                                   th:classappend="${#fields.hasErrors('quotationFollowupDays')}?'is-invalid'">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('quotationFollowupDays')}" th:errors="*{quotationFollowupDays}"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">預設付款條件</label>
-                            <input class="form-control" th:field="*{defaultPaymentTerms}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">預設交貨條件</label>
-                            <select class="form-select" th:field="*{defaultDeliveryTerms}">
-                                <option value="">(未指定)</option>
-                                <option th:each="d : ${deliveryTermsOptions}" th:value="${d}" th:text="${d}"></option>
-                                <option th:if="${settingsForm.defaultDeliveryTerms != null and !settingsForm.defaultDeliveryTerms.isEmpty() and !#lists.contains(deliveryTermsOptions, settingsForm.defaultDeliveryTerms)}"
-                                        th:value="${settingsForm.defaultDeliveryTerms}" th:text="${settingsForm.defaultDeliveryTerms}"></option>
-                            </select>
+                <!-- 報價單預設 -->
+                <section class="settings-panel" id="panel-quote">
+                    <div class="card">
+                        <div class="card-header"><i data-lucide="file-text"></i> 報價單預設
+                            <span class="text-muted small fw-normal ms-1">新建報價單時自動帶入(選到客戶時,會以客戶自己的預設覆蓋)</span></div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">預設幣別</label>
+                                    <select class="form-select" th:field="*{defaultCurrency}">
+                                        <option th:each="c : ${currencyOptions}" th:value="${c}" th:text="${c}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">預設稅率(%)</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" th:field="*{defaultTaxRate}"
+                                           th:classappend="${#fields.hasErrors('defaultTaxRate')}?'is-invalid'">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('defaultTaxRate')}" th:errors="*{defaultTaxRate}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">預設付款條件</label>
+                                    <input class="form-control" th:field="*{defaultPaymentTerms}" placeholder="例:T/T 30% 訂金 70% 出貨前">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">預設交貨條件</label>
+                                    <select class="form-select" th:field="*{defaultDeliveryTerms}">
+                                        <option value="">(未指定)</option>
+                                        <option th:each="d : ${deliveryTermsOptions}" th:value="${d}" th:text="${d}"></option>
+                                        <option th:if="${settingsForm.defaultDeliveryTerms != null and !settingsForm.defaultDeliveryTerms.isEmpty() and !#lists.contains(deliveryTermsOptions, settingsForm.defaultDeliveryTerms)}"
+                                                th:value="${settingsForm.defaultDeliveryTerms}" th:text="${settingsForm.defaultDeliveryTerms}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> 儲存設定</button>
+                            </div>
                         </div>
                     </div>
+                </section>
 
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> 儲存設定</button>
+                <!-- 提醒設定 -->
+                <section class="settings-panel" id="panel-remind">
+                    <div class="card">
+                        <div class="card-header"><i data-lucide="bell"></i> 提醒設定
+                            <span class="text-muted small fw-normal ms-1">控制首頁與通知中心「幾天才提醒」的門檻</span></div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="reminder-box">
+                                        <div class="rb-top"><i data-lucide="users"></i> 客戶未聯絡提醒</div>
+                                        <div class="input-group">
+                                            <input type="number" min="1" class="form-control" th:field="*{contactReminderDays}"
+                                                   th:classappend="${#fields.hasErrors('contactReminderDays')}?'is-invalid'">
+                                            <span class="input-group-text">天沒聯絡就提醒</span>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('contactReminderDays')}" th:errors="*{contactReminderDays}"></div>
+                                        </div>
+                                        <div class="rb-desc">影響<strong>首頁「客戶關懷提醒」</strong>與<strong>通知中心「太久沒聯絡」</strong>。只對有開「納入跟進提醒」的客戶生效。</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="reminder-box">
+                                        <div class="rb-top"><i data-lucide="file-clock"></i> 報價跟進提醒</div>
+                                        <div class="input-group">
+                                            <input type="number" min="1" class="form-control" th:field="*{quotationFollowupDays}"
+                                                   th:classappend="${#fields.hasErrors('quotationFollowupDays')}?'is-invalid'">
+                                            <span class="input-group-text">天未成交就提醒</span>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('quotationFollowupDays')}" th:errors="*{quotationFollowupDays}"></div>
+                                        </div>
+                                        <div class="rb-desc">影響<strong>通知中心「報價後未成交」</strong>。看進行中的報價單(草稿/已送出/確認中),與客戶開關無關。</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> 儲存設定</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
             </form>
-        </div>
 
-        <!-- 備份 -->
-        <div class="col-lg-5">
-            <div class="card">
-                <div class="card-header"><i data-lucide="hard-drive"></i> 資料庫備份</div>
-                <div class="card-body">
-                    <p class="mb-1">最近備份:
-                        <strong th:if="${lastBackup}" th:text="${lastBackup}">—</strong>
-                        <span th:unless="${lastBackup}" class="text-muted">尚無備份</span>
-                    </p>
-                    <p class="text-muted small">備份位置:<span th:text="${backupDir}"></span></p>
-                    <form method="post" th:action="@{/settings/backup}">
-                        <button type="submit" class="btn btn-success">
-                            <i data-lucide="download"></i> 立即備份
-                        </button>
-                    </form>
-                    <p class="text-muted small mt-2 mb-1">系統自動保留最近 30 份備份。</p>
-
-                    <div th:if="${!#lists.isEmpty(backupList)}" class="mt-2">
-                        <div class="text-muted small mb-1">備份清單(新到舊):</div>
-                        <ul class="list-group list-group-flush small" style="max-height:220px; overflow:auto;">
-                            <li class="list-group-item px-0 py-1" th:each="b : ${backupList}" th:text="${b}"></li>
-                        </ul>
+            <!-- 資料備份(獨立,不屬於上面的表單)-->
+            <section class="settings-panel" id="panel-backup">
+                <div class="card mb-3">
+                    <div class="card-header"><i data-lucide="hard-drive"></i> 資料庫備份</div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <p class="mb-1">最近備份:
+                                    <strong th:if="${lastBackup}" th:text="${lastBackup}">—</strong>
+                                    <span th:unless="${lastBackup}" class="text-muted">尚無備份</span>
+                                </p>
+                                <p class="text-muted small mb-0">備份位置:<span th:text="${backupDir}"></span></p>
+                            </div>
+                            <form method="post" th:action="@{/settings/backup}">
+                                <button type="submit" class="btn btn-success">
+                                    <i data-lucide="download"></i> 立即備份
+                                </button>
+                            </form>
+                        </div>
+                        <p class="text-muted small mt-2 mb-1">系統自動保留最近 30 份備份。</p>
+                        <div th:if="${!#lists.isEmpty(backupList)}" class="mt-2">
+                            <div class="text-muted small mb-1">備份清單(新到舊):</div>
+                            <ul class="list-group list-group-flush small" style="max-height:220px; overflow:auto;">
+                                <li class="list-group-item px-0 py-1" th:each="b : ${backupList}" th:text="${b}"></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card mt-3">
-                <div class="card-header"><i data-lucide="rotate-ccw"></i> 還原說明</div>
-                <div class="card-body small">
-                    <p>還原資料庫請依下列步驟(避免誤操作,不在網頁直接執行):</p>
-                    <ol class="mb-0">
-                        <li>關閉本系統(關閉執行視窗)。</li>
-                        <li>到 <code>backup</code> 資料夾,找到要還原的檔案。</li>
-                        <li>將它複製到 <code>data</code> 資料夾,並更名為 <code>crm.db</code>(先備份現有的)。</li>
-                        <li>重新執行 <code>start-crm.bat</code>。</li>
-                    </ol>
-                    <p class="mt-2 mb-0 text-muted">詳細步驟見專案根目錄的 <code>restore-guide.txt</code>。</p>
+                <div class="card">
+                    <div class="card-header"><i data-lucide="rotate-ccw"></i> 還原說明</div>
+                    <div class="card-body small">
+                        <p>還原資料庫請依下列步驟(避免誤操作,不在網頁直接執行):</p>
+                        <ol class="mb-0">
+                            <li>關閉本系統(關閉執行視窗)。</li>
+                            <li>到 <code>backup</code> 資料夾,找到要還原的檔案。</li>
+                            <li>將它複製到 <code>data</code> 資料夾,並更名為 <code>crm.db</code>(先備份現有的)。</li>
+                            <li>重新執行 <code>start-crm.bat</code>。</li>
+                        </ol>
+                        <p class="mt-2 mb-0 text-muted">詳細步驟見專案根目錄的 <code>restore-guide.txt</code>。</p>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 </main>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+<script>
+    (function () {
+        function activate(target) {
+            document.querySelectorAll('.settings-nav').forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-target') === target);
+            });
+            document.querySelectorAll('.settings-panel').forEach(function (p) {
+                p.classList.toggle('show', p.id === target);
+            });
+        }
+        document.querySelectorAll('.settings-nav').forEach(function (btn) {
+            btn.addEventListener('click', function () { activate(btn.getAttribute('data-target')); });
+        });
+        // 若有欄位驗證錯誤,自動切到含錯誤的分類
+        var firstError = document.querySelector('.is-invalid');
+        if (firstError) {
+            var panel = firstError.closest('.settings-panel');
+            if (panel) activate(panel.id);
+        }
+    })();
+</script>
 </body>
 </html>
