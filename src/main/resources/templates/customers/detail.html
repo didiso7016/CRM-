@@ -23,6 +23,15 @@
                   th:action="@{/customers/{id}/activate(id=${customer.id})}">
                 <button class="btn btn-outline-success" type="submit"><i data-lucide="circle-check"></i> 重新啟用</button>
             </form>
+            <!-- 跟進提醒開關(挪到上方)-->
+            <form method="post" th:action="@{/customers/{id}/follow-up(id=${customer.id})}">
+                <input type="hidden" name="enabled" th:value="${!customer.followUpEnabled}">
+                <button type="submit" class="btn"
+                        th:classappend="${customer.followUpEnabled} ? 'btn-outline-secondary' : 'btn-outline-primary'">
+                    <i th:attr="data-lucide=${customer.followUpEnabled ? 'bell-off' : 'bell'}"></i>
+                    <span th:text="${customer.followUpEnabled ? '停止跟進提醒' : '納入跟進提醒'}">納入跟進提醒</span>
+                </button>
+            </form>
             <a class="btn btn-outline-secondary" th:href="@{/customers}"><i data-lucide="arrow-left"></i> 返回列表</a>
             <a class="btn btn-outline-primary" th:href="@{/customers/{id}/edit(id=${customer.id})}">
                 <i data-lucide="pencil"></i> 編輯</a>
@@ -85,18 +94,6 @@
                             </td>
                         </tr>
                     </table>
-
-                    <div class="mt-3 d-flex gap-2">
-                        <!-- 跟進提醒開關 -->
-                        <form method="post" th:action="@{/customers/{id}/follow-up(id=${customer.id})}">
-                            <input type="hidden" name="enabled" th:value="${!customer.followUpEnabled}">
-                            <button type="submit" class="btn btn-sm"
-                                    th:classappend="${customer.followUpEnabled} ? 'btn-outline-secondary' : 'btn-outline-primary'">
-                                <i th:attr="data-lucide=${customer.followUpEnabled ? 'bell-off' : 'bell'}"></i>
-                                <span th:text="${customer.followUpEnabled ? '停止跟進提醒' : '納入跟進提醒'}">納入跟進提醒</span>
-                            </button>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>
@@ -173,8 +170,20 @@
                     <a class="btn btn-sm btn-success" th:href="@{/notifications(customerId=${customer.id})}">
                         <i data-lucide="plus"></i> 記錄通知</a>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2" th:each="log : ${contactLogs}">
+                <!-- 類別標籤(前端即時篩選) -->
+                <div class="px-3 pt-2 pb-1">
+                    <div class="btn-group btn-group-sm log-tabs" role="group">
+                        <button type="button" class="btn btn-primary" data-type="">全部</button>
+                        <button type="button" class="btn btn-outline-secondary" data-type="EMAIL">Email</button>
+                        <button type="button" class="btn btn-outline-secondary" data-type="PHONE">電話</button>
+                        <button type="button" class="btn btn-outline-secondary" data-type="MEETING">拜訪 / 會議</button>
+                        <button type="button" class="btn btn-outline-secondary" data-type="QUOTE">寄報價單</button>
+                        <button type="button" class="btn btn-outline-secondary" data-type="OTHER">其他</button>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush" id="contactLogList">
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2 log-row"
+                        th:each="log : ${contactLogs}" th:attr="data-type=${log.type.name()}">
                         <span>
                             <span class="text-muted small" th:text="${#temporals.format(log.logDate,'yyyy-MM-dd')}">2026-07-23</span>
                             <span class="badge text-bg-light border" th:text="${log.type.label}">Email</span>
@@ -190,8 +199,30 @@
                     <li class="list-group-item text-center text-muted py-3" th:if="${#lists.isEmpty(contactLogs)}">
                         尚無聯絡紀錄
                     </li>
+                    <li class="list-group-item text-center text-muted py-3 log-empty-filtered" style="display:none">
+                        此類別沒有紀錄
+                    </li>
                 </ul>
             </div>
+            <script>
+                document.querySelectorAll('.log-tabs button').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var type = btn.getAttribute('data-type');
+                        document.querySelectorAll('.log-tabs button').forEach(function (b) {
+                            b.className = 'btn btn-outline-secondary';
+                        });
+                        btn.className = 'btn btn-primary';
+                        var shown = 0;
+                        document.querySelectorAll('#contactLogList .log-row').forEach(function (row) {
+                            var match = (type === '' || row.getAttribute('data-type') === type);
+                            row.style.display = match ? '' : 'none';
+                            if (match) shown++;
+                        });
+                        var ef = document.querySelector('.log-empty-filtered');
+                        if (ef) ef.style.display = (shown === 0) ? '' : 'none';
+                    });
+                });
+            </script>
         </div>
     </div>
 </main>

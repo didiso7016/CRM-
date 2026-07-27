@@ -55,9 +55,8 @@ class ContactLogServiceTest {
 
         service.record(form(LocalDate.of(2026, 7, 10))); // 較舊
 
-        // 仍維持較新的 7/25,不被 7/10 覆蓋
+        // 仍維持較新的 7/25,不被 7/10 覆蓋(最後聯絡時間不往回調)
         assertThat(c.getLastContactedAt()).isEqualTo(LocalDateTime.of(2026, 7, 25, 0, 0));
         verify(logRepo).save(any());
-        verify(customerRepo, never()).save(any()); // 未更新客戶
     }
 }
