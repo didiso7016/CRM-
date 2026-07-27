@@ -212,6 +212,9 @@ main.container-fluid,main.container{max-width:1280px}
 .hbar-fill{background:var(--green-ink);height:100%;border-radius:6px;min-width:2px}
 .hbar-val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.8rem;color:var(--muted)}
 
+/* 聯絡紀錄類別篩選:隱藏不符的列(需 !important 蓋過 .d-flex)*/
+.log-hidden{display:none!important}
+
 /* ---------- 分頁 ---------- */
 .page-link{color:var(--accent-ink);background:var(--surface);border-color:var(--border)}
 .page-link:hover{background:var(--surface-2);color:var(--accent)}

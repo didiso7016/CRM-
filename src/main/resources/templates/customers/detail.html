@@ -215,7 +215,7 @@
                         var shown = 0;
                         document.querySelectorAll('#contactLogList .log-row').forEach(function (row) {
                             var match = (type === '' || row.getAttribute('data-type') === type);
-                            row.style.display = match ? '' : 'none';
+                            row.classList.toggle('log-hidden', !match);
                             if (match) shown++;
                         });
                         var ef = document.querySelector('.log-empty-filtered');
