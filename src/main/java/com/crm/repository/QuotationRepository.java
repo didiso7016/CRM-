@@ -88,6 +88,42 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
     List<Quotation> findOpenBefore(@Param("statuses") List<QuotationStatus> statuses,
                                    @Param("cutoff") LocalDate cutoff);
 
+    /** 已過期:有效期限早於今天,且仍在進行中的狀態(最新版) */
+    @EntityGraph(attributePaths = {"customer"})
+    @Query("""
+            select q from Quotation q
+            where q.validUntil is not null and q.validUntil < :today
+              and q.status in :statuses
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
+            order by q.validUntil asc
+            """)
+    List<Quotation> findExpiredOpen(@Param("today") LocalDate today,
+                                    @Param("statuses") List<QuotationStatus> statuses);
+
+    /** 客戶要求回覆日將至/已過:回覆日 <= 門檻,狀態進行中(最新版) */
+    @EntityGraph(attributePaths = {"customer"})
+    @Query("""
+            select q from Quotation q
+            where q.customerReplyDueDate is not null and q.customerReplyDueDate <= :threshold
+              and q.status in :statuses
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
+            order by q.customerReplyDueDate asc
+            """)
+    List<Quotation> findReplyDueBefore(@Param("threshold") LocalDate threshold,
+                                       @Param("statuses") List<QuotationStatus> statuses);
+
+    /** 交期將至/已過:交貨日 <= 門檻,狀態為已收訂/付清尾款(最新版) */
+    @EntityGraph(attributePaths = {"customer"})
+    @Query("""
+            select q from Quotation q
+            where q.deliveryDueDate is not null and q.deliveryDueDate <= :threshold
+              and q.status in :statuses
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
+            order by q.deliveryDueDate asc
+            """)
+    List<Quotation> findDeliveryDueBefore(@Param("threshold") LocalDate threshold,
+                                          @Param("statuses") List<QuotationStatus> statuses);
+
     /**
      * 報價單搜尋:可依客戶、單號、關鍵字(客戶名稱/編號、料號、品名)、狀態、
      * 日期區間、含稅總計金額區間篩選。條件為 null 時忽略。

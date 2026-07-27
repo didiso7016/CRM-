@@ -16,16 +16,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 通知中心:彙整需要跟進的提醒。
- *  1. 超過設定天數未聯絡的客戶
- *  2. 報價後超過設定天數仍未成交的報價單
+ * 通知中心:彙整需要跟進的提醒。涵蓋:
+ *  1. 客戶長時間未聯絡
+ *  2. 報價尚未完成(草稿放太久)
+ *  3. 報價送出後尚未回覆
+ *  4. 報價即將到期
+ *  5. 報價已過期
+ *  6. 客戶要求回覆日期(將至/已過)
+ *  7. 交期即將到期(交貨日將至/已過)
  */
 @Service
 public class NotificationService {
 
-    /** 視為「進行中、需跟進」的報價狀態 */
+    /** 進行中(尚未成交)的報價狀態 */
     private static final List<QuotationStatus> OPEN_STATUSES =
             List.of(QuotationStatus.DRAFT, QuotationStatus.SENT, QuotationStatus.CONFIRMING);
+    /** 已送出、等待客戶回覆的狀態 */
+    private static final List<QuotationStatus> SENT_STATUSES =
+            List.of(QuotationStatus.SENT, QuotationStatus.CONFIRMING);
+    /** 已接單(需追交期)的狀態 */
+    private static final List<QuotationStatus> ORDER_STATUSES =
+            List.of(QuotationStatus.ACCEPTED, QuotationStatus.PAID);
+
+    /** 到期/回覆/交期提醒的提前天數 */
+    private static final int APPROACH_DAYS = 7;
 
     private final CustomerService customerService;
     private final QuotationRepository quotationRepository;
@@ -46,26 +60,70 @@ public class NotificationService {
         int reminderDays = s.getContactReminderDays() == null ? 30 : s.getContactReminderDays();
         int followupDays = s.getQuotationFollowupDays() == null ? 14 : s.getQuotationFollowupDays();
         LocalDate today = LocalDate.now();
+        LocalDate cutoff = today.minusDays(followupDays);
+        LocalDate approach = today.plusDays(APPROACH_DAYS);
 
         List<NotificationItem> items = new ArrayList<>();
 
-        // 1. 客戶未聯絡
+        // 1. 客戶長時間未聯絡
         for (Customer c : customerService.needFollowUp(reminderDays)) {
             long days = daysSinceContact(c, today);
-            String msg = "「" + c.getCompanyName() + "」已經 " + days + " 天沒聯絡";
-            items.add(new NotificationItem("CUSTOMER", msg, "/customers/" + c.getId(), c.getId(), days));
+            items.add(new NotificationItem("CUSTOMER",
+                    "「" + c.getCompanyName() + "」已經 " + days + " 天沒聯絡",
+                    "/customers/" + c.getId(), c.getId(), days));
         }
 
-        // 2. 報價後未成交
-        LocalDate cutoff = today.minusDays(followupDays);
-        for (Quotation q : quotationRepository.findOpenBefore(OPEN_STATUSES, cutoff)) {
+        // 2. 報價尚未完成(草稿放太久)
+        for (Quotation q : quotationRepository.findOpenBefore(List.of(QuotationStatus.DRAFT), cutoff)) {
             long days = ChronoUnit.DAYS.between(q.getQuotationDate(), today);
-            String msg = "報價單 " + q.getQuotationNumber() + "(" + q.getCustomer().getCompanyName()
-                    + ")報價後已經 " + days + " 天未成交";
-            items.add(new NotificationItem("QUOTATION", msg, "/quotations/" + q.getId(), null, days));
+            items.add(new NotificationItem("QUOTE_DRAFT",
+                    "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")仍是草稿,已 " + days + " 天未完成",
+                    link(q), null, days));
         }
 
-        // 天數多的排前面
+        // 3. 報價送出後尚未回覆
+        for (Quotation q : quotationRepository.findOpenBefore(SENT_STATUSES, cutoff)) {
+            long days = ChronoUnit.DAYS.between(q.getQuotationDate(), today);
+            items.add(new NotificationItem("QUOTE_NOREPLY",
+                    "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")送出後 " + days + " 天客戶尚未回覆",
+                    link(q), null, days));
+        }
+
+        // 4. 報價即將到期
+        for (Quotation q : quotationRepository.findExpiringSoon(today, approach, OPEN_STATUSES)) {
+            long remaining = ChronoUnit.DAYS.between(today, q.getValidUntil());
+            items.add(new NotificationItem("QUOTE_EXPIRING",
+                    "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")有效期限剩 " + remaining + " 天(" + q.getValidUntil() + ")",
+                    link(q), null, -remaining));
+        }
+
+        // 5. 報價已過期
+        for (Quotation q : quotationRepository.findExpiredOpen(today, OPEN_STATUSES)) {
+            long overdue = ChronoUnit.DAYS.between(q.getValidUntil(), today);
+            items.add(new NotificationItem("QUOTE_EXPIRED",
+                    "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")已過期 " + overdue + " 天(有效期限 " + q.getValidUntil() + ")",
+                    link(q), null, overdue));
+        }
+
+        // 6. 客戶要求回覆日期(將至/已過)
+        for (Quotation q : quotationRepository.findReplyDueBefore(approach, OPEN_STATUSES)) {
+            long signed = ChronoUnit.DAYS.between(q.getCustomerReplyDueDate(), today);
+            String msg = signed >= 0
+                    ? "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")客戶要求回覆日已過 " + signed + " 天(" + q.getCustomerReplyDueDate() + ")"
+                    : "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")客戶要求 " + q.getCustomerReplyDueDate() + " 前回覆(剩 " + (-signed) + " 天)";
+            items.add(new NotificationItem("REPLY_DUE", msg, link(q), null, signed));
+        }
+
+        // 7. 交期即將到期(交貨日將至/已過)
+        for (Quotation q : quotationRepository.findDeliveryDueBefore(approach, ORDER_STATUSES)) {
+            long signed = ChronoUnit.DAYS.between(q.getDeliveryDueDate(), today);
+            String msg = signed >= 0
+                    ? "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")交貨日已過 " + signed + " 天(" + q.getDeliveryDueDate() + ")"
+                    : "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")交期將至," + q.getDeliveryDueDate() + " 交貨(剩 " + (-signed) + " 天)";
+            items.add(new NotificationItem("DELIVERY_DUE", msg, link(q), null, signed));
+        }
+
+        // 天數多(越逾期)的排前面
         items.sort((a, b) -> Long.compare(b.getDays(), a.getDays()));
         return items;
     }
@@ -74,6 +132,14 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public int count() {
         return load().size();
+    }
+
+    private String name(Quotation q) {
+        return q.getCustomer() != null ? q.getCustomer().getCompanyName() : "";
+    }
+
+    private String link(Quotation q) {
+        return "/quotations/" + q.getId();
     }
 
     /** 距最後聯絡的天數;從未聯絡則以建立日計算 */

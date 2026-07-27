@@ -58,6 +58,10 @@
                                 <tr><th class="text-muted">付款條件</th><td th:text="${quotation.paymentTerms}"></td></tr>
                                 <tr><th class="text-muted">交貨條件</th><td th:text="${quotation.deliveryTerms}"></td></tr>
                                 <tr><th class="text-muted">預計交期</th><td th:text="${quotation.estimatedDelivery}"></td></tr>
+                                <tr><th class="text-muted">客戶要求回覆日</th>
+                                    <td th:text="${quotation.customerReplyDueDate != null ? #temporals.format(quotation.customerReplyDueDate,'yyyy-MM-dd') : '—'}"></td></tr>
+                                <tr><th class="text-muted">交貨日</th>
+                                    <td th:text="${quotation.deliveryDueDate != null ? #temporals.format(quotation.deliveryDueDate,'yyyy-MM-dd') : '—'}"></td></tr>
                                 <tr><th class="text-muted">建立時間</th>
                                     <td th:text="${#temporals.format(quotation.createdAt,'yyyy-MM-dd HH:mm')}"></td></tr>
                             </table>

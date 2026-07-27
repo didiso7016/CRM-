@@ -37,6 +37,12 @@ public class QuotationForm {
     private String deliveryTerms;
     private String estimatedDelivery;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate customerReplyDueDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate deliveryDueDate;
+
     private BigDecimal overallDiscount = BigDecimal.ZERO;
     private BigDecimal freight = BigDecimal.ZERO;
     private BigDecimal otherFee = BigDecimal.ZERO;
@@ -83,6 +89,12 @@ public class QuotationForm {
 
     public String getEstimatedDelivery() { return estimatedDelivery; }
     public void setEstimatedDelivery(String estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }
+
+    public LocalDate getCustomerReplyDueDate() { return customerReplyDueDate; }
+    public void setCustomerReplyDueDate(LocalDate customerReplyDueDate) { this.customerReplyDueDate = customerReplyDueDate; }
+
+    public LocalDate getDeliveryDueDate() { return deliveryDueDate; }
+    public void setDeliveryDueDate(LocalDate deliveryDueDate) { this.deliveryDueDate = deliveryDueDate; }
 
     public BigDecimal getOverallDiscount() { return overallDiscount; }
     public void setOverallDiscount(BigDecimal overallDiscount) { this.overallDiscount = overallDiscount; }

@@ -252,6 +252,8 @@ public class QuotationController {
         f.setPaymentTerms(q.getPaymentTerms());
         f.setDeliveryTerms(q.getDeliveryTerms());
         f.setEstimatedDelivery(q.getEstimatedDelivery());
+        f.setCustomerReplyDueDate(q.getCustomerReplyDueDate());
+        f.setDeliveryDueDate(q.getDeliveryDueDate());
         f.setOverallDiscount(q.getOverallDiscount());
         f.setFreight(q.getFreight());
         f.setOtherFee(q.getOtherFee());

@@ -88,6 +88,16 @@
                     <input type="text" class="form-control" th:field="*{estimatedDelivery}" placeholder="例:收到訂金後 30 天">
                     <div class="form-text">交期自「收到訂金日」起算</div>
                 </div>
+                <div class="col-md-4">
+                    <label class="form-label">客戶要求回覆日</label>
+                    <input type="date" class="form-control" th:field="*{customerReplyDueDate}">
+                    <div class="form-text">選填;有填會在到期前提醒</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">交貨日(交期提醒)</label>
+                    <input type="date" class="form-control" th:field="*{deliveryDueDate}">
+                    <div class="form-text">選填;有填會在交期將至時提醒</div>
+                </div>
             </div>
         </div>
 
