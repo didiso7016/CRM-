@@ -2,6 +2,7 @@ package com.crm.dto;
 
 import com.crm.entity.Customer;
 import com.crm.entity.Quotation;
+import com.crm.entity.Task;
 
 import java.util.List;
 
@@ -23,12 +24,13 @@ public class DashboardData {
     private List<Customer> followUpCustomers;
     private int reminderDays;
 
-    /** 圖表:近 6 個月成交營業額 / Top 客戶 / 成交率 */
+    /** 成交金額(基準=已收訂):近 6 個月每月 + 本年度合計 */
     private List<ChartBar> monthlyRevenue;
-    private List<ChartBar> topCustomers;
-    private int winRatePercent;
-    private long wonCount;
-    private long lostCount;
+    private java.math.BigDecimal yearlyRevenue;
+
+    /** 待辦 */
+    private List<Task> upcomingTasks;
+    private long overdueTaskCount;
 
     // ===== Getter / Setter =====
     public long getCustomerCount() { return customerCount; }
@@ -61,15 +63,12 @@ public class DashboardData {
     public List<ChartBar> getMonthlyRevenue() { return monthlyRevenue; }
     public void setMonthlyRevenue(List<ChartBar> monthlyRevenue) { this.monthlyRevenue = monthlyRevenue; }
 
-    public List<ChartBar> getTopCustomers() { return topCustomers; }
-    public void setTopCustomers(List<ChartBar> topCustomers) { this.topCustomers = topCustomers; }
+    public java.math.BigDecimal getYearlyRevenue() { return yearlyRevenue; }
+    public void setYearlyRevenue(java.math.BigDecimal yearlyRevenue) { this.yearlyRevenue = yearlyRevenue; }
 
-    public int getWinRatePercent() { return winRatePercent; }
-    public void setWinRatePercent(int winRatePercent) { this.winRatePercent = winRatePercent; }
+    public List<Task> getUpcomingTasks() { return upcomingTasks; }
+    public void setUpcomingTasks(List<Task> upcomingTasks) { this.upcomingTasks = upcomingTasks; }
 
-    public long getWonCount() { return wonCount; }
-    public void setWonCount(long wonCount) { this.wonCount = wonCount; }
-
-    public long getLostCount() { return lostCount; }
-    public void setLostCount(long lostCount) { this.lostCount = lostCount; }
+    public long getOverdueTaskCount() { return overdueTaskCount; }
+    public void setOverdueTaskCount(long overdueTaskCount) { this.overdueTaskCount = overdueTaskCount; }
 }

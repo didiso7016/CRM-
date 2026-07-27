@@ -27,13 +27,16 @@ public class DashboardService {
     private final CustomerService customerService;
     private final QuotationService quotationService;
     private final CompanySettingsService companySettingsService;
+    private final TaskService taskService;
 
     public DashboardService(CustomerService customerService,
                             QuotationService quotationService,
-                            CompanySettingsService companySettingsService) {
+                            CompanySettingsService companySettingsService,
+                            TaskService taskService) {
         this.customerService = customerService;
         this.quotationService = quotationService;
         this.companySettingsService = companySettingsService;
+        this.taskService = taskService;
     }
 
     @Transactional(readOnly = true)
@@ -56,15 +59,15 @@ public class DashboardService {
         d.setFollowUpCustomers(customerService.needFollowUp(reminderDays));
         d.setReminderDays(reminderDays);
 
-        // ===== 圖表 =====
-        List<Quotation> accepted = quotationService.acceptedQuotations();
-        d.setMonthlyRevenue(buildMonthlyRevenue(accepted));
-        d.setTopCustomers(buildTopCustomers(accepted));
-        long won = d.getAcceptedCount();
-        long lost = quotationService.countByStatus(QuotationStatus.REJECTED);
-        d.setWonCount(won);
-        d.setLostCount(lost);
-        d.setWinRatePercent((won + lost) == 0 ? 0 : (int) Math.round(won * 100.0 / (won + lost)));
+        // ===== 成交金額(基準 = 已收訂)=====
+        List<Quotation> won = quotationService.acceptedQuotations();
+        d.setMonthlyRevenue(buildMonthlyRevenue(won));
+        d.setYearlyRevenue(buildYearlyRevenue(won));
+
+        // ===== 待辦 =====
+        List<com.crm.entity.Task> openTasks = taskService.listOpen();
+        d.setUpcomingTasks(openTasks.size() > 6 ? openTasks.subList(0, 6) : openTasks);
+        d.setOverdueTaskCount(taskService.countOverdue());
         return d;
     }
 
@@ -90,22 +93,16 @@ public class DashboardService {
         return bars;
     }
 
-    /** 成交金額 Top 5 客戶 */
-    private List<ChartBar> buildTopCustomers(List<Quotation> accepted) {
-        Map<String, BigDecimal> byCustomer = new LinkedHashMap<>();
-        for (Quotation q : accepted) {
-            String name = q.getCustomer() != null ? q.getCustomer().getCompanyName() : "(未知)";
-            byCustomer.merge(name, nz(q.getTotalAmount()), BigDecimal::add);
+    /** 本年度成交金額合計(已收訂報價) */
+    private BigDecimal buildYearlyRevenue(List<Quotation> won) {
+        int year = LocalDate.now().getYear();
+        BigDecimal total = BigDecimal.ZERO;
+        for (Quotation q : won) {
+            if (q.getQuotationDate() != null && q.getQuotationDate().getYear() == year) {
+                total = total.add(nz(q.getTotalAmount()));
+            }
         }
-        List<Map.Entry<String, BigDecimal>> sorted = new ArrayList<>(byCustomer.entrySet());
-        sorted.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-        BigDecimal max = sorted.isEmpty() ? BigDecimal.ZERO : sorted.get(0).getValue();
-        List<ChartBar> bars = new ArrayList<>();
-        for (int i = 0; i < Math.min(5, sorted.size()); i++) {
-            Map.Entry<String, BigDecimal> e = sorted.get(i);
-            bars.add(new ChartBar(e.getKey(), e.getValue(), pct(e.getValue(), max)));
-        }
-        return bars;
+        return total;
     }
 
     private int pct(BigDecimal v, BigDecimal max) {

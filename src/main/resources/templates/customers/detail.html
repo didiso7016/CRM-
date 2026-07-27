@@ -64,7 +64,7 @@
                         <tr><th class="text-muted">最後聯絡</th>
                             <td class="text-nowrap" th:with="days=${customer.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(customer.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
                                 <span th:if="${customer.lastContactedAt != null}"
-                                      th:text="${#temporals.format(customer.lastContactedAt,'yyyy-MM-dd')}"></span>
+                                      th:text="${#temporals.format(customer.lastContactedAt,'yyyy-MM-dd HH:mm')}"></span>
                                 <span th:if="${days != null}" class="day-badge"
                                       th:classappend="${days <= 7} ? 'day-green' : (${days <= 14} ? 'day-amber' : 'day-red')"
                                       th:text="${days == 0 ? '今天聯絡' : (days + ' 天沒聯絡')}">N 天沒聯絡</span>
@@ -73,8 +73,8 @@
                         </tr>
                         <tr><th class="text-muted">建立 / 更新</th>
                             <td>
-                                <span th:text="${#temporals.format(customer.createdAt,'yyyy-MM-dd')}"></span> /
-                                <span th:text="${#temporals.format(customer.updatedAt,'yyyy-MM-dd')}"></span>
+                                <span th:text="${#temporals.format(customer.createdAt,'yyyy-MM-dd HH:mm')}"></span> /
+                                <span th:text="${#temporals.format(customer.updatedAt,'yyyy-MM-dd HH:mm')}"></span>
                             </td>
                         </tr>
                     </table>

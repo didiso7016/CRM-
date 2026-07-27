@@ -62,7 +62,7 @@
                     <td th:text="${c.phone}">02-1234</td>
                     <td class="text-nowrap" th:with="days=${c.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(c.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
                         <span th:if="${c.lastContactedAt != null}"
-                              th:text="${#temporals.format(c.lastContactedAt,'yyyy-MM-dd')}">2026-07-01</span>
+                              th:text="${#temporals.format(c.lastContactedAt,'yyyy-MM-dd HH:mm')}">2026-07-01</span>
                         <span th:if="${days != null}" class="day-badge"
                               th:classappend="${days <= 7} ? 'day-green' : (${days <= 14} ? 'day-amber' : 'day-red')"
                               th:text="${days == 0 ? '今天' : (days + ' 天')}">N 天</span>

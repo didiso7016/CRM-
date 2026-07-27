@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('待辦事項')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4" style="max-width: 900px;">
+    <h4 class="mb-3"><i data-lucide="check-square"></i> 待辦事項</h4>
+
+    <!-- 新增待辦(內嵌) -->
+    <form method="post" th:action="@{/tasks}" th:object="${taskForm}" class="card card-body mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label required mb-1">事項</label>
+                <input class="form-control" th:field="*{title}" placeholder="例:回電給 Airspec 確認交期">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1">到期日</label>
+                <input type="date" class="form-control" th:field="*{dueDate}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1">相關客戶(可選)</label>
+                <select class="form-select" th:field="*{customerId}">
+                    <option value="">(無)</option>
+                    <option th:each="c : ${activeCustomers}" th:value="${c.id}" th:text="${c.companyName}"></option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary w-100" type="submit"><i data-lucide="plus"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <!-- 篩選 -->
+    <div class="btn-group btn-group-sm mb-2" role="group">
+        <a class="btn" th:classappend="${show=='open'} ? 'btn-primary' : 'btn-outline-secondary'"
+           th:href="@{/tasks(show='open')}">未完成</a>
+        <a class="btn" th:classappend="${show=='all'} ? 'btn-primary' : 'btn-outline-secondary'"
+           th:href="@{/tasks(show='all')}">全部</a>
+    </div>
+
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex align-items-center gap-2" th:each="t : ${tasks}">
+                <!-- 完成勾選 -->
+                <form method="post" th:action="@{/tasks/{id}/toggle(id=${t.id})}">
+                    <input type="hidden" name="redirect" th:value="@{/tasks(show=${show})}">
+                    <button type="submit" class="btn btn-sm p-0 border-0 bg-transparent" title="切換完成">
+                        <i th:attr="data-lucide=${t.done ? 'check-square' : 'square'}"
+                           th:style="${t.done} ? 'color:var(--green-ink)' : 'color:var(--muted)'"></i>
+                    </button>
+                </form>
+                <!-- 內容 -->
+                <div class="flex-grow-1" th:classappend="${t.done} ? 'text-muted text-decoration-line-through' : ''">
+                    <span th:text="${t.title}">事項</span>
+                    <span th:if="${t.customer != null}" class="badge text-bg-light border ms-1">
+                        <a th:href="@{/customers/{id}(id=${t.customer.id})}" class="text-decoration-none"
+                           th:text="${t.customer.companyName}">客戶</a>
+                    </span>
+                </div>
+                <!-- 到期日 -->
+                <span th:if="${t.dueDate != null}" class="small text-nowrap"
+                      th:classappend="${!t.done and t.dueDate.isBefore(T(java.time.LocalDate).now())} ? 'text-danger fw-bold' : 'text-muted'"
+                      th:text="${#temporals.format(t.dueDate,'yyyy-MM-dd')}">2026-07-30</span>
+                <!-- 刪除 -->
+                <form method="post" class="confirm-action" data-confirm-message="確定刪除這筆待辦?"
+                      th:action="@{/tasks/{id}/delete(id=${t.id})}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i data-lucide="trash-2"></i></button>
+                </form>
+            </li>
+            <li class="list-group-item text-center text-muted py-4" th:if="${#lists.isEmpty(tasks)}">
+                目前沒有待辦事項
+            </li>
+        </ul>
+    </div>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

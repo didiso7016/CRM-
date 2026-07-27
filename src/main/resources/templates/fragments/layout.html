@@ -52,6 +52,11 @@
         <span class="nav-count" th:if="${navNotificationCount != null and navNotificationCount > 0}"
               th:text="${navNotificationCount}">0</span>
     </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='tasks'}?'active'" th:href="@{/tasks}">
+        <i data-lucide="check-square"></i> 待辦
+        <span class="nav-count" th:if="${navOverdueTasks != null and navOverdueTasks > 0}"
+              th:text="${navOverdueTasks}">0</span>
+    </a>
     <a class="app-nav-link" th:classappend="${activeMenu=='settings'}?'active'" th:href="@{/settings}">
         <i data-lucide="sliders-horizontal"></i> 設定
     </a>
