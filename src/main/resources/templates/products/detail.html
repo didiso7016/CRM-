@@ -63,42 +63,61 @@
                         <!-- 摘要:最近一次 / 最低 / 已成交 -->
                         <div class="row g-2 mb-3">
                             <div class="col-md-4">
-                                <div class="card stat-card border-start border-4 border-primary h-100">
+                                <a class="card stat-card border-start border-4 border-primary h-100 text-decoration-none"
+                                   th:if="${priceHistory.latest != null}"
+                                   th:href="@{/quotations/{id}(id=${priceHistory.latest.quotationId})}"
+                                   title="點擊查看這筆報價單">
                                     <div class="card-body py-2">
-                                        <div class="text-muted small">最近一次報價</div>
-                                        <div class="fs-5 fw-bold amount" th:if="${priceHistory.latest != null}">
+                                        <div class="text-muted small d-flex justify-content-between">
+                                            <span>最近一次報價</span><i data-lucide="external-link" style="width:14px;height:14px"></i></div>
+                                        <div class="fs-5 fw-bold amount text-dark">
                                             <span class="text-muted small" th:text="${priceHistory.latest.currency}">USD</span>
                                             <span th:text="${#numbers.formatDecimal(priceHistory.latest.unitPrice,1,'COMMA',2,'POINT')}">0</span>
                                         </div>
-                                        <div class="text-muted small" th:if="${priceHistory.latest != null}"
+                                        <div class="text-muted small"
                                              th:text="${#temporals.format(priceHistory.latest.date,'yyyy-MM-dd')} + ' · ' + ${priceHistory.latest.customerName}"></div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-4">
-                                <div class="card stat-card border-start border-4 border-success h-100">
+                                <a class="card stat-card border-start border-4 border-success h-100 text-decoration-none"
+                                   th:if="${priceHistory.lowest != null}"
+                                   th:href="@{/quotations/{id}(id=${priceHistory.lowest.quotationId})}"
+                                   title="點擊查看這筆報價單">
                                     <div class="card-body py-2">
-                                        <div class="text-muted small">最低報價</div>
-                                        <div class="fs-5 fw-bold amount" th:if="${priceHistory.lowest != null}">
+                                        <div class="text-muted small d-flex justify-content-between">
+                                            <span>最低報價</span><i data-lucide="external-link" style="width:14px;height:14px"></i></div>
+                                        <div class="fs-5 fw-bold amount text-dark">
                                             <span class="text-muted small" th:text="${priceHistory.lowest.currency}">USD</span>
                                             <span th:text="${#numbers.formatDecimal(priceHistory.lowest.unitPrice,1,'COMMA',2,'POINT')}">0</span>
                                         </div>
-                                        <div class="text-muted small" th:if="${priceHistory.lowest != null}"
+                                        <div class="text-muted small"
                                              th:text="${#temporals.format(priceHistory.lowest.date,'yyyy-MM-dd')} + ' · ' + ${priceHistory.lowest.customerName}"></div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-4">
-                                <div class="card stat-card border-start border-4 border-warning h-100">
+                                <!-- 有成交:可點跳到最近一筆成交的報價單 -->
+                                <a class="card stat-card border-start border-4 border-warning h-100 text-decoration-none"
+                                   th:if="${!#lists.isEmpty(priceHistory.accepted)}"
+                                   th:href="@{/quotations/{id}(id=${priceHistory.accepted[0].quotationId})}"
+                                   title="點擊查看這筆成交報價單">
                                     <div class="card-body py-2">
-                                        <div class="text-muted small">已成交價格</div>
-                                        <div class="fs-5 fw-bold amount" th:if="${!#lists.isEmpty(priceHistory.accepted)}">
+                                        <div class="text-muted small d-flex justify-content-between">
+                                            <span>已成交價格</span><i data-lucide="external-link" style="width:14px;height:14px"></i></div>
+                                        <div class="fs-5 fw-bold amount text-dark">
                                             <span class="text-muted small" th:text="${priceHistory.accepted[0].currency}">USD</span>
                                             <span th:text="${#numbers.formatDecimal(priceHistory.accepted[0].unitPrice,1,'COMMA',2,'POINT')}">0</span>
                                         </div>
-                                        <div class="text-muted small" th:if="${!#lists.isEmpty(priceHistory.accepted)}"
-                                             th:text="'共 ' + ${#lists.size(priceHistory.accepted)} + ' 筆成交'">共 0 筆</div>
-                                        <div class="text-muted small" th:if="${#lists.isEmpty(priceHistory.accepted)}">尚無成交</div>
+                                        <div class="text-muted small" th:text="'共 ' + ${#lists.size(priceHistory.accepted)} + ' 筆成交'">共 0 筆</div>
+                                    </div>
+                                </a>
+                                <!-- 尚無成交:純顯示,不可點 -->
+                                <div class="card stat-card border-start border-4 border-warning h-100"
+                                     th:if="${#lists.isEmpty(priceHistory.accepted)}">
+                                    <div class="card-body py-2">
+                                        <div class="text-muted small">已成交價格</div>
+                                        <div class="text-muted small mt-2">尚無成交</div>
                                     </div>
                                 </div>
                             </div>
