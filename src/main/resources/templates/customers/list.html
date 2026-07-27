@@ -60,7 +60,7 @@
                     </td>
                     <td th:text="${c.customerType != null ? c.customerType.label : ''}">一般客戶</td>
                     <td th:text="${c.phone}">02-1234</td>
-                    <td th:with="days=${c.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(c.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
+                    <td class="text-nowrap" th:with="days=${c.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(c.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
                         <span th:if="${c.lastContactedAt != null}"
                               th:text="${#temporals.format(c.lastContactedAt,'yyyy-MM-dd')}">2026-07-01</span>
                         <span th:if="${days != null}" class="day-badge"

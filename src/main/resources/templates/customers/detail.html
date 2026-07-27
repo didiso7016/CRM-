@@ -62,7 +62,7 @@
                         <tr><th class="text-muted">地址</th><td th:text="${customer.address}"></td></tr>
                         <tr><th class="text-muted">備註</th><td th:text="${customer.notes}"></td></tr>
                         <tr><th class="text-muted">最後聯絡</th>
-                            <td th:with="days=${customer.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(customer.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
+                            <td class="text-nowrap" th:with="days=${customer.lastContactedAt != null ? T(java.time.temporal.ChronoUnit).DAYS.between(customer.lastContactedAt, T(java.time.LocalDateTime).now()) : null}">
                                 <span th:if="${customer.lastContactedAt != null}"
                                       th:text="${#temporals.format(customer.lastContactedAt,'yyyy-MM-dd')}"></span>
                                 <span th:if="${days != null}" class="day-badge"

@@ -56,10 +56,10 @@
 }
 
 /* ---------- 基礎 ---------- */
-html{font-size:16px}
+html{font-size:15px}
 body{
   background:var(--paper);color:var(--text);
-  font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;
+  font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;
   padding-left:var(--sidebar-w);          /* 讓出左側欄空間 */
 }
 h1,h2,h3,h4,h5,h6{color:var(--ink)}
@@ -142,8 +142,8 @@ main.container-fluid,main.container{max-width:1280px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   box-shadow:var(--shadow);--bs-card-bg:var(--surface)}
 .card-header{background:var(--surface);border-bottom:1px solid var(--border);
-  font-weight:700;color:var(--ink);padding:14px 18px}
-.card-body{padding:18px}
+  font-weight:700;color:var(--ink);padding:10px 15px}
+.card-body{padding:14px}
 
 /* Dashboard KPI 卡 */
 .stat-card{transition:transform .1s ease}
@@ -155,7 +155,7 @@ main.container-fluid,main.container{max-width:1280px}
 .table>thead th,.table-light>thead th,.table-light th{
   background:var(--surface-2)!important;color:var(--muted);font-weight:600;font-size:.8rem;
   letter-spacing:.02em;border-color:var(--border)}
-.table>tbody>tr>td{border-color:var(--border);padding:.7rem .9rem;vertical-align:middle}
+.table>tbody>tr>td{border-color:var(--border);padding:.5rem .8rem;vertical-align:middle}
 .table-hover>tbody>tr:hover>*{background:var(--surface-2);color:var(--ink)}
 
 /* ---------- 表單 ---------- */
@@ -209,8 +209,8 @@ main.container-fluid,main.container{max-width:1280px}
 .flash-error>svg.lucide{color:var(--bad)}
 
 /* 最後聯絡天數色標(1~7 綠 / 8~14 黃 / 15+ 紅)*/
-.day-badge{display:inline-block;font-weight:700;font-size:.74rem;padding:2px 8px;
-  border-radius:20px;margin-left:5px;white-space:nowrap}
+.day-badge{display:inline-block;font-weight:700;font-size:.72rem;padding:1px 7px;
+  border-radius:20px;margin-left:4px;white-space:nowrap}
 .day-green{background:var(--green-weak);color:var(--green-ink)}
 .day-amber{background:var(--warn-weak);color:var(--warn)}
 .day-red{background:var(--bad-weak);color:var(--bad)}
