@@ -19,10 +19,13 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final ContactLogService contactLogService;
+    private final CustomerNumberService customerNumberService;
 
-    public CustomerService(CustomerRepository customerRepository, ContactLogService contactLogService) {
+    public CustomerService(CustomerRepository customerRepository, ContactLogService contactLogService,
+                           CustomerNumberService customerNumberService) {
         this.customerRepository = customerRepository;
         this.contactLogService = contactLogService;
+        this.customerNumberService = customerNumberService;
     }
 
     @Transactional(readOnly = true)
@@ -57,6 +60,8 @@ public class CustomerService {
     public Customer create(CustomerForm form) {
         Customer c = new Customer();
         apply(form, c);
+        // 客戶編號由系統自動產生(CUS-YYYY-NNN),不由使用者輸入
+        c.setCustomerCode(customerNumberService.generate());
         return customerRepository.save(c);
     }
 
@@ -124,9 +129,8 @@ public class CustomerService {
         customerRepository.save(c);
     }
 
-    /** 將表單資料套用到 Entity(去除前後空白) */
+    /** 將表單資料套用到 Entity(去除前後空白)。客戶編號為系統管理,不在此處理。 */
     private void apply(CustomerForm form, Customer c) {
-        c.setCustomerCode(trim(form.getCustomerCode()));
         c.setCompanyName(trim(form.getCompanyName()));
         c.setTaxId(trim(form.getTaxId()));
         c.setPhone(trim(form.getPhone()));

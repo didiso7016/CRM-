@@ -19,7 +19,8 @@ class CustomerServiceTest {
 
     private final CustomerRepository repo = mock(CustomerRepository.class);
     private final ContactLogService contactLogService = mock(ContactLogService.class);
-    private final CustomerService service = new CustomerService(repo, contactLogService);
+    private final CustomerNumberService customerNumberService = mock(CustomerNumberService.class);
+    private final CustomerService service = new CustomerService(repo, contactLogService, customerNumberService);
 
     private Customer withId(Long id) {
         Customer c = new Customer();

@@ -154,7 +154,7 @@ main.container-fluid,main.container{max-width:1280px}
 .table{--bs-table-bg:transparent;color:var(--text);border-color:var(--border);margin-bottom:0}
 .table>thead th,.table-light>thead th,.table-light th{
   background:var(--surface-2)!important;color:var(--muted);font-weight:600;font-size:.8rem;
-  letter-spacing:.02em;border-color:var(--border)}
+  letter-spacing:.02em;border-color:var(--border);padding:.5rem .8rem;vertical-align:middle}
 .table>tbody>tr>td{border-color:var(--border);padding:.5rem .8rem;vertical-align:middle}
 .table-hover>tbody>tr:hover>*{background:var(--surface-2);color:var(--ink)}
 

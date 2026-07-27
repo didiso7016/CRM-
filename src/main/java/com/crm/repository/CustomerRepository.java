@@ -20,6 +20,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByCustomerCode(String customerCode);
 
+    /** 取出符合前綴的客戶編號(供自動產生編號時計算當年度流水號) */
+    @Query("select c.customerCode from Customer c where c.customerCode like :prefix")
+    List<String> findCodesByPrefix(@Param("prefix") String prefix);
+
     /**
      * 綜合搜尋:可依公司名稱、客戶編號或聯絡人姓名模糊比對。
      * onlyActive 為 true 時只回傳啟用中的客戶。

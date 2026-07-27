@@ -19,9 +19,11 @@
             <div class="form-section-title">基本資料</div>
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label required">客戶編號</label>
-                    <input type="text" class="form-control" th:field="*{customerCode}"
+                    <label class="form-label">客戶編號</label>
+                    <input type="text" class="form-control bg-light" th:field="*{customerCode}" readonly
                            th:classappend="${#fields.hasErrors('customerCode')}?'is-invalid'">
+                    <div class="form-text"
+                         th:text="${editId != null} ? '系統編號,不可修改' : '系統自動產生,儲存後即固定'">系統自動產生</div>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('customerCode')}"
                          th:errors="*{customerCode}"></div>
                 </div>

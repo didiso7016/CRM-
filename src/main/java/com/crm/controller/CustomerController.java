@@ -5,6 +5,7 @@ import com.crm.entity.Customer;
 import com.crm.enums.CustomerType;
 import com.crm.service.ContactLogService;
 import com.crm.service.ContactService;
+import com.crm.service.CustomerNumberService;
 import com.crm.service.CustomerService;
 import com.crm.service.QuotationService;
 import jakarta.validation.Valid;
@@ -25,13 +26,16 @@ public class CustomerController {
     private final ContactService contactService;
     private final QuotationService quotationService;
     private final ContactLogService contactLogService;
+    private final CustomerNumberService customerNumberService;
 
     public CustomerController(CustomerService customerService, ContactService contactService,
-                             QuotationService quotationService, ContactLogService contactLogService) {
+                             QuotationService quotationService, ContactLogService contactLogService,
+                             CustomerNumberService customerNumberService) {
         this.customerService = customerService;
         this.contactService = contactService;
         this.quotationService = quotationService;
         this.contactLogService = contactLogService;
+        this.customerNumberService = customerNumberService;
     }
 
     /** 客戶列表 + 搜尋 + 分頁 */
@@ -57,7 +61,10 @@ public class CustomerController {
     public String newForm(Model model) {
         model.addAttribute("activeMenu", "customers");
         if (!model.containsAttribute("customerForm")) {
-            model.addAttribute("customerForm", new CustomerForm());
+            CustomerForm form = new CustomerForm();
+            // 預覽即將自動產生的客戶編號(實際值以儲存當下為準)
+            form.setCustomerCode(customerNumberService.generate());
+            model.addAttribute("customerForm", form);
         }
         model.addAttribute("customerTypes", CustomerType.values());
         return "customers/form";
@@ -67,13 +74,12 @@ public class CustomerController {
     @PostMapping
     public String create(@Valid @ModelAttribute("customerForm") CustomerForm form,
                          BindingResult result, Model model, RedirectAttributes ra) {
-        // 後端重新驗證客戶編號重複
-        if (customerService.isCodeDuplicate(form.getCustomerCode(), null)) {
-            result.rejectValue("customerCode", "duplicate", "客戶編號已存在,請改用其他編號");
-        }
+        // 客戶編號由系統自動產生,不需驗證重複
         if (result.hasErrors()) {
             model.addAttribute("activeMenu", "customers");
             model.addAttribute("customerTypes", CustomerType.values());
+            // 重新產生預覽編號供畫面顯示
+            form.setCustomerCode(customerNumberService.generate());
             return "customers/form";
         }
         Customer saved = customerService.create(form);
@@ -109,9 +115,7 @@ public class CustomerController {
     public String update(@PathVariable Long id,
                          @Valid @ModelAttribute("customerForm") CustomerForm form,
                          BindingResult result, Model model, RedirectAttributes ra) {
-        if (customerService.isCodeDuplicate(form.getCustomerCode(), id)) {
-            result.rejectValue("customerCode", "duplicate", "客戶編號已存在,請改用其他編號");
-        }
+        // 客戶編號不可修改,無需重複驗證
         if (result.hasErrors()) {
             model.addAttribute("activeMenu", "customers");
             model.addAttribute("customerTypes", CustomerType.values());

@@ -12,7 +12,7 @@ public class CustomerForm {
 
     private Long id;
 
-    @NotBlank(message = "客戶編號為必填")
+    // 客戶編號由系統自動產生(CUS-YYYY-NNN),不由使用者輸入,故不做必填驗證
     @Size(max = 50, message = "客戶編號不可超過 50 字")
     private String customerCode;
 
