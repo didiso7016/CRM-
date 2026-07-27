@@ -336,6 +336,12 @@ public class QuotationService {
         return quotationRepository.findTop5ByOrderByCreatedAtDesc();
     }
 
+    /** 已成交(已接受)的報價,供儀表板統計 */
+    @Transactional(readOnly = true)
+    public List<Quotation> acceptedQuotations() {
+        return quotationRepository.findByStatus(QuotationStatus.ACCEPTED);
+    }
+
     @Transactional(readOnly = true)
     public List<Quotation> expiringSoon(int days) {
         LocalDate today = LocalDate.now();

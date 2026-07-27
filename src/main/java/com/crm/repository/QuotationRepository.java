@@ -53,6 +53,10 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
 
     long countByStatus(QuotationStatus status);
 
+    /** 依狀態取回報價(含客戶),供儀表板統計 */
+    @EntityGraph(attributePaths = {"customer"})
+    List<Quotation> findByStatus(QuotationStatus status);
+
     /** 最近建立的報價單 */
     @EntityGraph(attributePaths = {"customer"})
     List<Quotation> findTop5ByOrderByCreatedAtDesc();

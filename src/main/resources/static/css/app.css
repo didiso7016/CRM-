@@ -189,6 +189,26 @@ main.container-fluid,main.container{max-width:1280px}
 .text-bg-warning{color:#fff!important}
 :root[data-theme="dark"] .text-bg-warning{color:#1B2A33!important}
 
+/* ---------- 儀表板圖表(純 SVG/CSS,離線可用)---------- */
+/* 直條圖:近 6 月營業額 */
+.bar-chart{display:flex;align-items:flex-end;gap:10px;height:150px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;min-width:0}
+.bar-track{flex:1;width:100%;display:flex;align-items:flex-end;background:var(--surface-2);border-radius:6px 6px 0 0}
+.bar-fill{width:100%;background:var(--accent);border-radius:6px 6px 0 0;min-height:3px}
+.bar-label{font-size:.74rem;color:var(--muted)}
+/* 成交率圓環 */
+.donut{width:118px;height:118px}
+.donut circle{fill:none;stroke-width:4.2}
+.donut-bg{stroke:var(--surface-2)}
+.donut-val{stroke:var(--green-ink);stroke-linecap:round;stroke-dashoffset:25}
+.donut-text{fill:var(--ink);font-size:8px;font-weight:800;text-anchor:middle;dominant-baseline:central}
+/* 橫條圖:Top 客戶 */
+.hbar{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:9px;margin-bottom:9px}
+.hbar-label{font-size:.82rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar-track{background:var(--surface-2);border-radius:6px;height:15px;overflow:hidden}
+.hbar-fill{background:var(--green-ink);height:100%;border-radius:6px;min-width:2px}
+.hbar-val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.8rem;color:var(--muted)}
+
 /* ---------- 分頁 ---------- */
 .page-link{color:var(--accent-ink);background:var(--surface);border-color:var(--border)}
 .page-link:hover{background:var(--surface-2);color:var(--accent)}

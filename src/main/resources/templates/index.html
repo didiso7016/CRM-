@@ -54,6 +54,58 @@
         <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i data-lucide="file-text"></i> 查看所有報價單</a>
     </div>
 
+    <!-- ===== 圖表:營運概況 ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-5">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="bar-chart-3"></i> 近 6 個月成交營業額</div>
+                <div class="card-body">
+                    <div class="bar-chart">
+                        <div class="bar-col" th:each="b : ${stats.monthlyRevenue}">
+                            <div class="bar-track">
+                                <div class="bar-fill" th:style="'height:' + ${b.pct} + '%'"
+                                     th:title="${b.label} + ':' + ${#numbers.formatDecimal(b.value,1,'COMMA',0,'POINT')}"></div>
+                            </div>
+                            <div class="bar-label" th:text="${b.label}">1月</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="target"></i> 報價成交率</div>
+                <div class="card-body text-center">
+                    <svg class="donut" viewBox="0 0 42 42" aria-label="成交率">
+                        <circle class="donut-bg" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="donut-val" cx="21" cy="21" r="15.915"
+                                th:attr="stroke-dasharray=${stats.winRatePercent + ' ' + (100 - stats.winRatePercent)}"></circle>
+                        <text x="21" y="21" class="donut-text" th:text="${stats.winRatePercent} + '%'">0%</text>
+                    </svg>
+                    <div class="text-muted small mt-2">
+                        成交 <span class="fw-bold" style="color:var(--green-ink)" th:text="${stats.wonCount}">0</span> ·
+                        未成交 <span class="fw-bold" th:text="${stats.lostCount}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="trophy"></i> 成交金額 Top 客戶</div>
+                <div class="card-body">
+                    <div class="hbar" th:each="b : ${stats.topCustomers}">
+                        <div class="hbar-label" th:text="${b.label}" th:title="${b.label}">客戶</div>
+                        <div class="hbar-track"><div class="hbar-fill" th:style="'width:' + ${b.pct} + '%'"></div></div>
+                        <div class="hbar-val" th:text="${#numbers.formatDecimal(b.value,1,'COMMA',0,'POINT')}">0</div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(stats.topCustomers)}" class="text-muted small py-3 text-center">
+                        尚無成交資料
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 客戶關懷提醒:超過 N 天未聯絡 -->
     <div class="card mb-4 border-danger" th:if="${!#lists.isEmpty(stats.followUpCustomers)}">
         <div class="card-header bg-danger-subtle">

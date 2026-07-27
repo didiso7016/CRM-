@@ -23,6 +23,13 @@ public class DashboardData {
     private List<Customer> followUpCustomers;
     private int reminderDays;
 
+    /** 圖表:近 6 個月成交營業額 / Top 客戶 / 成交率 */
+    private List<ChartBar> monthlyRevenue;
+    private List<ChartBar> topCustomers;
+    private int winRatePercent;
+    private long wonCount;
+    private long lostCount;
+
     // ===== Getter / Setter =====
     public long getCustomerCount() { return customerCount; }
     public void setCustomerCount(long customerCount) { this.customerCount = customerCount; }
@@ -50,4 +57,19 @@ public class DashboardData {
 
     public int getReminderDays() { return reminderDays; }
     public void setReminderDays(int reminderDays) { this.reminderDays = reminderDays; }
+
+    public List<ChartBar> getMonthlyRevenue() { return monthlyRevenue; }
+    public void setMonthlyRevenue(List<ChartBar> monthlyRevenue) { this.monthlyRevenue = monthlyRevenue; }
+
+    public List<ChartBar> getTopCustomers() { return topCustomers; }
+    public void setTopCustomers(List<ChartBar> topCustomers) { this.topCustomers = topCustomers; }
+
+    public int getWinRatePercent() { return winRatePercent; }
+    public void setWinRatePercent(int winRatePercent) { this.winRatePercent = winRatePercent; }
+
+    public long getWonCount() { return wonCount; }
+    public void setWonCount(long wonCount) { this.wonCount = wonCount; }
+
+    public long getLostCount() { return lostCount; }
+    public void setLostCount(long lostCount) { this.lostCount = lostCount; }
 }
