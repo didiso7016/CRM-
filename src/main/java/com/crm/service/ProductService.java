@@ -23,8 +23,9 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<Product> search(String keyword, boolean onlyActive) {
-        return productRepository.search(keyword == null ? "" : keyword.trim(), onlyActive);
+    public org.springframework.data.domain.Page<Product> search(String keyword, boolean onlyActive,
+                                                                org.springframework.data.domain.Pageable pageable) {
+        return productRepository.search(keyword == null ? "" : keyword.trim(), onlyActive, pageable);
     }
 
     @Transactional(readOnly = true)

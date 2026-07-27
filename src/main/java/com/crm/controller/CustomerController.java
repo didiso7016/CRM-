@@ -34,15 +34,21 @@ public class CustomerController {
         this.contactLogService = contactLogService;
     }
 
-    /** 客戶列表 + 搜尋 */
+    /** 客戶列表 + 搜尋 + 分頁 */
     @GetMapping
     public String list(@RequestParam(required = false) String keyword,
                        @RequestParam(defaultValue = "false") boolean activeOnly,
+                       @RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "20") int size,
                        Model model) {
         model.addAttribute("activeMenu", "customers");
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeOnly", activeOnly);
-        model.addAttribute("customers", customerService.search(keyword, activeOnly));
+        var result = customerService.search(keyword, activeOnly,
+                org.springframework.data.domain.PageRequest.of(page, size));
+        model.addAttribute("customers", result.getContent());
+        model.addAttribute("page", result);
+        model.addAttribute("pageSize", size);
         return "customers/list";
     }
 

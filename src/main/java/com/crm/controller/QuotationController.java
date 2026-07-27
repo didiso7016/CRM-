@@ -67,9 +67,15 @@ public class QuotationController {
                        @RequestParam(required = false) QuotationStatus status,
                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+                       @RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "20") int size,
                        Model model) {
         model.addAttribute("activeMenu", "quotations");
-        model.addAttribute("quotations", quotationService.search(customerId, number, status, from, to));
+        var result = quotationService.search(customerId, number, status, from, to,
+                org.springframework.data.domain.PageRequest.of(page, size));
+        model.addAttribute("quotations", result.getContent());
+        model.addAttribute("page", result);
+        model.addAttribute("pageSize", size);
         model.addAttribute("statuses", QuotationStatus.values());
         model.addAttribute("customers", customerRepository.findAll());
         // 回填搜尋條件

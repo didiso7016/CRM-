@@ -39,7 +39,7 @@ public class NotificationController {
         model.addAttribute("activeMenu", "notifications");
         model.addAttribute("items", notificationService.load());
         model.addAttribute("recentLogs", contactLogService.recent());
-        model.addAttribute("activeCustomers", customerService.search("", true));
+        model.addAttribute("activeCustomers", customerService.listActiveForSelect());
         model.addAttribute("contactTypes", ContactType.values());
         if (!model.containsAttribute("logForm")) {
             ContactLogForm form = new ContactLogForm();
@@ -57,7 +57,7 @@ public class NotificationController {
             model.addAttribute("activeMenu", "notifications");
             model.addAttribute("items", notificationService.load());
             model.addAttribute("recentLogs", contactLogService.recent());
-            model.addAttribute("activeCustomers", customerService.search("", true));
+            model.addAttribute("activeCustomers", customerService.listActiveForSelect());
             model.addAttribute("contactTypes", ContactType.values());
             return "notifications/index";
         }

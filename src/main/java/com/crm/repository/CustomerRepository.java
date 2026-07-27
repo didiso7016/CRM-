@@ -1,6 +1,8 @@
 package com.crm.repository;
 
 import com.crm.entity.Customer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,7 +24,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      * 綜合搜尋:可依公司名稱、客戶編號或聯絡人姓名模糊比對。
      * onlyActive 為 true 時只回傳啟用中的客戶。
      */
-    @Query("""
+    @Query(value = """
             select distinct c from Customer c
             left join Contact ct on ct.customer = c
             where (:keyword is null or :keyword = ''
@@ -31,9 +33,22 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
                    or lower(ct.name) like lower(concat('%', :keyword, '%')))
               and (:onlyActive = false or c.active = true)
             order by c.updatedAt desc
+            """,
+            countQuery = """
+            select count(distinct c) from Customer c
+            left join Contact ct on ct.customer = c
+            where (:keyword is null or :keyword = ''
+                   or lower(c.companyName) like lower(concat('%', :keyword, '%'))
+                   or lower(c.customerCode) like lower(concat('%', :keyword, '%'))
+                   or lower(ct.name) like lower(concat('%', :keyword, '%')))
+              and (:onlyActive = false or c.active = true)
             """)
-    List<Customer> search(@Param("keyword") String keyword,
-                          @Param("onlyActive") boolean onlyActive);
+    Page<Customer> search(@Param("keyword") String keyword,
+                          @Param("onlyActive") boolean onlyActive,
+                          Pageable pageable);
+
+    /** 供下拉選單:所有啟用中的客戶(不分頁) */
+    List<Customer> findByActiveTrueOrderByCompanyNameAsc();
 
     /** 最近更新的客戶(首頁用) */
     List<Customer> findTop5ByOrderByUpdatedAtDesc();

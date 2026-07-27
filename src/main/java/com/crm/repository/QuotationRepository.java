@@ -2,6 +2,8 @@ package com.crm.repository;
 
 import com.crm.entity.Quotation;
 import com.crm.enums.QuotationStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -86,7 +88,7 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
      * 報價單搜尋:可依客戶、單號、狀態、日期區間篩選。條件為 null 時忽略。
      */
     @EntityGraph(attributePaths = {"customer"})
-    @Query("""
+    @Query(value = """
             select q from Quotation q
             where (:customerId is null or q.customer.id = :customerId)
               and (:number is null or :number = '' or lower(q.quotationNumber) like lower(concat('%', :number, '%')))
@@ -95,10 +97,20 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
               and (:to is null or q.quotationDate <= :to)
               and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
             order by q.createdAt desc
+            """,
+            countQuery = """
+            select count(q) from Quotation q
+            where (:customerId is null or q.customer.id = :customerId)
+              and (:number is null or :number = '' or lower(q.quotationNumber) like lower(concat('%', :number, '%')))
+              and (:status is null or q.status = :status)
+              and (:from is null or q.quotationDate >= :from)
+              and (:to is null or q.quotationDate <= :to)
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
             """)
-    List<Quotation> search(@Param("customerId") Long customerId,
+    Page<Quotation> search(@Param("customerId") Long customerId,
                            @Param("number") String number,
                            @Param("status") QuotationStatus status,
                            @Param("from") LocalDate from,
-                           @Param("to") LocalDate to);
+                           @Param("to") LocalDate to,
+                           Pageable pageable);
 }

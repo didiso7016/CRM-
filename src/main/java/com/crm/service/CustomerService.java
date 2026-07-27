@@ -24,8 +24,15 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public List<Customer> search(String keyword, boolean onlyActive) {
-        return customerRepository.search(keyword == null ? "" : keyword.trim(), onlyActive);
+    public org.springframework.data.domain.Page<Customer> search(String keyword, boolean onlyActive,
+                                                                 org.springframework.data.domain.Pageable pageable) {
+        return customerRepository.search(keyword == null ? "" : keyword.trim(), onlyActive, pageable);
+    }
+
+    /** 所有啟用中客戶(供下拉選單,不分頁) */
+    @Transactional(readOnly = true)
+    public List<Customer> listActiveForSelect() {
+        return customerRepository.findByActiveTrueOrderByCompanyNameAsc();
     }
 
     @Transactional(readOnly = true)

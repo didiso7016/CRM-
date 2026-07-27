@@ -55,10 +55,10 @@ public class QuotationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Quotation> search(Long customerId, String number, QuotationStatus status,
-                                  LocalDate from, LocalDate to) {
+    public org.springframework.data.domain.Page<Quotation> search(Long customerId, String number, QuotationStatus status,
+                                  LocalDate from, LocalDate to, org.springframework.data.domain.Pageable pageable) {
         return quotationRepository.search(customerId,
-                number == null ? "" : number.trim(), status, from, to);
+                number == null ? "" : number.trim(), status, from, to, pageable);
     }
 
     @Transactional(readOnly = true)

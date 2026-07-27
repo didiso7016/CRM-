@@ -189,6 +189,11 @@ main.container-fluid,main.container{max-width:1280px}
 .text-bg-warning{color:#fff!important}
 :root[data-theme="dark"] .text-bg-warning{color:#1B2A33!important}
 
+/* ---------- 分頁 ---------- */
+.page-link{color:var(--accent-ink);background:var(--surface);border-color:var(--border)}
+.page-link:hover{background:var(--surface-2);color:var(--accent)}
+.page-item.disabled .page-link{background:var(--surface);border-color:var(--border);color:var(--muted)}
+
 /* ---------- list-group(通知 / 聯絡人 / 備份清單)---------- */
 .list-group-item{background:var(--surface);color:var(--text);border-color:var(--border)}
 

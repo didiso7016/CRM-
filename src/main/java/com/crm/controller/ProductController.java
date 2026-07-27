@@ -27,11 +27,17 @@ public class ProductController {
     @GetMapping
     public String list(@RequestParam(required = false) String keyword,
                        @RequestParam(defaultValue = "false") boolean activeOnly,
+                       @RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "20") int size,
                        Model model) {
         model.addAttribute("activeMenu", "products");
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeOnly", activeOnly);
-        model.addAttribute("products", productService.search(keyword, activeOnly));
+        var result = productService.search(keyword, activeOnly,
+                org.springframework.data.domain.PageRequest.of(page, size));
+        model.addAttribute("products", result.getContent());
+        model.addAttribute("page", result);
+        model.addAttribute("pageSize", size);
         return "products/list";
     }
 

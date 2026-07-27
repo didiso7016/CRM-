@@ -86,7 +86,30 @@
             </table>
         </div>
     </div>
-    <p class="text-muted small mt-2">共 <span th:text="${#lists.size(customers)}">0</span> 筆</p>
+    <!-- 分頁 -->
+    <nav class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+        <form method="get" th:action="@{/customers}" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="keyword" th:value="${keyword}">
+            <input type="hidden" name="activeOnly" th:value="${activeOnly}">
+            <span class="text-muted small">共 <span th:text="${page.totalElements}">0</span> 筆</span>
+            <label class="text-muted small mb-0">每頁</label>
+            <select class="form-select form-select-sm" style="width:auto" name="size" onchange="this.form.submit()">
+                <option value="10" th:selected="${pageSize==10}">10</option>
+                <option value="20" th:selected="${pageSize==20}">20</option>
+                <option value="50" th:selected="${pageSize==50}">50</option>
+            </select>
+        </form>
+        <ul class="pagination pagination-sm mb-0" th:if="${page.totalPages > 1}">
+            <li class="page-item" th:classappend="${page.first}?'disabled'">
+                <a class="page-link" th:href="@{/customers(page=${page.number-1},size=${pageSize},keyword=${keyword},activeOnly=${activeOnly})}">上一頁</a>
+            </li>
+            <li class="page-item disabled"><span class="page-link"
+                th:text="'第 ' + (${page.number+1}) + ' / ' + ${page.totalPages} + ' 頁'">第 1 頁</span></li>
+            <li class="page-item" th:classappend="${page.last}?'disabled'">
+                <a class="page-link" th:href="@{/customers(page=${page.number+1},size=${pageSize},keyword=${keyword},activeOnly=${activeOnly})}">下一頁</a>
+            </li>
+        </ul>
+    </nav>
 </main>
 
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
