@@ -18,7 +18,8 @@ import static org.mockito.Mockito.when;
 class CustomerServiceTest {
 
     private final CustomerRepository repo = mock(CustomerRepository.class);
-    private final CustomerService service = new CustomerService(repo);
+    private final ContactLogService contactLogService = mock(ContactLogService.class);
+    private final CustomerService service = new CustomerService(repo, contactLogService);
 
     private Customer withId(Long id) {
         Customer c = new Customer();

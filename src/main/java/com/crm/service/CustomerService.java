@@ -18,9 +18,11 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final ContactLogService contactLogService;
 
-    public CustomerService(CustomerRepository customerRepository) {
+    public CustomerService(CustomerRepository customerRepository, ContactLogService contactLogService) {
         this.customerRepository = customerRepository;
+        this.contactLogService = contactLogService;
     }
 
     @Transactional(readOnly = true)
@@ -78,11 +80,14 @@ public class CustomerService {
         customerRepository.save(c);
     }
 
-    /** 記錄一次聯絡:更新最後聯絡時間(供未聯絡提醒) */
+    /** 記錄一次聯絡:建立一筆聯絡紀錄(最後聯絡時間以紀錄為準) */
     public void recordContact(Long id) {
-        Customer c = getById(id);
-        c.setLastContactedAt(LocalDateTime.now());
-        customerRepository.save(c);
+        com.crm.dto.ContactLogForm f = new com.crm.dto.ContactLogForm();
+        f.setCustomerId(id);
+        f.setLogDate(LocalDate.now());
+        f.setType(com.crm.enums.ContactType.OTHER);
+        f.setNote("記錄聯絡");
+        contactLogService.record(f);
     }
 
     @Transactional(readOnly = true)

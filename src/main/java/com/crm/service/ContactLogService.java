@@ -62,9 +62,32 @@ public class ContactLogService {
         return customer;
     }
 
-    /** 刪除一筆聯絡紀錄(不影響客戶的最後聯絡時間) */
+    /** 刪除一筆聯絡紀錄,並依剩餘紀錄重算客戶的最後聯絡時間 */
     public void delete(Long id) {
-        contactLogRepository.deleteById(id);
+        ContactLog log = contactLogRepository.findById(id).orElse(null);
+        if (log == null) {
+            return;
+        }
+        Customer customer = log.getCustomer();
+        contactLogRepository.delete(log);
+        recomputeLastContact(customer);
+    }
+
+    /** 依客戶目前的聯絡紀錄,重算最後聯絡時間(無紀錄則清空) */
+    private void recomputeLastContact(Customer customer) {
+        List<ContactLog> logs = contactLogRepository.findByCustomerIdOrderByLogDateDescIdDesc(customer.getId());
+        LocalDateTime newValue = logs.isEmpty() ? null : logs.get(0).getLogDate().atStartOfDay();
+        if (!java.util.Objects.equals(customer.getLastContactedAt(), newValue)) {
+            customer.setLastContactedAt(newValue);
+            customerRepository.save(customer);
+        }
+    }
+
+    /** 啟動時對齊:所有客戶的最後聯絡時間 = 其最新聯絡紀錄(自我修復) */
+    public void reconcileAll() {
+        for (Customer c : customerRepository.findAll()) {
+            recomputeLastContact(c);
+        }
     }
 
     @Transactional(readOnly = true)
