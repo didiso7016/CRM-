@@ -11,23 +11,34 @@
         <a class="btn btn-primary" th:href="@{/customers/new}"><i data-lucide="user-plus"></i> 新增客戶</a>
     </div>
 
-    <!-- 搜尋列 -->
+    <!-- 搜尋列:關鍵字(即時建議)/ 類型 / 狀態 -->
     <form class="card card-body mb-3" method="get" th:action="@{/customers}">
         <div class="row g-2 align-items-end">
-            <div class="col-md-6">
-                <label class="form-label small text-muted">關鍵字(公司名稱 / 客戶編號 / 聯絡人)</label>
-                <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="輸入關鍵字搜尋">
+            <div class="col-md-5">
+                <label class="form-label small text-muted">關鍵字(公司名稱 / 編號 / Email / 備註 / 聯絡人)</label>
+                <input type="text" class="form-control" name="keyword" th:value="${keyword}"
+                       placeholder="輸入即時顯示符合的客戶"
+                       data-suggest="customers" data-suggest-action="navigate">
             </div>
             <div class="col-md-3">
-                <div class="form-check mt-4">
-                    <input class="form-check-input" type="checkbox" name="activeOnly" value="true"
-                           id="activeOnly" th:checked="${activeOnly}">
-                    <label class="form-check-label" for="activeOnly">只顯示啟用中</label>
-                </div>
+                <label class="form-label small text-muted">客戶類型</label>
+                <select class="form-select" name="type">
+                    <option value="">全部類型</option>
+                    <option th:each="t : ${customerTypes}" th:value="${t}" th:text="${t.label}"
+                            th:selected="${fType != null and fType == t}"></option>
+                </select>
             </div>
-            <div class="col-md-3 text-end">
-                <button class="btn btn-outline-primary" type="submit"><i data-lucide="search"></i> 搜尋</button>
-                <a class="btn btn-outline-secondary" th:href="@{/customers}">清除</a>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">狀態</label>
+                <select class="form-select" name="status">
+                    <option value="" th:selected="${fStatus == null or fStatus == ''}">全部</option>
+                    <option value="active" th:selected="${fStatus == 'active'}">啟用中</option>
+                    <option value="inactive" th:selected="${fStatus == 'inactive'}">已停用</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-primary w-100" type="submit"><i data-lucide="search"></i> 搜尋</button>
+                <a class="btn btn-outline-secondary" th:href="@{/customers}" title="清除條件">清除</a>
             </div>
         </div>
     </form>
@@ -90,7 +101,8 @@
     <nav class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
         <form method="get" th:action="@{/customers}" class="d-flex align-items-center gap-2">
             <input type="hidden" name="keyword" th:value="${keyword}">
-            <input type="hidden" name="activeOnly" th:value="${activeOnly}">
+            <input type="hidden" name="type" th:if="${fType != null}" th:value="${fType}">
+            <input type="hidden" name="status" th:value="${fStatus}">
             <span class="text-muted small">共 <span th:text="${page.totalElements}">0</span> 筆</span>
             <label class="text-muted small mb-0">每頁</label>
             <select class="form-select form-select-sm" style="width:auto" name="size" onchange="this.form.submit()">
@@ -101,12 +113,12 @@
         </form>
         <ul class="pagination pagination-sm mb-0" th:if="${page.totalPages > 1}">
             <li class="page-item" th:classappend="${page.first}?'disabled'">
-                <a class="page-link" th:href="@{/customers(page=${page.number-1},size=${pageSize},keyword=${keyword},activeOnly=${activeOnly})}">上一頁</a>
+                <a class="page-link" th:href="@{/customers(page=${page.number-1},size=${pageSize},keyword=${keyword},type=${fType},status=${fStatus})}">上一頁</a>
             </li>
             <li class="page-item disabled"><span class="page-link"
                 th:text="'第 ' + (${page.number+1}) + ' / ' + ${page.totalPages} + ' 頁'">第 1 頁</span></li>
             <li class="page-item" th:classappend="${page.last}?'disabled'">
-                <a class="page-link" th:href="@{/customers(page=${page.number+1},size=${pageSize},keyword=${keyword},activeOnly=${activeOnly})}">下一頁</a>
+                <a class="page-link" th:href="@{/customers(page=${page.number+1},size=${pageSize},keyword=${keyword},type=${fType},status=${fStatus})}">下一頁</a>
             </li>
         </ul>
     </nav>

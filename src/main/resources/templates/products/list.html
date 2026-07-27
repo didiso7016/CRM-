@@ -56,6 +56,8 @@
                         <span th:unless="${p.active}" class="badge text-bg-secondary">停用</span>
                     </td>
                     <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/products/{id}(id=${p.id})}"
+                           title="詳細 / 歷史報價"><i data-lucide="eye"></i></a>
                         <a class="btn btn-sm btn-outline-primary" th:href="@{/products/{id}/edit(id=${p.id})}">
                             <i data-lucide="pencil"></i></a>
                         <form th:if="${p.active}" method="post" class="d-inline confirm-action"

@@ -47,14 +47,20 @@ public class CustomerController {
     /** 客戶列表 + 搜尋 + 分頁 */
     @GetMapping
     public String list(@RequestParam(required = false) String keyword,
-                       @RequestParam(defaultValue = "false") boolean activeOnly,
+                       @RequestParam(required = false) CustomerType type,
+                       @RequestParam(required = false) String status,
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "20") int size,
                        Model model) {
+        // status:空=全部、active=啟用中、inactive=已停用
+        Boolean active = "active".equals(status) ? Boolean.TRUE
+                : ("inactive".equals(status) ? Boolean.FALSE : null);
         model.addAttribute("activeMenu", "customers");
         model.addAttribute("keyword", keyword);
-        model.addAttribute("activeOnly", activeOnly);
-        var result = customerService.search(keyword, activeOnly,
+        model.addAttribute("fType", type);
+        model.addAttribute("fStatus", status);
+        model.addAttribute("customerTypes", CustomerType.values());
+        var result = customerService.search(keyword, type, active,
                 org.springframework.data.domain.PageRequest.of(page, size));
         model.addAttribute("customers", result.getContent());
         model.addAttribute("page", result);

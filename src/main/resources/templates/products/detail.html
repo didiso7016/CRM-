@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('零件 ' + ${product.internalPartNumber})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="mb-0">
+            <i data-lucide="cog"></i>
+            <span th:text="${product.internalPartNumber}">EV-001</span>
+            <span class="text-muted" th:text="${product.name}">品名</span>
+            <span th:if="${product.active}" class="badge text-bg-success align-middle">啟用</span>
+            <span th:unless="${product.active}" class="badge text-bg-secondary align-middle">停用</span>
+        </h4>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/products}"><i data-lucide="arrow-left"></i> 返回列表</a>
+            <a class="btn btn-outline-primary" th:href="@{/products/{id}/edit(id=${product.id})}">
+                <i data-lucide="pencil"></i> 編輯</a>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- 基本資料 -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="info"></i> 零件資料</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="text-muted" style="width:40%">內部料號</th><td th:text="${product.internalPartNumber}"></td></tr>
+                        <tr><th class="text-muted">客戶料號</th><td th:text="${product.customerPartNumber}"></td></tr>
+                        <tr><th class="text-muted">品名</th><td th:text="${product.name}"></td></tr>
+                        <tr><th class="text-muted">規格</th><td th:text="${product.specification}"></td></tr>
+                        <tr><th class="text-muted">材質</th><td th:text="${product.material}"></td></tr>
+                        <tr><th class="text-muted">表面處理</th><td th:text="${product.surfaceTreatment}"></td></tr>
+                        <tr><th class="text-muted">單位</th><td th:text="${product.unit}"></td></tr>
+                        <tr><th class="text-muted">預設單價</th>
+                            <td class="amount" th:text="${#numbers.formatDecimal(product.defaultUnitPrice,1,'COMMA',2,'POINT')}"></td></tr>
+                        <tr><th class="text-muted">MOQ</th><td th:text="${product.moq}"></td></tr>
+                        <tr><th class="text-muted">預設交期(天)</th><td th:text="${product.defaultLeadTimeDays}"></td></tr>
+                        <tr><th class="text-muted">備註</th><td th:text="${product.notes}"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 歷史報價 -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i data-lucide="history"></i> 歷史報價
+                        <span class="text-muted small fw-normal">(這顆料號過去被報過的價格)</span></span>
+                    <span class="badge text-bg-light border" th:text="'共 ' + ${#lists.size(priceHistory.entries)} + ' 筆'">共 0 筆</span>
+                </div>
+                <div class="card-body">
+                    <!-- 空狀態 -->
+                    <div th:if="${priceHistory.isEmpty()}" class="text-center text-muted py-4">
+                        這顆零件目前沒有任何報價紀錄。
+                    </div>
+
+                    <div th:unless="${priceHistory.isEmpty()}">
+                        <!-- 摘要:最近一次 / 最低 / 已成交 -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <div class="card stat-card border-start border-4 border-primary h-100">
+                                    <div class="card-body py-2">
+                                        <div class="text-muted small">最近一次報價</div>
+                                        <div class="fs-5 fw-bold amount" th:if="${priceHistory.latest != null}">
+                                            <span class="text-muted small" th:text="${priceHistory.latest.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(priceHistory.latest.unitPrice,1,'COMMA',2,'POINT')}">0</span>
+                                        </div>
+                                        <div class="text-muted small" th:if="${priceHistory.latest != null}"
+                                             th:text="${#temporals.format(priceHistory.latest.date,'yyyy-MM-dd')} + ' · ' + ${priceHistory.latest.customerName}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card stat-card border-start border-4 border-success h-100">
+                                    <div class="card-body py-2">
+                                        <div class="text-muted small">最低報價</div>
+                                        <div class="fs-5 fw-bold amount" th:if="${priceHistory.lowest != null}">
+                                            <span class="text-muted small" th:text="${priceHistory.lowest.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(priceHistory.lowest.unitPrice,1,'COMMA',2,'POINT')}">0</span>
+                                        </div>
+                                        <div class="text-muted small" th:if="${priceHistory.lowest != null}"
+                                             th:text="${#temporals.format(priceHistory.lowest.date,'yyyy-MM-dd')} + ' · ' + ${priceHistory.lowest.customerName}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card stat-card border-start border-4 border-warning h-100">
+                                    <div class="card-body py-2">
+                                        <div class="text-muted small">已成交價格</div>
+                                        <div class="fs-5 fw-bold amount" th:if="${!#lists.isEmpty(priceHistory.accepted)}">
+                                            <span class="text-muted small" th:text="${priceHistory.accepted[0].currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(priceHistory.accepted[0].unitPrice,1,'COMMA',2,'POINT')}">0</span>
+                                        </div>
+                                        <div class="text-muted small" th:if="${!#lists.isEmpty(priceHistory.accepted)}"
+                                             th:text="'共 ' + ${#lists.size(priceHistory.accepted)} + ' 筆成交'">共 0 筆</div>
+                                        <div class="text-muted small" th:if="${#lists.isEmpty(priceHistory.accepted)}">尚無成交</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-2" th:if="${priceHistory.lowest != null}">
+                            <i data-lucide="info"></i> 最低報價為不分幣別取最小單價;各筆幣別以表格為準。
+                        </p>
+
+                        <!-- 完整明細 -->
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>報價日期</th><th>客戶</th><th>報價單號</th>
+                                    <th class="text-end">數量</th><th>單位</th>
+                                    <th class="text-end amount">單價</th><th>幣別</th><th>狀態</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="e : ${priceHistory.entries}">
+                                    <td th:text="${#temporals.format(e.date,'yyyy-MM-dd')}">2026-07-01</td>
+                                    <td th:text="${e.customerName}">客戶</td>
+                                    <td><a th:href="@{/quotations/{id}(id=${e.quotationId})}"
+                                           th:text="${e.quotationNumber} + ' v' + ${e.version}">QT- v1</a></td>
+                                    <td class="text-end" th:text="${#numbers.formatDecimal(e.quantity,1,'COMMA',0,'POINT')}">0</td>
+                                    <td th:text="${e.unit}">PCS</td>
+                                    <td class="text-end amount" th:text="${#numbers.formatDecimal(e.unitPrice,1,'COMMA',2,'POINT')}">0</td>
+                                    <td th:text="${e.currency}">USD</td>
+                                    <td><span th:replace="~{fragments/status :: badge(${e.status})}"></span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

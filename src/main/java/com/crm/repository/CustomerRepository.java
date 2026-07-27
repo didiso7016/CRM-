@@ -25,8 +25,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<String> findCodesByPrefix(@Param("prefix") String prefix);
 
     /**
-     * 綜合搜尋:關鍵字可比對 公司名稱 / 客戶編號 / 公司 Email / 備註 / 聯絡人姓名。
-     * onlyActive 為 true 時只回傳啟用中的客戶。
+     * 綜合搜尋:關鍵字比對 公司名稱 / 客戶編號 / 公司 Email / 備註 / 聯絡人姓名;
+     * 另可依 客戶類型、啟用狀態(active 為 null 時不限)篩選。
      */
     @Query(value = """
             select distinct c from Customer c
@@ -37,7 +37,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
                    or lower(c.email) like lower(concat('%', :keyword, '%'))
                    or lower(c.notes) like lower(concat('%', :keyword, '%'))
                    or lower(ct.name) like lower(concat('%', :keyword, '%')))
-              and (:onlyActive = false or c.active = true)
+              and (:type is null or c.customerType = :type)
+              and (:active is null or c.active = :active)
             order by c.updatedAt desc
             """,
             countQuery = """
@@ -49,10 +50,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
                    or lower(c.email) like lower(concat('%', :keyword, '%'))
                    or lower(c.notes) like lower(concat('%', :keyword, '%'))
                    or lower(ct.name) like lower(concat('%', :keyword, '%')))
-              and (:onlyActive = false or c.active = true)
+              and (:type is null or c.customerType = :type)
+              and (:active is null or c.active = :active)
             """)
     Page<Customer> search(@Param("keyword") String keyword,
-                          @Param("onlyActive") boolean onlyActive,
+                          @Param("type") com.crm.enums.CustomerType type,
+                          @Param("active") Boolean active,
                           Pageable pageable);
 
     /** 供下拉選單:所有啟用中的客戶(不分頁) */

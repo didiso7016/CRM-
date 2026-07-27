@@ -41,6 +41,16 @@ public class ProductController {
         return "products/list";
     }
 
+    /** 零件詳細資料 + 歷史報價查詢 */
+    @GetMapping("/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "products");
+        Product p = productService.getById(id);
+        model.addAttribute("product", p);
+        model.addAttribute("priceHistory", productService.priceHistory(p));
+        return "products/detail";
+    }
+
     @GetMapping("/new")
     public String newForm(Model model) {
         prepareForm(model, null);

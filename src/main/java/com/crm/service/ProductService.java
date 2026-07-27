@@ -1,25 +1,61 @@
 package com.crm.service;
 
+import com.crm.dto.PriceHistoryEntry;
 import com.crm.dto.ProductForm;
+import com.crm.dto.ProductPriceHistory;
 import com.crm.entity.Product;
+import com.crm.entity.Quotation;
+import com.crm.entity.QuotationItem;
+import com.crm.enums.QuotationStatus;
 import com.crm.repository.ProductRepository;
+import com.crm.repository.QuotationItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 
 /**
- * 零件商業邏輯:新增/編輯/停用、料號搜尋與內部料號重複檢查。
+ * 零件商業邏輯:新增/編輯/停用、料號搜尋、內部料號重複檢查與歷史報價查詢。
  */
 @Service
 @Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final QuotationItemRepository quotationItemRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository,
+                          QuotationItemRepository quotationItemRepository) {
         this.productRepository = productRepository;
+        this.quotationItemRepository = quotationItemRepository;
+    }
+
+    /** 某零件的歷史報價:完整明細 + 最近一次 / 最低 / 已成交摘要 */
+    @Transactional(readOnly = true)
+    public ProductPriceHistory priceHistory(Product product) {
+        List<QuotationItem> items = quotationItemRepository.findPriceHistory(
+                product.getId(),
+                product.getInternalPartNumber() == null ? "" : product.getInternalPartNumber());
+
+        List<PriceHistoryEntry> entries = items.stream().map(it -> {
+            Quotation q = it.getQuotation();
+            return new PriceHistoryEntry(q.getId(), q.getQuotationNumber(), q.getVersion(),
+                    q.getCustomer().getCompanyName(), q.getQuotationDate(), it.getQuantity(), it.getUnit(),
+                    it.getUnitPrice(), q.getCurrency(), q.getStatus());
+        }).toList();
+
+        PriceHistoryEntry latest = entries.isEmpty() ? null : entries.get(0); // 已依日期新到舊
+        PriceHistoryEntry lowest = entries.stream()
+                .filter(e -> e.unitPrice() != null && e.unitPrice().signum() > 0)
+                .min(Comparator.comparing(PriceHistoryEntry::unitPrice))
+                .orElse(null);
+        List<PriceHistoryEntry> accepted = entries.stream()
+                .filter(e -> e.status() == QuotationStatus.ACCEPTED || e.status() == QuotationStatus.PAID)
+                .toList();
+
+        return new ProductPriceHistory(entries, latest, lowest, accepted);
     }
 
     @Transactional(readOnly = true)

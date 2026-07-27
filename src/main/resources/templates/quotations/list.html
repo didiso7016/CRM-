@@ -14,18 +14,11 @@
     <!-- 搜尋列:關鍵字 / 客戶 / 單號 / 狀態 / 日期區間 / 金額區間 -->
     <form class="card card-body mb-3" method="get" th:action="@{/quotations}">
         <div class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label small text-muted">關鍵字</label>
+            <div class="col-md-5">
+                <label class="form-label small text-muted">關鍵字(客戶名稱/編號、料號、品名)</label>
                 <input type="text" class="form-control" name="keyword" th:value="${fKeyword}"
-                       placeholder="客戶名稱/編號、料號、品名">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted">客戶</label>
-                <select class="form-select" name="customerId">
-                    <option value="">全部客戶</option>
-                    <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.companyName}"
-                            th:selected="${fCustomerId != null and fCustomerId == c.id}"></option>
-                </select>
+                       placeholder="輸入即時顯示符合的客戶"
+                       data-suggest="customers" data-suggest-action="fill">
             </div>
             <div class="col-md-3">
                 <label class="form-label small text-muted">報價單號</label>

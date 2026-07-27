@@ -27,9 +27,10 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<Customer> search(String keyword, boolean onlyActive,
+    public org.springframework.data.domain.Page<Customer> search(String keyword,
+                                                                 com.crm.enums.CustomerType type, Boolean active,
                                                                  org.springframework.data.domain.Pageable pageable) {
-        return customerRepository.search(keyword == null ? "" : keyword.trim(), onlyActive, pageable);
+        return customerRepository.search(keyword == null ? "" : keyword.trim(), type, active, pageable);
     }
 
     /** 所有啟用中客戶(供下拉選單,不分頁) */
