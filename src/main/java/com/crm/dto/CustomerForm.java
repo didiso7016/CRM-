@@ -31,11 +31,15 @@ public class CustomerForm {
     private String email;
 
     private String address;
+    private String country;
+    private String city;
     private CustomerType customerType = CustomerType.GENERAL;
     private String industry;
     private String source;
     private String notes;
     private boolean active = true;
+    /** 納入跟進提醒(預設不提醒) */
+    private boolean followUpEnabled = false;
 
     // ===== Getter / Setter =====
     public Long getId() { return id; }
@@ -62,6 +66,12 @@ public class CustomerForm {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
     public CustomerType getCustomerType() { return customerType; }
     public void setCustomerType(CustomerType customerType) { this.customerType = customerType; }
 
@@ -76,4 +86,7 @@ public class CustomerForm {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public boolean isFollowUpEnabled() { return followUpEnabled; }
+    public void setFollowUpEnabled(boolean followUpEnabled) { this.followUpEnabled = followUpEnabled; }
 }

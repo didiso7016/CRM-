@@ -34,10 +34,8 @@ public class DashboardService {
         DashboardData d = new DashboardData();
         d.setCustomerCount(customerService.countActive());
         d.setMonthlyQuotationCount(quotationService.countThisMonth());
-        // 報價中 = 草稿 + 已送出 + 客戶確認中
-        d.setInProgressCount(quotationService.countByStatus(QuotationStatus.DRAFT)
-                + quotationService.countByStatus(QuotationStatus.SENT)
-                + quotationService.countByStatus(QuotationStatus.CONFIRMING));
+        // 報價中 = 草稿 + 已送出 + 客戶確認中(僅計最新版本,舊版不算)
+        d.setInProgressCount(quotationService.countInProgress());
         d.setAcceptedCount(quotationService.countByStatus(QuotationStatus.ACCEPTED));
 
         d.setRecentQuotations(quotationService.recent());

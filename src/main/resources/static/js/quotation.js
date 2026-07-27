@@ -58,7 +58,7 @@
             <td class="text-end amount amount-cell">0.00</td>
             <td><input class="form-control form-control-sm" name="items[${i}].leadTime"></td>
             <td><input class="form-control form-control-sm" name="items[${i}].notes"></td>
-            <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger del-btn"><i class="bi bi-trash"></i></button></td>
+            <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger del-btn"><i data-lucide="trash-2"></i></button></td>
         `;
         // 隱藏的 productId
         const hidden = document.createElement('input');
@@ -124,6 +124,7 @@
 
         recalcRow(tr);
         renumber();
+        if (window.lucide) { lucide.createIcons(); } // 讓新列的圖示以 Lucide 渲染
     }
 
     function setVal(tr, name, value) {
@@ -175,7 +176,13 @@
         const filtered = contacts.filter(c => String(c.customerId) === String(cid));
         contactSelect.innerHTML = '<option value="">(未指定)</option>' +
             filtered.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-        if (preselectId) contactSelect.value = preselectId;
+        if (preselectId) {
+            contactSelect.value = preselectId;
+        } else {
+            // 未指定時,預設帶入該客戶的主要聯絡人
+            const primary = filtered.find(c => c.primary);
+            if (primary) contactSelect.value = primary.id;
+        }
     }
 
     // ===== 初始化 =====

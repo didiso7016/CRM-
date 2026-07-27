@@ -141,6 +141,28 @@ public class CustomerController {
         return "redirect:/customers/" + id;
     }
 
+    /** 設定是否納入跟進提醒 */
+    @PostMapping("/{id}/follow-up")
+    public String setFollowUp(@PathVariable Long id, @RequestParam boolean enabled,
+                              @RequestParam(required = false) String redirect, RedirectAttributes ra) {
+        customerService.setFollowUp(id, enabled);
+        ra.addFlashAttribute("flashSuccess", enabled ? "已納入跟進提醒" : "已停止此客戶的跟進提醒");
+        return "redirect:" + backTo(redirect, id);
+    }
+
+    /** 延後提醒指定天數 */
+    @PostMapping("/{id}/snooze")
+    public String snooze(@PathVariable Long id, @RequestParam int days,
+                         @RequestParam(required = false) String redirect, RedirectAttributes ra) {
+        customerService.snoozeFollowUp(id, days);
+        ra.addFlashAttribute("flashSuccess", "已延後 " + days + " 天再提醒");
+        return "redirect:" + backTo(redirect, id);
+    }
+
+    private String backTo(String redirect, Long id) {
+        return (redirect != null && !redirect.isBlank()) ? redirect : "/customers/" + id;
+    }
+
     /** Entity 轉表單(編輯時回填) */
     private CustomerForm toForm(Customer c) {
         CustomerForm f = new CustomerForm();
@@ -152,11 +174,14 @@ public class CustomerController {
         f.setFax(c.getFax());
         f.setEmail(c.getEmail());
         f.setAddress(c.getAddress());
+        f.setCountry(c.getCountry());
+        f.setCity(c.getCity());
         f.setCustomerType(c.getCustomerType());
         f.setIndustry(c.getIndustry());
         f.setSource(c.getSource());
         f.setNotes(c.getNotes());
         f.setActive(c.isActive());
+        f.setFollowUpEnabled(c.isFollowUpEnabled());
         return f;
     }
 }

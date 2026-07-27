@@ -40,7 +40,7 @@ public class CompanySettings {
     private String logoPath;
 
     @Column(name = "default_currency", length = 10)
-    private String defaultCurrency = "TWD";
+    private String defaultCurrency = "USD";
 
     @Column(name = "default_tax_rate", precision = 6, scale = 2)
     private BigDecimal defaultTaxRate = new BigDecimal("5");

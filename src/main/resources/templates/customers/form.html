@@ -6,7 +6,7 @@
 
 <main class="container py-4" style="max-width: 900px;">
     <h4 class="mb-3">
-        <i class="bi bi-person-vcard"></i>
+        <i data-lucide="contact"></i>
         <span th:text="${editId != null ? '編輯客戶' : '新增客戶'}">新增客戶</span>
     </h4>
 
@@ -54,6 +54,25 @@
                     <label class="form-label">公司地址</label>
                     <input type="text" class="form-control" th:field="*{address}">
                 </div>
+                <div class="col-md-3">
+                    <label class="form-label">國家</label>
+                    <input type="text" class="form-control" th:field="*{country}" list="countryList" placeholder="例:USA">
+                    <datalist id="countryList">
+                        <option value="Taiwan"></option><option value="USA"></option>
+                        <option value="China"></option><option value="Japan"></option>
+                        <option value="Germany"></option><option value="South Korea"></option>
+                        <option value="Vietnam"></option><option value="Thailand"></option>
+                        <option value="Malaysia"></option><option value="Singapore"></option>
+                        <option value="Canada"></option><option value="United Kingdom"></option>
+                        <option value="France"></option><option value="Netherlands"></option>
+                        <option value="Australia"></option><option value="India"></option>
+                        <option value="Mexico"></option><option value="Italy"></option>
+                    </datalist>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">城市</label>
+                    <input type="text" class="form-control" th:field="*{city}" placeholder="例:Los Angeles">
+                </div>
             </div>
 
             <div class="form-section-title">分類資訊</div>
@@ -81,12 +100,18 @@
                         <input class="form-check-input" type="checkbox" th:field="*{active}" id="active">
                         <label class="form-check-label" for="active">啟用此客戶</label>
                     </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" th:field="*{followUpEnabled}" id="followUpEnabled">
+                        <label class="form-check-label" for="followUpEnabled">
+                            納入跟進提醒(勾選後,這家太久沒聯絡時會出現在通知中心)
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="mt-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> 儲存</button>
+            <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> 儲存</button>
             <a class="btn btn-outline-secondary"
                th:href="${editId != null} ? @{/customers/{id}(id=${editId})} : @{/customers}">取消</a>
         </div>

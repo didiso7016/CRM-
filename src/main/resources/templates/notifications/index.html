@@ -6,43 +6,58 @@
 <div th:replace="~{fragments/layout :: flash}"></div>
 
 <main class="container-fluid py-4">
-    <h4 class="mb-3"><i class="bi bi-bell"></i> 通知中心</h4>
+    <h4 class="mb-3"><i data-lucide="bell"></i> 通知中心</h4>
 
     <div class="row g-3">
         <!-- 左:需要跟進的提醒 -->
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-exclamation-circle text-danger"></i> 需要跟進</span>
+                    <span><i data-lucide="circle-alert" class="text-danger"></i> 需要跟進</span>
                     <span class="badge text-bg-danger" th:text="${#lists.size(items)} + ' 則'">0 則</span>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2"
                         th:each="n : ${items}">
                         <span>
-                            <i class="bi bi-person-badge text-primary" th:if="${n.kind == 'CUSTOMER'}"></i>
-                            <i class="bi bi-file-earmark-text text-warning" th:if="${n.kind == 'QUOTATION'}"></i>
+                            <i data-lucide="user-round" class="text-primary" th:if="${n.kind == 'CUSTOMER'}"></i>
+                            <i data-lucide="file-text" class="text-warning" th:if="${n.kind == 'QUOTATION'}"></i>
                             <a th:href="@{${n.linkUrl}}" class="text-decoration-none" th:text="${n.message}">提醒訊息</a>
                         </span>
-                        <span>
-                            <!-- 客戶類提醒:可直接記錄通知 -->
-                            <button th:if="${n.customerId != null}" type="button"
-                                    class="btn btn-sm btn-outline-success"
+                        <span class="d-flex gap-1" th:if="${n.customerId != null}">
+                            <!-- 客戶類提醒:記錄通知 / 延後 / 停止 -->
+                            <button type="button" class="btn btn-sm btn-outline-success"
                                     th:attr="data-customer-id=${n.customerId}"
                                     onclick="fillLogCustomer(this)">
-                                <i class="bi bi-check2"></i> 記錄通知
+                                <i data-lucide="check"></i> 記錄通知
                             </button>
+                            <form method="post" th:action="@{/customers/{id}/snooze(id=${n.customerId})}">
+                                <input type="hidden" name="days" value="30">
+                                <input type="hidden" name="redirect" value="/notifications">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="延後 30 天再提醒">
+                                    <i data-lucide="alarm-clock"></i> 延後
+                                </button>
+                            </form>
+                            <form method="post" class="confirm-action"
+                                  data-confirm-message="確定不再提醒這家客戶?(客戶頁可再開啟)"
+                                  th:action="@{/customers/{id}/follow-up(id=${n.customerId})}">
+                                <input type="hidden" name="enabled" value="false">
+                                <input type="hidden" name="redirect" value="/notifications">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="不再提醒這家">
+                                    <i data-lucide="bell-off"></i> 停止
+                                </button>
+                            </form>
                         </span>
                     </li>
                     <li class="list-group-item text-center text-muted py-4" th:if="${#lists.isEmpty(items)}">
-                        <i class="bi bi-check2-circle text-success"></i> 目前沒有需要跟進的項目
+                        <i data-lucide="circle-check" class="text-success"></i> 目前沒有需要跟進的項目
                     </li>
                 </ul>
             </div>
 
             <!-- 最近的聯絡紀錄 -->
             <div class="card mt-3">
-                <div class="card-header"><i class="bi bi-journal-text"></i> 最近的聯絡紀錄</div>
+                <div class="card-header"><i data-lucide="notebook-text"></i> 最近的聯絡紀錄</div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item" th:each="log : ${recentLogs}">
                         <span class="text-muted small" th:text="${#temporals.format(log.logDate,'yyyy-MM-dd')}">2026-07-23</span>
@@ -61,7 +76,7 @@
         <!-- 右:記錄一筆通知 -->
         <div class="col-lg-5">
             <div class="card">
-                <div class="card-header"><i class="bi bi-pencil-square"></i> 記錄通知 / 聯絡</div>
+                <div class="card-header"><i data-lucide="square-pen"></i> 記錄通知 / 聯絡</div>
                 <div class="card-body">
                     <p class="text-muted small">例如:今天發信給客戶,填好按「記錄」,系統會記下並清除該客戶的未聯絡提醒。</p>
                     <form method="post" th:action="@{/notifications/log}" th:object="${logForm}">
@@ -93,7 +108,7 @@
                             <input class="form-control" th:field="*{note}" placeholder="例:已寄報價單 QT-202607-0001">
                         </div>
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-check-lg"></i> 記錄
+                            <i data-lucide="check"></i> 記錄
                         </button>
                     </form>
                 </div>

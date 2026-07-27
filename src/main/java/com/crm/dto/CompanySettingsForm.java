@@ -24,7 +24,7 @@ public class CompanySettingsForm {
     private String email;
 
     private String contactName;
-    private String defaultCurrency = "TWD";
+    private String defaultCurrency = "USD";
 
     @DecimalMin(value = "0", message = "預設稅率不得小於 0")
     private BigDecimal defaultTaxRate = new BigDecimal("5");

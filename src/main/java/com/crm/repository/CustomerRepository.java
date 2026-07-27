@@ -41,14 +41,20 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     long countByActiveTrue();
 
     /**
-     * 需要關懷提醒的客戶:啟用中,且「最後聯絡時間(從未聯絡則以建立時間計)」早於門檻。
-     * 如此剛建立、尚未聯絡的新客戶不會立即被提醒,需超過門檻天數才出現。
+     * 需要關懷提醒的客戶:
+     *   - 啟用中
+     *   - 已標記「納入跟進提醒」(followUpEnabled = true,預設不提醒)
+     *   - 未在延後期間內
+     *   - 最後聯絡時間(從未聯絡則以建立時間計)早於門檻
      */
     @Query("""
             select c from Customer c
             where c.active = true
+              and c.followUpEnabled = true
+              and (c.followUpSnoozeUntil is null or c.followUpSnoozeUntil <= :today)
               and coalesce(c.lastContactedAt, c.createdAt) < :threshold
             order by coalesce(c.lastContactedAt, c.createdAt) asc
             """)
-    List<Customer> findNeedFollowUp(@Param("threshold") LocalDateTime threshold);
+    List<Customer> findNeedFollowUp(@Param("threshold") LocalDateTime threshold,
+                                    @Param("today") java.time.LocalDate today);
 }

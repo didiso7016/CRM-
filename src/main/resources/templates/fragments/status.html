@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <body>
-<!-- 報價狀態標籤:傳入 QuotationStatus,依 badgeClass 顯示不同樣式 -->
-<span th:fragment="badge(status)" class="badge"
-      th:classappend="${status != null ? status.badgeClass : 'text-bg-secondary'}"
-      th:text="${status != null ? status.label : ''}">狀態</span>
+<!-- 報價狀態徽章:顏色 + 圖示 + 文字 三重標示(色盲友善)。傳入 QuotationStatus。 -->
+<span th:fragment="badge(status)" class="qbadge"
+      th:classappend="'qbadge-' + ${status != null ? status.name() : 'DRAFT'}">
+    <i th:attr="data-lucide=${status != null ? status.icon : 'pencil'}"></i>
+    <span th:text="${status != null ? status.label : ''}">狀態</span>
+</span>
 </body>
 </html>

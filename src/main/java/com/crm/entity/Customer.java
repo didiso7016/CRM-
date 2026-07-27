@@ -45,6 +45,14 @@ public class Customer {
     @Column(length = 300)
     private String address;
 
+    /** 國家(許多客戶為外國公司) */
+    @Column(length = 60)
+    private String country;
+
+    /** 城市 */
+    @Column(length = 60)
+    private String city;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "customer_type", length = 20)
     private CustomerType customerType = CustomerType.GENERAL;
@@ -66,6 +74,15 @@ public class Customer {
     /** 最後聯絡時間:供「幾天未聯絡」提醒使用,可為空 */
     @Column(name = "last_contacted_at")
     private LocalDateTime lastContactedAt;
+
+    /** 是否納入跟進提醒:預設 false,只有標記「要跟進」的客戶才會出現在通知 */
+    // columnDefinition 帶預設值,SQLite 才能對既有資料表順利新增此 NOT NULL 欄位
+    @Column(name = "follow_up_enabled", nullable = false, columnDefinition = "integer not null default 0")
+    private boolean followUpEnabled = false;
+
+    /** 提醒延後至此日期(含)之前不提醒,可為空 */
+    @Column(name = "follow_up_snooze_until")
+    private java.time.LocalDate followUpSnoozeUntil;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -110,6 +127,12 @@ public class Customer {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
     public CustomerType getCustomerType() { return customerType; }
     public void setCustomerType(CustomerType customerType) { this.customerType = customerType; }
 
@@ -127,6 +150,12 @@ public class Customer {
 
     public LocalDateTime getLastContactedAt() { return lastContactedAt; }
     public void setLastContactedAt(LocalDateTime lastContactedAt) { this.lastContactedAt = lastContactedAt; }
+
+    public boolean isFollowUpEnabled() { return followUpEnabled; }
+    public void setFollowUpEnabled(boolean followUpEnabled) { this.followUpEnabled = followUpEnabled; }
+
+    public java.time.LocalDate getFollowUpSnoozeUntil() { return followUpSnoozeUntil; }
+    public void setFollowUpSnoozeUntil(java.time.LocalDate followUpSnoozeUntil) { this.followUpSnoozeUntil = followUpSnoozeUntil; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

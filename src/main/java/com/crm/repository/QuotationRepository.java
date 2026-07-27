@@ -24,6 +24,18 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
     /** 同一客戶的所有報價(含各版本),供客戶頁歷史查詢 */
     List<Quotation> findByCustomerIdOrderByQuotationNumberDescVersionDesc(Long customerId);
 
+    /** 同一報價單號的所有版本(新到舊),供報價明細頁的版本歷史 */
+    @EntityGraph(attributePaths = {"customer"})
+    List<Quotation> findByQuotationNumberOrderByVersionDesc(String quotationNumber);
+
+    /** 某狀態且為「最新版本」的報價數量(舊版不計入) */
+    @Query("""
+            select count(q) from Quotation q
+            where q.status in :statuses
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
+            """)
+    long countByStatusInLatest(@Param("statuses") List<QuotationStatus> statuses);
+
     /** 取得某報價單號目前最大版本 */
     @Query("select max(q.version) from Quotation q where q.quotationNumber = :number")
     Integer findMaxVersion(@Param("number") String number);
@@ -64,6 +76,7 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
     @Query("""
             select q from Quotation q
             where q.status in :statuses and q.quotationDate <= :cutoff
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
             order by q.quotationDate asc
             """)
     List<Quotation> findOpenBefore(@Param("statuses") List<QuotationStatus> statuses,
@@ -80,6 +93,7 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
               and (:status is null or q.status = :status)
               and (:from is null or q.quotationDate >= :from)
               and (:to is null or q.quotationDate <= :to)
+              and q.version = (select max(q2.version) from Quotation q2 where q2.quotationNumber = q.quotationNumber)
             order by q.createdAt desc
             """)
     List<Quotation> search(@Param("customerId") Long customerId,

@@ -30,7 +30,7 @@ public class QuotationForm {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate validUntil;
 
-    private String currency = "TWD";
+    private String currency = "USD";
     private String taxType = "應稅";
     private BigDecimal taxRate = new BigDecimal("5");
     private String paymentTerms;

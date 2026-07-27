@@ -1,25 +1,26 @@
 package com.crm.enums;
 
 /**
- * 報價狀態。label 用於顯示,badgeClass 用於畫面標籤樣式(Bootstrap)。
+ * 報價狀態。label 顯示文字;icon 為 Bootstrap Icons 類別;
+ * 徽章以「顏色 + 圖示 + 文字」三重標示,色盲也能辨識。
  */
 public enum QuotationStatus {
-    DRAFT("草稿", "text-bg-secondary"),
-    SENT("已送出", "text-bg-primary"),
-    CONFIRMING("客戶確認中", "text-bg-info"),
-    ACCEPTED("已接受", "text-bg-success"),
-    REJECTED("已拒絕", "text-bg-danger"),
-    EXPIRED("已失效", "text-bg-dark"),
-    CANCELLED("已取消", "text-bg-light border");
+    DRAFT("草稿", "pencil"),
+    SENT("已送出", "send"),
+    CONFIRMING("客戶確認中", "hourglass"),
+    ACCEPTED("已接受", "circle-check"),
+    REJECTED("已拒絕", "circle-x"),
+    EXPIRED("已失效", "circle-slash"),
+    CANCELLED("已取消", "circle-minus");
 
     private final String label;
-    private final String badgeClass;
+    private final String icon;
 
-    QuotationStatus(String label, String badgeClass) {
+    QuotationStatus(String label, String icon) {
         this.label = label;
-        this.badgeClass = badgeClass;
+        this.icon = icon;
     }
 
     public String getLabel() { return label; }
-    public String getBadgeClass() { return badgeClass; }
+    public String getIcon() { return icon; }
 }

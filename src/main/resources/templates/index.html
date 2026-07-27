@@ -6,7 +6,7 @@
 <div th:replace="~{fragments/layout :: flash}"></div>
 
 <main class="container-fluid py-4">
-    <h4 class="mb-4"><i class="bi bi-speedometer2"></i> 首頁 Dashboard</h4>
+    <h4 class="mb-4"><i data-lucide="gauge"></i> 首頁 Dashboard</h4>
 
     <!-- 統計卡片 -->
     <div class="row g-3 mb-4">
@@ -48,16 +48,16 @@
 
     <!-- 快速按鈕 -->
     <div class="d-flex flex-wrap gap-2 mb-4">
-        <a class="btn btn-primary" th:href="@{/customers/new}"><i class="bi bi-person-plus"></i> 新增客戶</a>
-        <a class="btn btn-success" th:href="@{/quotations/new}"><i class="bi bi-plus-lg"></i> 新增報價單</a>
-        <a class="btn btn-outline-secondary" th:href="@{/customers}"><i class="bi bi-people"></i> 查看所有客戶</a>
-        <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i class="bi bi-file-earmark-text"></i> 查看所有報價單</a>
+        <a class="btn btn-primary" th:href="@{/customers/new}"><i data-lucide="user-plus"></i> 新增客戶</a>
+        <a class="btn btn-success" th:href="@{/quotations/new}"><i data-lucide="plus"></i> 新增報價單</a>
+        <a class="btn btn-outline-secondary" th:href="@{/customers}"><i data-lucide="users"></i> 查看所有客戶</a>
+        <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i data-lucide="file-text"></i> 查看所有報價單</a>
     </div>
 
     <!-- 客戶關懷提醒:超過 N 天未聯絡 -->
     <div class="card mb-4 border-danger" th:if="${!#lists.isEmpty(stats.followUpCustomers)}">
         <div class="card-header bg-danger-subtle">
-            <i class="bi bi-bell text-danger"></i>
+            <i data-lucide="bell" class="text-danger"></i>
             <strong>客戶關懷提醒</strong>
             — 以下客戶已超過 <span th:text="${stats.reminderDays}">30</span> 天未聯絡
         </div>
@@ -83,7 +83,7 @@
                     <td class="text-end">
                         <form method="post" th:action="@{/customers/{id}/record-contact(id=${c.id})}" class="d-inline">
                             <button class="btn btn-sm btn-outline-success" type="submit">
-                                <i class="bi bi-telephone-outbound"></i> 記錄聯絡</button>
+                                <i data-lucide="phone-outgoing"></i> 記錄聯絡</button>
                         </form>
                     </td>
                 </tr>
@@ -96,7 +96,7 @@
         <!-- 最近建立的報價單 -->
         <div class="col-lg-6">
             <div class="card h-100">
-                <div class="card-header"><i class="bi bi-clock-history"></i> 最近建立的報價單</div>
+                <div class="card-header"><i data-lucide="history"></i> 最近建立的報價單</div>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover align-middle mb-0">
                         <thead class="table-light">
@@ -122,7 +122,7 @@
         <!-- 即將到期的報價單 -->
         <div class="col-lg-6">
             <div class="card h-100">
-                <div class="card-header"><i class="bi bi-hourglass-split"></i> 即將到期的報價單(7 天內)</div>
+                <div class="card-header"><i data-lucide="hourglass"></i> 即將到期的報價單(7 天內)</div>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover align-middle mb-0">
                         <thead class="table-light">
@@ -147,7 +147,7 @@
         <!-- 最近更新的客戶 -->
         <div class="col-lg-6">
             <div class="card h-100">
-                <div class="card-header"><i class="bi bi-people"></i> 最近更新的客戶</div>
+                <div class="card-header"><i data-lucide="users"></i> 最近更新的客戶</div>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover align-middle mb-0">
                         <thead class="table-light">

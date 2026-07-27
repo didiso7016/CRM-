@@ -8,23 +8,23 @@
 <main class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
         <h4 class="mb-0">
-            <i class="bi bi-file-earmark-text"></i>
+            <i data-lucide="file-text"></i>
             <span th:text="${quotation.quotationNumber}">QT-202607-0001</span>
             <span class="text-muted">Ver.<span th:text="${quotation.version}">1</span></span>
             <span th:replace="~{fragments/status :: badge(${quotation.status})}"></span>
         </h4>
         <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i class="bi bi-arrow-left"></i> 列表</a>
+            <a class="btn btn-outline-secondary" th:href="@{/quotations}"><i data-lucide="arrow-left"></i> 列表</a>
             <a class="btn btn-outline-primary" th:href="@{/quotations/{id}/edit(id=${quotation.id})}">
-                <i class="bi bi-pencil"></i> 編輯</a>
+                <i data-lucide="pencil"></i> 編輯</a>
             <form method="post" th:action="@{/quotations/{id}/copy(id=${quotation.id})}" class="d-inline">
-                <button class="btn btn-outline-info" type="submit"><i class="bi bi-files"></i> 複製</button>
+                <button class="btn btn-outline-info" type="submit"><i data-lucide="copy"></i> 複製</button>
             </form>
             <form method="post" th:action="@{/quotations/{id}/new-version(id=${quotation.id})}" class="d-inline">
-                <button class="btn btn-outline-warning" type="submit"><i class="bi bi-layers"></i> 建立新版</button>
+                <button class="btn btn-outline-warning" type="submit"><i data-lucide="layers"></i> 建立新版</button>
             </form>
             <a class="btn btn-dark" th:href="@{/quotations/{id}/print(id=${quotation.id})}" target="_blank">
-                <i class="bi bi-printer"></i> 列印 / PDF</a>
+                <i data-lucide="printer"></i> 列印 / PDF</a>
         </div>
     </div>
 
@@ -32,7 +32,7 @@
         <!-- 表頭資訊 -->
         <div class="col-lg-8">
             <div class="card mb-3">
-                <div class="card-header"><i class="bi bi-info-circle"></i> 報價資訊</div>
+                <div class="card-header"><i data-lucide="info"></i> 報價資訊</div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
@@ -68,7 +68,7 @@
 
             <!-- 品項 -->
             <div class="card">
-                <div class="card-header"><i class="bi bi-list-ol"></i> 報價品項</div>
+                <div class="card-header"><i data-lucide="list-ordered"></i> 報價品項</div>
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered mb-0">
                         <thead class="table-light">
@@ -109,7 +109,7 @@
         <!-- 側欄:金額 + 狀態 -->
         <div class="col-lg-4">
             <div class="card mb-3">
-                <div class="card-header"><i class="bi bi-calculator"></i> 金額</div>
+                <div class="card-header"><i data-lucide="calculator"></i> 金額</div>
                 <div class="card-body">
                     <table class="table table-sm mb-0">
                         <tr><th class="text-muted">未稅小計</th>
@@ -129,7 +129,7 @@
             </div>
 
             <div class="card mb-3">
-                <div class="card-header"><i class="bi bi-flag"></i> 變更狀態</div>
+                <div class="card-header"><i data-lucide="flag"></i> 變更狀態</div>
                 <div class="card-body">
                     <form method="post" th:action="@{/quotations/{id}/status(id=${quotation.id})}" class="d-flex gap-2">
                         <select class="form-select" name="status">
@@ -141,8 +141,32 @@
                 </div>
             </div>
 
+            <div class="card mb-3" th:if="${#lists.size(versions) > 1}">
+                <div class="card-header"><i data-lucide="layers"></i> 版本紀錄
+                    <span class="text-muted small">(共 <span th:text="${#lists.size(versions)}">1</span> 版)</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        th:each="v : ${versions}"
+                        th:classappend="${v.id == quotation.id} ? 'bg-body-secondary' : ''">
+                        <span>
+                            <a th:href="@{/quotations/{id}(id=${v.id})}"
+                               th:text="'Ver.' + ${v.version}">Ver.1</a>
+                            <span th:if="${v.id == quotation.id}" class="badge text-bg-secondary">目前檢視</span>
+                            <span class="text-muted small ms-1"
+                                  th:text="${#temporals.format(v.quotationDate,'yyyy-MM-dd')}"></span>
+                        </span>
+                        <span>
+                            <span class="amount small me-2"
+                                  th:text="${#numbers.formatDecimal(v.totalAmount,1,'COMMA',0,'POINT')}"></span>
+                            <span th:replace="~{fragments/status :: badge(${v.status})}"></span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+
             <div class="card" th:if="${!#strings.isEmpty(quotation.quotationNotes) or !#strings.isEmpty(quotation.internalNotes)}">
-                <div class="card-header"><i class="bi bi-sticky"></i> 備註</div>
+                <div class="card-header"><i data-lucide="sticky-note"></i> 備註</div>
                 <div class="card-body">
                     <div th:if="${quotation.quotationNotes}">
                         <div class="text-muted small">報價備註</div>

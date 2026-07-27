@@ -62,7 +62,7 @@ public class DataSeeder implements ApplicationRunner {
         s.setFax("04-2358-9988");
         s.setEmail("sales@dingxin.com.tw");
         s.setContactName("陳志明");
-        s.setDefaultCurrency("TWD");
+        s.setDefaultCurrency("USD");
         s.setDefaultTaxRate(new BigDecimal("5"));
         s.setDefaultPaymentTerms("月結 30 天");
         s.setDefaultDeliveryTerms("工廠交貨");
@@ -71,16 +71,20 @@ public class DataSeeder implements ApplicationRunner {
         settingsService.save(s);
 
         // ---- 客戶 ----
-        Customer airspec = customerService.create(customer("C001", "Airspec 航太精密", "11223344",
-                "03-577-1234", "info@airspec.com", "新竹市科學園區研新一路 8 號", CustomerType.LONG_TERM, "航太", "展覽"));
-        Customer hydro = customerService.create(customer("C002", "Hydro System 水力系統", "22334455",
-                "07-812-5678", "service@hydrosys.com", "高雄市前鎮區成功二路 25 號", CustomerType.GENERAL, "油壓機械", "老客戶介紹"));
+        Customer airspec = customerService.create(customer("C001", "Airspec Aerospace Inc.", "US-1123",
+                "+1 310-555-0182", "info@airspec.com", "1200 Aviation Blvd", "USA", "Los Angeles", CustomerType.LONG_TERM, "Aerospace", "展覽"));
+        Customer hydro = customerService.create(customer("C002", "Hydro System GmbH", "DE-2234",
+                "+49 40 555 210", "service@hydrosys.de", "Industriestrasse 25", "Germany", "Hamburg", CustomerType.GENERAL, "Hydraulics", "老客戶介紹"));
         Customer datong = customerService.create(customer("C003", "大同機械廠", "33445566",
-                "04-711-3366", "sales@datong-m.com", "台中市大甲區工業路 100 號", CustomerType.GENERAL, "工具機", "網路"));
-        Customer jinggong = customerService.create(customer("C004", "精工五金企業社", "44556677",
-                "04-2533-2211", "jg@jinggong.tw", "台中市神岡區中山路 55 號", CustomerType.DEALER, "五金", "展覽"));
+                "04-711-3366", "sales@datong-m.com", "台中市大甲區工業路 100 號", "Taiwan", "台中市", CustomerType.GENERAL, "工具機", "網路"));
+        Customer jinggong = customerService.create(customer("C004", "Seiko Fastener Co.", "JP-4456",
+                "+81 6-555-3344", "jg@seiko-f.jp", "3-5-5 Chuo", "Japan", "Osaka", CustomerType.DEALER, "Fasteners", "展覽"));
         customerService.create(customer("C005", "台灣鋼鐵材料", "55667788",
-                "02-2599-8877", "supply@twsteel.com", "新北市五股區五權路 3 號", CustomerType.SUPPLIER, "鋼材", "供應商"));
+                "02-2599-8877", "supply@twsteel.com", "新北市五股區五權路 3 號", "Taiwan", "新北市", CustomerType.SUPPLIER, "鋼材", "供應商"));
+
+        // 示範:把這兩家標記為「要跟進」,才會出現在通知(其餘客戶預設不提醒)
+        customerService.setFollowUp(hydro.getId(), true);
+        customerService.setFollowUp(datong.getId(), true);
 
         // ---- 聯絡人 ----
         contactService.create(contact(airspec.getId(), "王建國", "採購部", "採購經理", "0912-345-678", "wang@airspec.com", true));
@@ -130,7 +134,8 @@ public class DataSeeder implements ApplicationRunner {
     // ===== 建構表單的小工具 =====
 
     private CustomerForm customer(String code, String name, String taxId, String phone, String email,
-                                  String address, CustomerType type, String industry, String source) {
+                                  String address, String country, String city,
+                                  CustomerType type, String industry, String source) {
         CustomerForm f = new CustomerForm();
         f.setCustomerCode(code);
         f.setCompanyName(name);
@@ -138,6 +143,8 @@ public class DataSeeder implements ApplicationRunner {
         f.setPhone(phone);
         f.setEmail(email);
         f.setAddress(address);
+        f.setCountry(country);
+        f.setCity(city);
         f.setCustomerType(type);
         f.setIndustry(industry);
         f.setSource(source);
@@ -192,7 +199,7 @@ public class DataSeeder implements ApplicationRunner {
         f.setCustomerId(customerId);
         f.setQuotationDate(date);
         f.setValidUntil(date.plusDays(30));
-        f.setCurrency("TWD");
+        f.setCurrency("USD");
         f.setTaxType("應稅");
         f.setTaxRate(new BigDecimal("5"));
         f.setFreight(new BigDecimal(freight));

@@ -66,6 +66,19 @@ public class QuotationService {
         return quotationRepository.findByCustomerIdOrderByQuotationNumberDescVersionDesc(customerId);
     }
 
+    /** 同一報價單號的所有版本(新到舊),供明細頁的版本歷史 */
+    @Transactional(readOnly = true)
+    public List<Quotation> getVersions(String quotationNumber) {
+        return quotationRepository.findByQuotationNumberOrderByVersionDesc(quotationNumber);
+    }
+
+    /** 報價中(草稿/已送出/確認中)且為最新版本的數量 */
+    @Transactional(readOnly = true)
+    public long countInProgress() {
+        return quotationRepository.countByStatusInLatest(
+                List.of(QuotationStatus.DRAFT, QuotationStatus.SENT, QuotationStatus.CONFIRMING));
+    }
+
     // ===================== 驗證 =====================
 
     /**

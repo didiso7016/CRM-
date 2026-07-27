@@ -1,21 +1,78 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="'報價單 ' + ${quotation.quotationNumber}">報價單</title>
-    <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+    <title th:text="'QUOTATION ' + ${quotation.quotationNumber}">QUOTATION</title>
     <style>
-        /* A4 列印版面 */
-        @page { size: A4; margin: 12mm; }
-        body { font-size: 12px; color: #000; background: #fff; }
-        .a4 { width: 186mm; margin: 0 auto; }
-        .quote-title { font-size: 22px; font-weight: 700; letter-spacing: 4px; }
-        table.items th, table.items td { padding: 4px 6px; }
-        .totals th { text-align: right; color: #333; }
-        .totals td { text-align: right; }
-        .sign-box { height: 70px; border: 1px solid #999; }
-        .company-logo { max-height: 60px; max-width: 200px; }
+        @page { size: A4; margin: 14mm 12mm; }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, "Helvetica Neue", Helvetica, "Noto Sans TC", sans-serif;
+            color: #000; background: #fff; font-size: 12px; }
+        .sheet { width: 190mm; margin: 0 auto; }
+        .num { font-variant-numeric: tabular-nums; }
+
+        /* 工具列(列印時隱藏) */
         .toolbar { text-align: right; margin-bottom: 10px; }
+        .toolbar button, .toolbar a { font-size: 13px; padding: 6px 14px; margin-left: 6px;
+            border: 1px solid #888; background: #f3f3f3; color: #000; border-radius: 5px;
+            text-decoration: none; cursor: pointer; }
+        .toolbar button { background: #1E3B55; color: #fff; border-color: #1E3B55; }
+
+        /* 公司抬頭 */
+        .co-name { text-align: center; font-size: 27px; font-weight: 800; letter-spacing: .5px;
+            margin: 0 0 8px; }
+        .co-head { display: flex; justify-content: space-between; align-items: flex-start;
+            border-bottom: 2px solid #000; padding-bottom: 8px; }
+        .co-addr { line-height: 1.5; }
+        .co-addr .addr { font-weight: 700; margin-bottom: 2px; }
+        .co-addr .lbl { display: inline-block; letter-spacing: 2px; }
+        .co-addr .val { font-family: "Consolas", "Courier New", monospace; }
+        .page { font-size: 12px; white-space: nowrap; padding-top: 30px; }
+
+        /* QUOTATION 標題框 */
+        .qtitle { text-align: center; margin: 12px 0 8px; }
+        .qtitle span { display: inline-block; border: 1px solid #000; padding: 3px 16px;
+            font-size: 20px; font-weight: 700; letter-spacing: 8px; }
+
+        /* 客戶 / 報價資訊 */
+        .meta { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        .meta td { vertical-align: top; padding: 2px 4px; font-size: 12px; }
+        .meta .k { letter-spacing: 1px; }
+        .meta .v { font-family: "Consolas", "Courier New", monospace; }
+        .meta .right { width: 34%; }
+
+        /* 品項表格 */
+        table.items { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        table.items th, table.items td { border: 1px solid #000; padding: 5px 6px; }
+        table.items th { text-align: center; font-weight: 700; font-size: 11.5px; }
+        table.items td { font-size: 12px; vertical-align: top; }
+        .c-no { width: 26px; text-align: center; }
+        .c-part { width: 26%; }
+        .c-desc { width: 24%; }
+        .c-qty { width: 62px; text-align: right; }
+        .c-unit { width: 42px; text-align: center; }
+        .c-price { width: 68px; text-align: right; }
+        .c-amt { width: 78px; text-align: right; }
+        .partno { font-weight: 700; }
+        .partname { }
+
+        /* 金額列 */
+        table.sum { width: 100%; border-collapse: collapse; }
+        table.sum td { border: 1px solid #000; border-top: none; padding: 6px; font-size: 12px; }
+        table.sum .lbl { letter-spacing: 1px; font-weight: 700; }
+        table.sum .amt { text-align: right; font-weight: 700; }
+
+        /* REMARK */
+        .remark { border: 1px solid #000; border-top: none; padding: 8px 8px 26px;
+            font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+            min-height: 120px; }
+        .remark .rk { letter-spacing: 1px; font-weight: 700; }
+
+        /* 簽章 */
+        .signs { display: flex; justify-content: space-between; margin-top: 26px; }
+        .signs .box { width: 30%; }
+        .signs .box .t { font-weight: 700; margin-bottom: 48px; }
+
         @media print {
             .no-print { display: none !important; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -23,147 +80,107 @@
     </style>
 </head>
 <body>
-<div class="a4">
-    <!-- 列印工具列(列印時隱藏) -->
+<div class="sheet">
+    <!-- 工具列 -->
     <div class="toolbar no-print">
-        <button class="btn btn-primary btn-sm" onclick="window.print()">
-            <i></i> 列印 / 另存 PDF
-        </button>
-        <a class="btn btn-outline-secondary btn-sm" th:href="@{/quotations/{id}(id=${quotation.id})}">返回</a>
+        <button onclick="window.print()">Print / Save as PDF</button>
+        <a th:href="@{/quotations/{id}(id=${quotation.id})}">Back</a>
     </div>
 
-    <!-- 抬頭:公司資訊 -->
-    <div class="d-flex justify-content-between align-items-start border-bottom pb-2 mb-3">
-        <div>
-            <img th:if="${company.logoPath}" class="company-logo mb-1"
-                 th:src="@{/uploads/{f}(f=${company.logoPath})}" alt="logo">
-            <div class="fs-5 fw-bold" th:text="${company.companyName}">公司名稱</div>
-            <div th:if="${company.taxId}">統一編號:<span th:text="${company.taxId}"></span></div>
-            <div th:if="${company.address}" th:text="${company.address}"></div>
-            <div>
-                <span th:if="${company.phone}">電話:<span th:text="${company.phone}"></span>&nbsp;</span>
-                <span th:if="${company.fax}">傳真:<span th:text="${company.fax}"></span></span>
-            </div>
-            <div th:if="${company.email}">Email:<span th:text="${company.email}"></span></div>
+    <!-- ===== 公司抬頭 ===== -->
+    <div class="co-name" th:text="${company.companyName}">EnviroValor CO., LTD.</div>
+    <div class="co-head">
+        <div class="co-addr">
+            <div class="addr" th:text="${company.address}">No. 120-2, ... Taiwan</div>
+            <div><span class="lbl">TEL</span> :&nbsp;<span class="val" th:text="${company.phone}"></span></div>
+            <div><span class="lbl">FAX</span> :&nbsp;<span class="val" th:text="${company.fax}"></span></div>
+            <div><span class="lbl">E-MAIL</span> :&nbsp;<span class="val" th:text="${company.email}"></span></div>
         </div>
-        <div class="text-end">
-            <div class="quote-title">報價單</div>
-            <div class="mt-2">
-                <table class="table table-sm table-borderless mb-0" style="font-size:12px;">
-                    <tr><th class="text-end pe-2">報價單號</th>
-                        <td class="text-start" th:text="${quotation.quotationNumber} + ' Ver.' + ${quotation.version}"></td></tr>
-                    <tr><th class="text-end pe-2">報價日期</th>
-                        <td class="text-start" th:text="${#temporals.format(quotation.quotationDate,'yyyy-MM-dd')}"></td></tr>
-                    <tr><th class="text-end pe-2">有效期限</th>
-                        <td class="text-start" th:text="${quotation.validUntil != null ? #temporals.format(quotation.validUntil,'yyyy-MM-dd') : '—'}"></td></tr>
-                </table>
-            </div>
-        </div>
+        <div class="page">Page : 1 of 1</div>
     </div>
 
-    <!-- 客戶資訊 -->
-    <div class="row mb-3">
-        <div class="col-7">
-            <table class="table table-sm table-borderless mb-0">
-                <tr><th style="width:70px;">客戶</th><td th:text="${quotation.customer.companyName}"></td></tr>
-                <tr><th>地址</th><td th:text="${quotation.customer.address}"></td></tr>
-                <tr><th>聯絡人</th><td th:text="${quotation.contact != null ? quotation.contact.name : ''}"></td></tr>
-            </table>
-        </div>
-        <div class="col-5">
-            <table class="table table-sm table-borderless mb-0">
-                <tr><th style="width:80px;">電話</th>
-                    <td th:text="${quotation.contact != null and quotation.contact.phone != null ? quotation.contact.phone : quotation.customer.phone}"></td></tr>
-                <tr><th>Email</th>
-                    <td th:text="${quotation.contact != null and quotation.contact.email != null ? quotation.contact.email : quotation.customer.email}"></td></tr>
-                <tr><th>客戶詢價單號</th><td th:text="${quotation.customerInquiryNumber}"></td></tr>
-            </table>
-        </div>
-    </div>
+    <!-- ===== QUOTATION 標題 ===== -->
+    <div class="qtitle"><span>QUOTATION</span></div>
 
-    <!-- 品項表格 -->
-    <table class="table table-sm table-bordered items">
-        <thead class="table-light">
+    <!-- ===== 客戶 / 報價資訊 ===== -->
+    <table class="meta">
         <tr>
-            <th style="width:32px;">#</th>
-            <th style="width:90px;">料號</th>
-            <th>品名 / 規格</th>
-            <th style="width:60px;" class="text-end">數量</th>
-            <th style="width:50px;">單位</th>
-            <th style="width:80px;" class="text-end">單價</th>
-            <th style="width:90px;" class="text-end">金額</th>
-            <th style="width:70px;">交期</th>
-            <th style="width:80px;">備註</th>
+            <td><span class="k">CUSTOMER</span> :&nbsp;<span class="v" th:text="${quotation.customer.companyName}"></span></td>
+            <td class="right"><span class="k">DATE</span> :&nbsp;<span class="v" th:text="${#temporals.format(quotation.quotationDate,'yyyy/MM/dd')}"></span></td>
+        </tr>
+        <tr>
+            <td><span class="k">CONTACT</span> :&nbsp;<span class="v" th:text="${quotation.contact != null ? quotation.contact.name : ''}"></span></td>
+            <td class="right"><span class="k">QNO</span> :&nbsp;<span class="v" th:text="${quotation.quotationNumber}"></span></td>
+        </tr>
+        <tr>
+            <td>
+                <span class="k">TEL</span> :&nbsp;<span class="v"
+                    th:text="${quotation.contact != null and quotation.contact.phone != null ? quotation.contact.phone : quotation.customer.phone}"></span>
+                &nbsp;&nbsp;&nbsp;<span class="k">FAX</span> :&nbsp;<span class="v" th:text="${quotation.customer.fax}"></span>
+            </td>
+            <td class="right"><span class="k">CURRENCY</span> :&nbsp;<span class="v" th:text="${quotation.currency}"></span></td>
+        </tr>
+    </table>
+
+    <!-- ===== 品項表格 ===== -->
+    <table class="items">
+        <thead>
+        <tr>
+            <th class="c-no">NO</th>
+            <th class="c-part">PART NO.&nbsp;&nbsp;&nbsp;PART NAME</th>
+            <th class="c-desc">DESCRIPTION</th>
+            <th class="c-qty">QUANTITY</th>
+            <th class="c-unit">UNIT</th>
+            <th class="c-price">UNIT PRICE</th>
+            <th class="c-amt">AMOUNT</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="it : ${quotation.items}">
-            <td class="text-center" th:text="${it.sequenceNumber}"></td>
-            <td>
-                <div th:text="${it.internalPartNumber}"></div>
-                <div class="text-muted" th:if="${it.customerPartNumber}" th:text="${it.customerPartNumber}"></div>
+            <td class="c-no" th:text="${it.sequenceNumber}">1</td>
+            <td class="c-part">
+                <div class="partno" th:text="${it.internalPartNumber}"></div>
+                <div class="partname" th:text="${it.productName}"></div>
+                <div th:if="${it.customerPartNumber}" style="color:#444"
+                     th:text="${it.customerPartNumber}"></div>
             </td>
-            <td>
-                <div th:text="${it.productName}"></div>
-                <div class="text-muted" th:text="${it.specification}"></div>
-                <div class="text-muted" th:if="${!#strings.isEmpty(it.material) or !#strings.isEmpty(it.surfaceTreatment)}"
+            <td class="c-desc">
+                <div th:text="${it.specification}"></div>
+                <div th:if="${!#strings.isEmpty(it.material) or !#strings.isEmpty(it.surfaceTreatment)}"
                      th:text="${it.material} + ' ' + ${it.surfaceTreatment}"></div>
             </td>
-            <td class="text-end" th:text="${#numbers.formatDecimal(it.quantity,1,'COMMA',0,'POINT')}"></td>
-            <td th:text="${it.unit}"></td>
-            <td class="text-end" th:text="${#numbers.formatDecimal(it.unitPrice,1,'COMMA',2,'POINT')}"></td>
-            <td class="text-end" th:text="${#numbers.formatDecimal(it.amount,1,'COMMA',2,'POINT')}"></td>
-            <td th:text="${it.leadTime}"></td>
-            <td th:text="${it.notes}"></td>
+            <td class="c-qty num" th:text="${#numbers.formatDecimal(it.quantity,1,'COMMA',2,'POINT')}"></td>
+            <td class="c-unit" th:text="${it.unit}"></td>
+            <td class="c-price num" th:text="${#numbers.formatDecimal(it.unitPrice,1,'COMMA',2,'POINT')}"></td>
+            <td class="c-amt num" th:text="${#numbers.formatDecimal(it.amount,1,'COMMA',2,'POINT')}"></td>
+        </tr>
+        <!-- 補幾列空白讓版面像正式表單 -->
+        <tr th:each="i : ${#numbers.sequence(1, T(java.lang.Math).max(0, 4 - #lists.size(quotation.items)))}">
+            <td class="c-no">&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
         </tr>
         </tbody>
     </table>
 
-    <!-- 金額區 -->
-    <div class="row">
-        <div class="col-7">
-            <div class="small">
-                <div><strong>付款條件:</strong><span th:text="${quotation.paymentTerms}"></span></div>
-                <div><strong>交貨條件:</strong><span th:text="${quotation.deliveryTerms}"></span></div>
-                <div><strong>預計交期:</strong><span th:text="${quotation.estimatedDelivery}"></span></div>
-                <div><strong>幣別:</strong><span th:text="${quotation.currency}"></span></div>
-            </div>
-        </div>
-        <div class="col-5">
-            <table class="table table-sm totals mb-0">
-                <tr><th>未稅小計</th><td th:text="${#numbers.formatDecimal(quotation.subtotal,1,'COMMA',2,'POINT')}"></td></tr>
-                <tr><th>折扣</th><td th:text="${#numbers.formatDecimal(quotation.overallDiscount,1,'COMMA',2,'POINT')}"></td></tr>
-                <tr><th>運費</th><td th:text="${#numbers.formatDecimal(quotation.freight,1,'COMMA',2,'POINT')}"></td></tr>
-                <tr><th>其他費用</th><td th:text="${#numbers.formatDecimal(quotation.otherFee,1,'COMMA',2,'POINT')}"></td></tr>
-                <tr><th th:text="'稅額 (' + ${quotation.taxRate} + '%)'">稅額</th>
-                    <td th:text="${#numbers.formatDecimal(quotation.taxAmount,1,'COMMA',2,'POINT')}"></td></tr>
-                <tr class="table-light"><th class="fw-bold">含稅總計</th>
-                    <td class="fw-bold" th:text="${quotation.currency} + ' ' + ${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></td></tr>
-            </table>
-        </div>
-    </div>
+    <!-- ===== 金額列 ===== -->
+    <table class="sum">
+        <tr>
+            <td style="width:33%"><span class="lbl">AMOUNT</span>&nbsp;&nbsp;
+                <span class="num" th:text="${#numbers.formatDecimal(quotation.subtotal,1,'COMMA',2,'POINT')}"></span></td>
+            <td style="width:34%"><span class="lbl">TAX</span> :&nbsp;
+                <span class="num" th:text="${quotation.taxAmount != null and quotation.taxAmount.signum() > 0 ? #numbers.formatDecimal(quotation.taxAmount,1,'COMMA',2,'POINT') : ''}"></span></td>
+            <td><span class="lbl">TOTAL AMOUNT</span> :&nbsp;
+                <span class="num" th:text="${#numbers.formatDecimal(quotation.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+        </tr>
+    </table>
 
-    <!-- 報價備註 -->
-    <div class="mt-3 small" th:if="${quotation.quotationNotes}">
-        <strong>備註:</strong>
-        <div th:text="${quotation.quotationNotes}"></div>
-    </div>
+    <!-- ===== REMARK ===== -->
+    <div class="remark"><span class="rk">REMARK</span> :&nbsp;<span th:text="${quotation.quotationNotes}"></span></div>
 
-    <!-- 頁尾:簽章欄 -->
-    <div class="row mt-4">
-        <div class="col-6">
-            <div class="small mb-1">客戶確認簽章</div>
-            <div class="sign-box"></div>
-        </div>
-        <div class="col-6">
-            <div class="small mb-1">報價公司簽章</div>
-            <div class="sign-box"></div>
-        </div>
-    </div>
-    <div class="text-center text-muted mt-3 small" th:if="${company.contactName}">
-        業務聯絡:<span th:text="${company.contactName}"></span>
-        <span th:if="${company.phone}"> / <span th:text="${company.phone}"></span></span>
-        <span th:if="${company.email}"> / <span th:text="${company.email}"></span></span>
+    <!-- ===== 簽章 ===== -->
+    <div class="signs">
+        <div class="box"><div class="t">Supervisor</div></div>
+        <div class="box" style="text-align:center"><div class="t">Representative</div></div>
+        <div class="box"><div class="t">Customer :</div></div>
     </div>
 </div>
 </body>

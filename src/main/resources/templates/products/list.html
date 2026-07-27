@@ -7,8 +7,8 @@
 
 <main class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0"><i class="bi bi-gear-wide-connected"></i> 零件列表</h4>
-        <a class="btn btn-primary" th:href="@{/products/new}"><i class="bi bi-plus-lg"></i> 新增零件</a>
+        <h4 class="mb-0"><i data-lucide="cog"></i> 零件列表</h4>
+        <a class="btn btn-primary" th:href="@{/products/new}"><i data-lucide="plus"></i> 新增零件</a>
     </div>
 
     <form class="card card-body mb-3" method="get" th:action="@{/products}">
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="col-md-3 text-end">
-                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i> 搜尋</button>
+                <button class="btn btn-outline-primary" type="submit"><i data-lucide="search"></i> 搜尋</button>
                 <a class="btn btn-outline-secondary" th:href="@{/products}">清除</a>
             </div>
         </div>
@@ -57,15 +57,15 @@
                     </td>
                     <td class="text-end text-nowrap">
                         <a class="btn btn-sm btn-outline-primary" th:href="@{/products/{id}/edit(id=${p.id})}">
-                            <i class="bi bi-pencil"></i></a>
+                            <i data-lucide="pencil"></i></a>
                         <form th:if="${p.active}" method="post" class="d-inline confirm-action"
                               data-confirm-message="確定要停用此零件嗎?"
                               th:action="@{/products/{id}/deactivate(id=${p.id})}">
-                            <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-slash-circle"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" type="submit"><i data-lucide="circle-slash"></i></button>
                         </form>
                         <form th:unless="${p.active}" method="post" class="d-inline"
                               th:action="@{/products/{id}/activate(id=${p.id})}">
-                            <button class="btn btn-sm btn-outline-success" type="submit"><i class="bi bi-check-circle"></i></button>
+                            <button class="btn btn-sm btn-outline-success" type="submit"><i data-lucide="circle-check"></i></button>
                         </form>
                     </td>
                 </tr>

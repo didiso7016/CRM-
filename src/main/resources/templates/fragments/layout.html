@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <!--
-  共用版型片段:head / nav / scripts。
+  共用版型片段:head / sidebar(nav)/ flash / scripts。
   各頁面以 th:replace 套用,維持一致外觀且避免重複程式碼。
 -->
 
@@ -9,91 +9,80 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title} + ' - 客戶與報價管理系統'">客戶與報價管理系統</title>
+    <title th:text="${title} + ' - EnviroValor 報價系統'">EnviroValor 報價系統</title>
+    <!-- 主題初始化(避免載入閃爍):優先用儲存值,否則跟隨系統 -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('crm-theme');
+                if (!t) { t = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'; }
+                document.documentElement.setAttribute('data-theme', t);
+                document.documentElement.setAttribute('data-bs-theme', t);
+            } catch (e) {}
+        })();
+    </script>
     <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/bootstrap-icons.css}">
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 
 <body>
 
-<!-- ===== 導覽列 ===== -->
-<nav th:fragment="nav" class="navbar navbar-expand-lg navbar-dark bg-dark no-print sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold" th:href="@{/}">
-            <i class="bi bi-box-seam"></i> 報價管理系統
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeMenu=='home'}?'active'" th:href="@{/}">
-                        <i class="bi bi-speedometer2"></i> 首頁
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeMenu=='customers'}?'active'" th:href="@{/customers}">
-                        <i class="bi bi-people"></i> 客戶
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeMenu=='products'}?'active'" th:href="@{/products}">
-                        <i class="bi bi-gear-wide-connected"></i> 零件
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeMenu=='quotations'}?'active'" th:href="@{/quotations}">
-                        <i class="bi bi-file-earmark-text"></i> 報價單
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link position-relative" th:classappend="${activeMenu=='notifications'}?'active'"
-                       th:href="@{/notifications}">
-                        <i class="bi bi-bell"></i> 通知
-                        <span th:if="${navNotificationCount != null and navNotificationCount > 0}"
-                              class="badge rounded-pill text-bg-danger"
-                              th:text="${navNotificationCount}">0</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activeMenu=='settings'}?'active'" th:href="@{/settings}">
-                        <i class="bi bi-sliders"></i> 設定
-                    </a>
-                </li>
-            </ul>
-            <div class="d-flex gap-2">
-                <a class="btn btn-sm btn-outline-light" th:href="@{/customers/new}">
-                    <i class="bi bi-person-plus"></i> 新增客戶
-                </a>
-                <a class="btn btn-sm btn-primary" th:href="@{/quotations/new}">
-                    <i class="bi bi-plus-lg"></i> 新增報價單
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
+<!-- ===== 左側欄(片段名沿用 nav,各頁不需改)===== -->
+<aside th:fragment="nav" class="app-side no-print">
+    <a class="app-brand" th:href="@{/}">
+        <img th:src="@{/img/logo-mark.jpg}" alt="EnviroValor">
+        <span><b>EnviroValor</b><small>報價管理系統</small></span>
+    </a>
 
-<!-- ===== 全域訊息(成功/失敗提示) ===== -->
-<div th:fragment="flash" class="no-print">
-    <div th:if="${flashSuccess}" class="container-fluid mt-3">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle"></i> <span th:text="${flashSuccess}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="app-nav-label">主功能</div>
+    <a class="app-nav-link" th:classappend="${activeMenu=='home'}?'active'" th:href="@{/}">
+        <i data-lucide="layout-dashboard"></i> 首頁
+    </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='customers'}?'active'" th:href="@{/customers}">
+        <i data-lucide="users"></i> 客戶
+    </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='products'}?'active'" th:href="@{/products}">
+        <i data-lucide="cog"></i> 零件
+    </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='quotations'}?'active'" th:href="@{/quotations}">
+        <i data-lucide="file-text"></i> 報價單
+    </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='notifications'}?'active'" th:href="@{/notifications}">
+        <i data-lucide="bell"></i> 通知
+        <span class="nav-count" th:if="${navNotificationCount != null and navNotificationCount > 0}"
+              th:text="${navNotificationCount}">0</span>
+    </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='settings'}?'active'" th:href="@{/settings}">
+        <i data-lucide="sliders-horizontal"></i> 設定
+    </a>
+
+    <div class="app-side-foot">
+        <button type="button" class="theme-toggle" onclick="toggleTheme()">
+            <i data-lucide="sun-moon"></i> 深色 / 淺色
+        </button>
+        <div class="meta">單機版 · 本機執行<br>127.0.0.1:8080</div>
     </div>
-    <div th:if="${flashError}" class="container-fluid mt-3">
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle"></i> <span th:text="${flashError}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+</aside>
+
+<!-- ===== 全域訊息(浮動 toast,不擠壓頁面內容)===== -->
+<div th:fragment="flash" class="no-print flash-toast-wrap">
+    <div th:if="${flashSuccess}" class="flash-toast flash-success" role="alert">
+        <i data-lucide="circle-check"></i>
+        <span th:text="${flashSuccess}"></span>
+        <button type="button" class="flash-x" onclick="this.parentElement.remove()" aria-label="關閉">&times;</button>
+    </div>
+    <div th:if="${flashError}" class="flash-toast flash-error" role="alert">
+        <i data-lucide="triangle-alert"></i>
+        <span th:text="${flashError}"></span>
+        <button type="button" class="flash-x" onclick="this.parentElement.remove()" aria-label="關閉">&times;</button>
     </div>
 </div>
 
 <!-- ===== 共用 JS ===== -->
 <th:block th:fragment="scripts">
     <script th:src="@{/vendor/bootstrap/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/vendor/lucide/lucide.min.js}"></script>
+    <script>if (window.lucide) { lucide.createIcons(); }</script>
     <script th:src="@{/js/app.js}"></script>
 </th:block>
 

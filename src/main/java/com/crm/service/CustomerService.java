@@ -6,6 +6,7 @@ import com.crm.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -87,11 +88,28 @@ public class CustomerService {
         return customerRepository.findTop5ByOrderByUpdatedAtDesc();
     }
 
-    /** 超過 days 天未聯絡的啟用客戶 */
+    /** 已標記跟進、且超過 days 天未聯絡的啟用客戶(排除延後中的) */
     @Transactional(readOnly = true)
     public List<Customer> needFollowUp(int days) {
         LocalDateTime threshold = LocalDateTime.now().minusDays(days);
-        return customerRepository.findNeedFollowUp(threshold);
+        return customerRepository.findNeedFollowUp(threshold, LocalDate.now());
+    }
+
+    /** 設定是否納入跟進提醒;重新啟用時清除延後 */
+    public void setFollowUp(Long id, boolean enabled) {
+        Customer c = getById(id);
+        c.setFollowUpEnabled(enabled);
+        if (enabled) {
+            c.setFollowUpSnoozeUntil(null);
+        }
+        customerRepository.save(c);
+    }
+
+    /** 延後提醒指定天數 */
+    public void snoozeFollowUp(Long id, int days) {
+        Customer c = getById(id);
+        c.setFollowUpSnoozeUntil(LocalDate.now().plusDays(days));
+        customerRepository.save(c);
     }
 
     /** 將表單資料套用到 Entity(去除前後空白) */
@@ -103,11 +121,14 @@ public class CustomerService {
         c.setFax(trim(form.getFax()));
         c.setEmail(trim(form.getEmail()));
         c.setAddress(trim(form.getAddress()));
+        c.setCountry(trim(form.getCountry()));
+        c.setCity(trim(form.getCity()));
         c.setCustomerType(form.getCustomerType());
         c.setIndustry(trim(form.getIndustry()));
         c.setSource(trim(form.getSource()));
         c.setNotes(form.getNotes());
         c.setActive(form.isActive());
+        c.setFollowUpEnabled(form.isFollowUpEnabled());
     }
 
     private String trim(String s) {

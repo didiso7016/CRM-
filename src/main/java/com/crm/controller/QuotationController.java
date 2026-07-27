@@ -16,6 +16,7 @@ import com.crm.repository.ProductRepository;
 import com.crm.service.CompanySettingsService;
 import com.crm.service.CustomerService;
 import com.crm.service.QuotationService;
+import com.crm.support.DeliveryTerms;
 import com.crm.support.Units;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,7 +36,7 @@ import java.util.List;
 @RequestMapping("/quotations")
 public class QuotationController {
 
-    private static final List<String> CURRENCY_OPTIONS = List.of("TWD", "USD", "CNY", "EUR", "JPY");
+    private static final List<String> CURRENCY_OPTIONS = List.of("USD", "TWD", "CNY", "EUR", "JPY", "GBP");
     private static final List<String> TAX_TYPE_OPTIONS = List.of("應稅", "免稅", "零稅率");
 
     private final QuotationService quotationService;
@@ -118,8 +119,10 @@ public class QuotationController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         model.addAttribute("activeMenu", "quotations");
-        model.addAttribute("quotation", quotationService.getById(id));
+        Quotation q = quotationService.getById(id);
+        model.addAttribute("quotation", q);
         model.addAttribute("statuses", QuotationStatus.values());
+        model.addAttribute("versions", quotationService.getVersions(q.getQuotationNumber()));
         return "quotations/detail";
     }
 
@@ -199,13 +202,14 @@ public class QuotationController {
                 customerRepository.findAll().stream()
                         .filter(Customer::isActive).toList());
         model.addAttribute("contactOptions", contactRepository.findAll().stream()
-                .map(c -> new ContactOption(c.getId(), c.getName(), c.getCustomer().getId()))
+                .map(c -> new ContactOption(c.getId(), c.getName(), c.getCustomer().getId(), c.isPrimaryContact()))
                 .toList());
         model.addAttribute("productOptions", productRepository.findByActiveTrueOrderByInternalPartNumberAsc().stream()
                 .map(this::toProductOption).toList());
         model.addAttribute("unitOptions", Units.OPTIONS);
         model.addAttribute("currencyOptions", CURRENCY_OPTIONS);
         model.addAttribute("taxTypeOptions", TAX_TYPE_OPTIONS);
+        model.addAttribute("deliveryTermsOptions", DeliveryTerms.OPTIONS);
     }
 
     private ProductOption toProductOption(Product p) {
