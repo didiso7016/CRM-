@@ -102,20 +102,20 @@ public class CustomerService {
         return customerRepository.findNeedFollowUp(threshold, LocalDate.now());
     }
 
-    /** 設定是否納入跟進提醒;重新啟用時清除延後 */
+    /** 設定是否納入跟進提醒;重新啟用時清除排定的下次追蹤日(回到全域規則) */
     public void setFollowUp(Long id, boolean enabled) {
         Customer c = getById(id);
         c.setFollowUpEnabled(enabled);
         if (enabled) {
-            c.setFollowUpSnoozeUntil(null);
+            c.setNextFollowUpDate(null);
         }
         customerRepository.save(c);
     }
 
-    /** 延後提醒指定天數 */
+    /** 延後/排定下次追蹤:設為 N 天後 */
     public void snoozeFollowUp(Long id, int days) {
         Customer c = getById(id);
-        c.setFollowUpSnoozeUntil(LocalDate.now().plusDays(days));
+        c.setNextFollowUpDate(LocalDate.now().plusDays(days));
         customerRepository.save(c);
     }
 

@@ -66,8 +66,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             select c from Customer c
             where c.active = true
               and c.followUpEnabled = true
-              and (c.followUpSnoozeUntil is null or c.followUpSnoozeUntil <= :today)
-              and coalesce(c.lastContactedAt, c.createdAt) < :threshold
+              and (
+                    (c.nextFollowUpDate is not null and c.nextFollowUpDate <= :today)
+                 or (c.nextFollowUpDate is null and coalesce(c.lastContactedAt, c.createdAt) < :threshold)
+              )
             order by coalesce(c.lastContactedAt, c.createdAt) asc
             """)
     List<Customer> findNeedFollowUp(@Param("threshold") LocalDateTime threshold,

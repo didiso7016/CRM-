@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -47,6 +48,15 @@ public class NotificationController {
             model.addAttribute("logForm", form);
         }
         return "notifications/index";
+    }
+
+    /** 刪除一筆聯絡紀錄 */
+    @PostMapping("/notifications/log/{id}/delete")
+    public String deleteLog(@PathVariable Long id,
+                            @RequestParam(required = false) String redirect, RedirectAttributes ra) {
+        contactLogService.delete(id);
+        ra.addFlashAttribute("flashSuccess", "已刪除聯絡紀錄");
+        return "redirect:" + (redirect != null && !redirect.isBlank() ? redirect : "/notifications");
     }
 
     /** 記錄一筆通知(例如:7/23 已發信給某客戶) */

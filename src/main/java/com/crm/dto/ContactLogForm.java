@@ -23,6 +23,9 @@ public class ContactLogForm {
 
     private String note;
 
+    /** 下次追蹤:""=依預設(全域天數)、數字=幾天後、stop=不用再追 */
+    private String nextFollowUp = "";
+
     // ===== Getter / Setter =====
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }
@@ -35,4 +38,7 @@ public class ContactLogForm {
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+
+    public String getNextFollowUp() { return nextFollowUp; }
+    public void setNextFollowUp(String nextFollowUp) { this.nextFollowUp = nextFollowUp; }
 }

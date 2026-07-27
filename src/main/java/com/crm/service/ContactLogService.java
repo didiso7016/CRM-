@@ -44,9 +44,27 @@ public class ContactLogService {
         LocalDateTime logTime = form.getLogDate().atStartOfDay();
         if (customer.getLastContactedAt() == null || logTime.isAfter(customer.getLastContactedAt())) {
             customer.setLastContactedAt(logTime);
-            customerRepository.save(customer);
         }
+
+        // 下次追蹤:數字=幾天後(並自動納入提醒)、stop=不用再追、空=依全域規則
+        String nf = form.getNextFollowUp();
+        if ("stop".equals(nf)) {
+            customer.setFollowUpEnabled(false);
+            customer.setNextFollowUpDate(null);
+        } else if (nf != null && nf.matches("\\d+")) {
+            customer.setFollowUpEnabled(true);
+            customer.setNextFollowUpDate(form.getLogDate().plusDays(Integer.parseInt(nf)));
+        } else {
+            customer.setNextFollowUpDate(null); // 依全域「N 天沒聯絡」規則
+        }
+
+        customerRepository.save(customer);
         return customer;
+    }
+
+    /** 刪除一筆聯絡紀錄(不影響客戶的最後聯絡時間) */
+    public void delete(Long id) {
+        contactLogRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)

@@ -71,6 +71,13 @@
                                 <span th:unless="${customer.lastContactedAt != null}" class="text-muted">尚無紀錄</span>
                             </td>
                         </tr>
+                        <tr th:if="${customer.followUpEnabled}"><th class="text-muted">下次追蹤</th>
+                            <td>
+                                <span th:if="${customer.nextFollowUpDate != null}" class="fw-semibold"
+                                      th:text="${#temporals.format(customer.nextFollowUpDate,'yyyy-MM-dd')}"></span>
+                                <span th:unless="${customer.nextFollowUpDate != null}" class="text-muted">依預設規則(未聯絡達設定天數才提醒)</span>
+                            </td>
+                        </tr>
                         <tr><th class="text-muted">建立 / 更新</th>
                             <td>
                                 <span th:text="${#temporals.format(customer.createdAt,'yyyy-MM-dd HH:mm')}"></span> /
@@ -167,10 +174,18 @@
                         <i data-lucide="plus"></i> 記錄通知</a>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item" th:each="log : ${contactLogs}">
-                        <span class="text-muted small" th:text="${#temporals.format(log.logDate,'yyyy-MM-dd')}">2026-07-23</span>
-                        <span class="badge text-bg-light border" th:text="${log.type.label}">Email</span>
-                        <span th:if="${log.note}" th:text="${log.note}"></span>
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-2" th:each="log : ${contactLogs}">
+                        <span>
+                            <span class="text-muted small" th:text="${#temporals.format(log.logDate,'yyyy-MM-dd')}">2026-07-23</span>
+                            <span class="badge text-bg-light border" th:text="${log.type.label}">Email</span>
+                            <span th:if="${log.note}" th:text="${log.note}"></span>
+                        </span>
+                        <form method="post" class="confirm-action" data-confirm-message="確定刪除這筆聯絡紀錄?"
+                              th:action="@{/notifications/log/{id}/delete(id=${log.id})}">
+                            <input type="hidden" name="redirect" th:value="@{/customers/{id}(id=${customer.id})}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="刪除">
+                                <i data-lucide="trash-2"></i></button>
+                        </form>
                     </li>
                     <li class="list-group-item text-center text-muted py-3" th:if="${#lists.isEmpty(contactLogs)}">
                         尚無聯絡紀錄

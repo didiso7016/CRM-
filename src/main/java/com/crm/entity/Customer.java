@@ -80,9 +80,12 @@ public class Customer {
     @Column(name = "follow_up_enabled", nullable = false, columnDefinition = "integer not null default 0")
     private boolean followUpEnabled = false;
 
-    /** 提醒延後至此日期(含)之前不提醒,可為空 */
-    @Column(name = "follow_up_snooze_until")
-    private java.time.LocalDate followUpSnoozeUntil;
+    /**
+     * 下次追蹤日:有設定時,到期(<= 今天)才提醒,且會蓋過全域「N 天沒聯絡」規則;
+     * 為空時,回到全域規則。記錄聯絡時可指定,或用「延後」推遲。
+     */
+    @Column(name = "next_follow_up_date")
+    private java.time.LocalDate nextFollowUpDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -154,8 +157,8 @@ public class Customer {
     public boolean isFollowUpEnabled() { return followUpEnabled; }
     public void setFollowUpEnabled(boolean followUpEnabled) { this.followUpEnabled = followUpEnabled; }
 
-    public java.time.LocalDate getFollowUpSnoozeUntil() { return followUpSnoozeUntil; }
-    public void setFollowUpSnoozeUntil(java.time.LocalDate followUpSnoozeUntil) { this.followUpSnoozeUntil = followUpSnoozeUntil; }
+    public java.time.LocalDate getNextFollowUpDate() { return nextFollowUpDate; }
+    public void setNextFollowUpDate(java.time.LocalDate nextFollowUpDate) { this.nextFollowUpDate = nextFollowUpDate; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

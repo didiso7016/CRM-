@@ -52,16 +52,16 @@ class CustomerServiceTest {
     }
 
     @Test
-    void 啟用跟進提醒會清除延後() {
+    void 啟用跟進提醒會清除下次追蹤日() {
         Customer c = new Customer();
         c.setId(5L);
-        c.setFollowUpSnoozeUntil(LocalDate.of(2026, 8, 1));
+        c.setNextFollowUpDate(LocalDate.of(2026, 8, 1));
         when(repo.findById(5L)).thenReturn(Optional.of(c));
 
         service.setFollowUp(5L, true);
 
         assertThat(c.isFollowUpEnabled()).isTrue();
-        assertThat(c.getFollowUpSnoozeUntil()).isNull();
+        assertThat(c.getNextFollowUpDate()).isNull();
     }
 
     @Test
@@ -77,13 +77,13 @@ class CustomerServiceTest {
     }
 
     @Test
-    void 延後提醒會設定延後日期() {
+    void 延後會設定下次追蹤日() {
         Customer c = new Customer();
         c.setId(5L);
         when(repo.findById(5L)).thenReturn(Optional.of(c));
 
         service.snoozeFollowUp(5L, 30);
 
-        assertThat(c.getFollowUpSnoozeUntil()).isEqualTo(LocalDate.now().plusDays(30));
+        assertThat(c.getNextFollowUpDate()).isEqualTo(LocalDate.now().plusDays(30));
     }
 }
