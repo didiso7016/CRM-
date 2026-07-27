@@ -56,7 +56,9 @@ public class Quotation {
     private String customerInquiryNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    // columnDefinition 明確指定型別,避免 Hibernate 產生「狀態白名單 CHECK 約束」
+    // (SQLite 無法事後修改;之後新增狀態才不會被舊約束擋住)
+    @Column(nullable = false, columnDefinition = "varchar(20) not null")
     private QuotationStatus status = QuotationStatus.DRAFT;
 
     @Column(name = "valid_until")

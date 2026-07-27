@@ -181,6 +181,7 @@ main.container-fluid,main.container{max-width:1280px}
 .qbadge-SENT{background:var(--accent-weak);color:var(--accent-ink)}
 .qbadge-CONFIRMING{background:var(--warn-weak);color:var(--warn)}
 .qbadge-ACCEPTED{background:var(--green-weak);color:var(--green-ink)}
+.qbadge-PAID{background:var(--green-ink);color:#fff}
 .qbadge-REJECTED{background:var(--bad-weak);color:var(--bad)}
 .qbadge-EXPIRED{background:var(--slate-weak);color:var(--ink)}
 .qbadge-CANCELLED{background:transparent;color:var(--muted);border:1px solid var(--border-strong)}

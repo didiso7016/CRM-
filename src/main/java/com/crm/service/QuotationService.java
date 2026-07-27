@@ -336,10 +336,16 @@ public class QuotationService {
         return quotationRepository.findTop5ByOrderByCreatedAtDesc();
     }
 
-    /** 已成交(已接受)的報價,供儀表板統計 */
+    /** 已收訂(訂金到)的報價,供「收訂中的公司」清單 */
     @Transactional(readOnly = true)
-    public List<Quotation> acceptedQuotations() {
+    public List<Quotation> depositQuotations() {
         return quotationRepository.findByStatus(QuotationStatus.ACCEPTED);
+    }
+
+    /** 付清尾款(完成)的報價,供成交金額統計 */
+    @Transactional(readOnly = true)
+    public List<Quotation> paidQuotations() {
+        return quotationRepository.findByStatus(QuotationStatus.PAID);
     }
 
     @Transactional(readOnly = true)

@@ -59,10 +59,12 @@ public class DashboardService {
         d.setFollowUpCustomers(customerService.needFollowUp(reminderDays));
         d.setReminderDays(reminderDays);
 
-        // ===== 成交金額(基準 = 已收訂)=====
-        List<Quotation> won = quotationService.acceptedQuotations();
-        d.setMonthlyRevenue(buildMonthlyRevenue(won));
-        d.setYearlyRevenue(buildYearlyRevenue(won));
+        // ===== 成交金額(基準 = 付清尾款)=====
+        List<Quotation> paid = quotationService.paidQuotations();
+        d.setMonthlyRevenue(buildMonthlyRevenue(paid));
+        d.setYearlyRevenue(buildYearlyRevenue(paid));
+        // 收訂中的公司(已收訂,尚未付清尾款)
+        d.setDepositQuotations(quotationService.depositQuotations());
 
         // ===== 待辦 =====
         List<com.crm.entity.Task> openTasks = taskService.listOpen();

@@ -9,6 +9,7 @@ public enum QuotationStatus {
     SENT("已送出", "send"),
     CONFIRMING("客戶確認中", "hourglass"),
     ACCEPTED("已收訂", "circle-check"),
+    PAID("付清尾款", "check-check"),
     REJECTED("已拒絕", "circle-x"),
     EXPIRED("已失效", "circle-slash"),
     CANCELLED("已取消", "circle-minus");

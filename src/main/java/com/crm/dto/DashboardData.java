@@ -24,9 +24,12 @@ public class DashboardData {
     private List<Customer> followUpCustomers;
     private int reminderDays;
 
-    /** 成交金額(基準=已收訂):近 6 個月每月 + 本年度合計 */
+    /** 成交金額(基準=付清尾款):近 6 個月每月 + 本年度合計 */
     private List<ChartBar> monthlyRevenue;
     private java.math.BigDecimal yearlyRevenue;
+
+    /** 收訂中的公司(已收訂、尚未付清尾款) */
+    private List<Quotation> depositQuotations;
 
     /** 待辦 */
     private List<Task> upcomingTasks;
@@ -65,6 +68,9 @@ public class DashboardData {
 
     public java.math.BigDecimal getYearlyRevenue() { return yearlyRevenue; }
     public void setYearlyRevenue(java.math.BigDecimal yearlyRevenue) { this.yearlyRevenue = yearlyRevenue; }
+
+    public List<Quotation> getDepositQuotations() { return depositQuotations; }
+    public void setDepositQuotations(List<Quotation> depositQuotations) { this.depositQuotations = depositQuotations; }
 
     public List<Task> getUpcomingTasks() { return upcomingTasks; }
     public void setUpcomingTasks(List<Task> upcomingTasks) { this.upcomingTasks = upcomingTasks; }

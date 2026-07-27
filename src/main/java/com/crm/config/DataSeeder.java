@@ -55,17 +55,17 @@ public class DataSeeder implements ApplicationRunner {
 
         // ---- 公司設定:未聯絡提醒 7 天、報價跟進 14 天 ----
         CompanySettings s = settingsService.getOrCreate();
-        s.setCompanyName("鼎新精密工業股份有限公司");
-        s.setTaxId("53212345");
-        s.setAddress("台中市西屯區工業八路 50 號");
-        s.setPhone("04-2358-9999");
-        s.setFax("04-2358-9988");
-        s.setEmail("sales@dingxin.com.tw");
-        s.setContactName("陳志明");
+        s.setCompanyName("EnviroValor CO., LTD.");
+        s.setTaxId("");
+        s.setAddress("No. 120-2, Ln. 460, Nanshi Sec. 2, Zhongfeng Rd., Pingzhen Dist., Taoyuan City 324032, Taiwan");
+        s.setPhone("+886 3 403-1234");
+        s.setFax("+886 3 470 4202");
+        s.setEmail("info@envirovalor.com");
+        s.setContactName("Jessie");
         s.setDefaultCurrency("USD");
-        s.setDefaultTaxRate(new BigDecimal("5"));
-        s.setDefaultPaymentTerms("月結 30 天");
-        s.setDefaultDeliveryTerms("工廠交貨");
+        s.setDefaultTaxRate(new BigDecimal("0"));
+        s.setDefaultPaymentTerms("50% deposit by T/T upon issuance of the PO, balance by T/T before shipment");
+        s.setDefaultDeliveryTerms("EXW");
         s.setContactReminderDays(7);
         s.setQuotationFollowupDays(14);
         settingsService.save(s);
@@ -101,22 +101,22 @@ public class DataSeeder implements ApplicationRunner {
         productService.create(product("PN-1005", "HY-J14", "高壓油壓接頭 1/4", "1/4 NPT", "黃銅", "鍍鎳", "PCS", "68", 200, 10));
 
         // ---- 報價單(過去日期以觸發跟進提醒) ----
-        // Airspec:今天(已接受)
+        // Airspec:今天 — 付清尾款(算進成交金額)
         Quotation q1 = quotationService.create(quotation(airspec.getId(), LocalDate.now(), "500",
                 item("PN-1001", "六角承窩螺絲 M8x25", "2000", "PCS", "3.5", "5"),
                 item("PN-1004", "CNC 車銑複合加工件", "300", "PCS", "95", "0")));
-        quotationService.changeStatus(q1.getId(), QuotationStatus.ACCEPTED);
+        quotationService.changeStatus(q1.getId(), QuotationStatus.PAID);
 
-        // Airspec:20 天前(已送出,未成交)
+        // Airspec:20 天前 — 已收訂(待付尾款)
         Quotation q2 = quotationService.create(quotation(airspec.getId(), LocalDate.now().minusDays(20), "0",
                 item("PN-1003", "精密軸承座 SNL-208", "40", "SET", "420", "0")));
-        quotationService.changeStatus(q2.getId(), QuotationStatus.SENT);
+        quotationService.changeStatus(q2.getId(), QuotationStatus.ACCEPTED);
 
-        // Hydro:16 天前(客戶確認中,未成交)
+        // Hydro:16 天前 — 已收訂(待付尾款)
         Quotation q3 = quotationService.create(quotation(hydro.getId(), LocalDate.now().minusDays(16), "800",
                 item("PN-1002", "不鏽鋼法蘭 DN50", "120", "PCS", "185", "8"),
                 item("PN-1005", "高壓油壓接頭 1/4", "500", "PCS", "68", "0")));
-        quotationService.changeStatus(q3.getId(), QuotationStatus.CONFIRMING);
+        quotationService.changeStatus(q3.getId(), QuotationStatus.ACCEPTED);
 
         // 大同:5 天前(草稿,尚未超過 14 天)
         quotationService.create(quotation(datong.getId(), LocalDate.now().minusDays(5), "0",

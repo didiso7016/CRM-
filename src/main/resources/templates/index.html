@@ -58,7 +58,7 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
             <span><i data-lucide="bar-chart-3"></i> 成交金額
-                <span class="text-muted fw-normal" style="font-size:.75rem">(已收訂報價)</span></span>
+                <span class="text-muted fw-normal" style="font-size:.75rem">(付清尾款)</span></span>
             <span class="text-muted small">本年度合計
                 <span class="fw-bold fs-5 ms-1" style="color:var(--green-ink);font-family:var(--mono)"
                       th:text="${#numbers.formatDecimal(stats.yearlyRevenue,1,'COMMA',0,'POINT')}">0</span></span>
@@ -116,6 +116,36 @@
     </div>
 
     <div class="row g-3">
+        <!-- 收訂中的公司(已收訂、待付尾款)-->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i data-lucide="circle-check" style="color:var(--green-ink)"></i> 收訂中的公司(待付尾款)
+                    <span class="badge text-bg-success ms-1" th:text="${#lists.size(stats.depositQuotations)}">0</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr><th>公司</th><th>報價單號</th><th class="text-end amount">金額</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.depositQuotations}">
+                            <td><a th:href="@{/customers/{id}(id=${q.customer.id})}"
+                                   th:text="${q.customer.companyName}">公司</a></td>
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}"
+                                   th:text="${q.quotationNumber}">QT-</a></td>
+                            <td class="text-end amount"
+                                th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',0,'POINT')}">0</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.depositQuotations)}">
+                            <td colspan="3" class="text-center text-muted py-3">目前沒有收訂中的訂單</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- 待辦事項 -->
         <div class="col-lg-6">
             <div class="card h-100">
