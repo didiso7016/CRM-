@@ -57,6 +57,7 @@ public class DashboardService {
         d.setExpiredQuotations(quotationService.expired());
         d.setAwaitingReplyQuotations(quotationService.awaitingReply());
         d.setDraftQuotations(quotationService.drafts());
+        d.setDeliveryDueQuotations(quotationService.deliveryDueSoon());
         d.setRecentlyUpdatedCustomers(customerService.recentlyUpdated());
 
         // 客戶關懷提醒:超過設定天數未聯絡的客戶

@@ -21,6 +21,7 @@ public class DashboardData {
     private List<Quotation> expiredQuotations;    // 已過期
     private List<Quotation> awaitingReplyQuotations; // 送出後尚未回覆
     private List<Quotation> draftQuotations;      // 尚未完成(草稿)
+    private List<Quotation> deliveryDueQuotations; // 交期將至/已過(已收訂/付清)
     private List<Customer> recentlyUpdatedCustomers;
 
     /** 需要關懷的客戶(超過提醒天數未聯絡) */
@@ -65,6 +66,9 @@ public class DashboardData {
 
     public List<Quotation> getDraftQuotations() { return draftQuotations; }
     public void setDraftQuotations(List<Quotation> draftQuotations) { this.draftQuotations = draftQuotations; }
+
+    public List<Quotation> getDeliveryDueQuotations() { return deliveryDueQuotations; }
+    public void setDeliveryDueQuotations(List<Quotation> deliveryDueQuotations) { this.deliveryDueQuotations = deliveryDueQuotations; }
 
     public List<Customer> getRecentlyUpdatedCustomers() { return recentlyUpdatedCustomers; }
     public void setRecentlyUpdatedCustomers(List<Customer> recentlyUpdatedCustomers) { this.recentlyUpdatedCustomers = recentlyUpdatedCustomers; }

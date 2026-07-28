@@ -23,7 +23,7 @@ import java.util.List;
  *  4. 報價即將到期
  *  5. 報價已過期
  *  6. 客戶要求回覆日期(將至/已過)
- *  7. 交期即將到期(交貨日將至/已過)
+ * (交期即將到期改於首頁「交期」卡呈現,不在此。)
  */
 @Service
 public class NotificationService {
@@ -34,11 +34,8 @@ public class NotificationService {
     /** 已送出、等待客戶回覆的狀態 */
     private static final List<QuotationStatus> SENT_STATUSES =
             List.of(QuotationStatus.SENT, QuotationStatus.CONFIRMING);
-    /** 已接單(需追交期)的狀態 */
-    private static final List<QuotationStatus> ORDER_STATUSES =
-            List.of(QuotationStatus.ACCEPTED, QuotationStatus.PAID);
 
-    /** 到期/回覆/交期提醒的提前天數 */
+    /** 到期/回覆提醒的提前天數 */
     private static final int APPROACH_DAYS = 7;
 
     private final CustomerService customerService;
@@ -114,14 +111,7 @@ public class NotificationService {
             items.add(new NotificationItem("REPLY_DUE", msg, link(q), null, signed));
         }
 
-        // 7. 交期即將到期(交貨日將至/已過)
-        for (Quotation q : quotationRepository.findDeliveryDueBefore(approach, ORDER_STATUSES)) {
-            long signed = ChronoUnit.DAYS.between(q.getDeliveryDueDate(), today);
-            String msg = signed >= 0
-                    ? "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")交貨日已過 " + signed + " 天(" + q.getDeliveryDueDate() + ")"
-                    : "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")交期將至," + q.getDeliveryDueDate() + " 交貨(剩 " + (-signed) + " 天)";
-            items.add(new NotificationItem("DELIVERY_DUE", msg, link(q), null, signed));
-        }
+        // 註:「交期即將到期」不放通知中心,改於首頁「交期」卡以倒數方式呈現。
 
         // 天數多(越逾期)的排前面
         items.sort((a, b) -> Long.compare(b.getDays(), a.getDays()));

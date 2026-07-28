@@ -386,6 +386,14 @@ public class QuotationService {
                 List.of(QuotationStatus.DRAFT), LocalDate.now());
     }
 
+    /** 交期將至/已過:交貨日在 7 天內或已過,狀態為已收訂/付清尾款(供首頁「交期」卡) */
+    @Transactional(readOnly = true)
+    public List<Quotation> deliveryDueSoon() {
+        LocalDate today = LocalDate.now();
+        return quotationRepository.findDeliveryDueBefore(today.plusDays(7),
+                List.of(QuotationStatus.ACCEPTED, QuotationStatus.PAID));
+    }
+
     private BigDecimal nz(BigDecimal v) { return v == null ? BigDecimal.ZERO : v; }
     private String trim(String s) { return s == null ? null : s.trim(); }
     private boolean isBlank(String s) { return s == null || s.isBlank(); }
