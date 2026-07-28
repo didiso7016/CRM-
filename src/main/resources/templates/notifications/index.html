@@ -22,7 +22,7 @@
                         <span>
                             <i data-lucide="user-round" class="text-primary" th:if="${n.kind == 'CUSTOMER'}"></i>
                             <i data-lucide="triangle-alert" class="text-danger"
-                               th:if="${n.kind == 'QUOTE_EXPIRED' or n.kind == 'REPLY_DUE' or n.kind == 'DELIVERY_DUE'}"></i>
+                               th:if="${n.kind == 'QUOTE_EXPIRED'}"></i>
                             <i data-lucide="file-clock" class="text-warning"
                                th:if="${n.kind == 'QUOTE_DRAFT' or n.kind == 'QUOTE_NOREPLY' or n.kind == 'QUOTE_EXPIRING'}"></i>
                             <a th:href="@{${n.linkUrl}}" class="text-decoration-none" th:text="${n.message}">提醒訊息</a>

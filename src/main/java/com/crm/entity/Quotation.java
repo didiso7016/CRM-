@@ -83,11 +83,7 @@ public class Quotation {
     @Column(name = "estimated_delivery", length = 100)
     private String estimatedDelivery;
 
-    /** 客戶要求回覆的截止日(選填,供「客戶要求回覆日期」提醒) */
-    @Column(name = "customer_reply_due_date")
-    private LocalDate customerReplyDueDate;
-
-    /** 交貨日(選填,具體日期;供「交期即將到期」提醒。文字交期仍存於 estimatedDelivery) */
+    /** 交貨日(選填,具體日期;供首頁「交期」卡倒數提醒。文字交期仍存於 estimatedDelivery) */
     @Column(name = "delivery_due_date")
     private LocalDate deliveryDueDate;
 
@@ -194,9 +190,6 @@ public class Quotation {
 
     public String getEstimatedDelivery() { return estimatedDelivery; }
     public void setEstimatedDelivery(String estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }
-
-    public LocalDate getCustomerReplyDueDate() { return customerReplyDueDate; }
-    public void setCustomerReplyDueDate(LocalDate customerReplyDueDate) { this.customerReplyDueDate = customerReplyDueDate; }
 
     public LocalDate getDeliveryDueDate() { return deliveryDueDate; }
     public void setDeliveryDueDate(LocalDate deliveryDueDate) { this.deliveryDueDate = deliveryDueDate; }

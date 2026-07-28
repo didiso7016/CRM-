@@ -235,7 +235,6 @@ public class QuotationService {
         q.setPaymentTerms(trim(form.getPaymentTerms()));
         q.setDeliveryTerms(trim(form.getDeliveryTerms()));
         q.setEstimatedDelivery(trim(form.getEstimatedDelivery()));
-        q.setCustomerReplyDueDate(form.getCustomerReplyDueDate());
         q.setDeliveryDueDate(form.getDeliveryDueDate());
         q.setOverallDiscount(nz(form.getOverallDiscount()));
         q.setFreight(nz(form.getFreight()));

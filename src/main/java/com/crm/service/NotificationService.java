@@ -22,8 +22,7 @@ import java.util.List;
  *  3. 報價送出後尚未回覆
  *  4. 報價即將到期
  *  5. 報價已過期
- *  6. 客戶要求回覆日期(將至/已過)
- * (交期即將到期改於首頁「交期」卡呈現,不在此。)
+ * (客戶要求回覆日期已移除;交期即將到期改於首頁「交期」卡呈現。)
  */
 @Service
 public class NotificationService {
@@ -102,16 +101,8 @@ public class NotificationService {
                     link(q), null, overdue));
         }
 
-        // 6. 客戶要求回覆日期(將至/已過)
-        for (Quotation q : quotationRepository.findReplyDueBefore(approach, OPEN_STATUSES)) {
-            long signed = ChronoUnit.DAYS.between(q.getCustomerReplyDueDate(), today);
-            String msg = signed >= 0
-                    ? "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")客戶要求回覆日已過 " + signed + " 天(" + q.getCustomerReplyDueDate() + ")"
-                    : "報價單 " + q.getQuotationNumber() + "(" + name(q) + ")客戶要求 " + q.getCustomerReplyDueDate() + " 前回覆(剩 " + (-signed) + " 天)";
-            items.add(new NotificationItem("REPLY_DUE", msg, link(q), null, signed));
-        }
-
-        // 註:「交期即將到期」不放通知中心,改於首頁「交期」卡以倒數方式呈現。
+        // 註:「客戶要求回覆日」「交期即將到期」不放通知中心
+        //   (前者已移除;後者改於首頁「交期」卡以倒數方式呈現)。
 
         // 天數多(越逾期)的排前面
         items.sort((a, b) -> Long.compare(b.getDays(), a.getDays()));
