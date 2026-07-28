@@ -17,7 +17,10 @@ public class DashboardData {
     private long acceptedCount;
 
     private List<Quotation> recentQuotations;
-    private List<Quotation> expiringQuotations;
+    private List<Quotation> expiringQuotations;   // 即將到期(有效期限 N 天內)
+    private List<Quotation> expiredQuotations;    // 已過期
+    private List<Quotation> awaitingReplyQuotations; // 送出後尚未回覆
+    private List<Quotation> draftQuotations;      // 尚未完成(草稿)
     private List<Customer> recentlyUpdatedCustomers;
 
     /** 需要關懷的客戶(超過提醒天數未聯絡) */
@@ -53,6 +56,15 @@ public class DashboardData {
 
     public List<Quotation> getExpiringQuotations() { return expiringQuotations; }
     public void setExpiringQuotations(List<Quotation> expiringQuotations) { this.expiringQuotations = expiringQuotations; }
+
+    public List<Quotation> getExpiredQuotations() { return expiredQuotations; }
+    public void setExpiredQuotations(List<Quotation> expiredQuotations) { this.expiredQuotations = expiredQuotations; }
+
+    public List<Quotation> getAwaitingReplyQuotations() { return awaitingReplyQuotations; }
+    public void setAwaitingReplyQuotations(List<Quotation> awaitingReplyQuotations) { this.awaitingReplyQuotations = awaitingReplyQuotations; }
+
+    public List<Quotation> getDraftQuotations() { return draftQuotations; }
+    public void setDraftQuotations(List<Quotation> draftQuotations) { this.draftQuotations = draftQuotations; }
 
     public List<Customer> getRecentlyUpdatedCustomers() { return recentlyUpdatedCustomers; }
     public void setRecentlyUpdatedCustomers(List<Customer> recentlyUpdatedCustomers) { this.recentlyUpdatedCustomers = recentlyUpdatedCustomers; }

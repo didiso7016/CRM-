@@ -365,6 +365,27 @@ public class QuotationService {
                 List.of(QuotationStatus.DRAFT, QuotationStatus.SENT, QuotationStatus.CONFIRMING));
     }
 
+    /** 已過期(有效期限已過、仍進行中) */
+    @Transactional(readOnly = true)
+    public List<Quotation> expired() {
+        return quotationRepository.findExpiredOpen(LocalDate.now(),
+                List.of(QuotationStatus.DRAFT, QuotationStatus.SENT, QuotationStatus.CONFIRMING));
+    }
+
+    /** 送出後尚未回覆(已送出/確認中,最新版) */
+    @Transactional(readOnly = true)
+    public List<Quotation> awaitingReply() {
+        return quotationRepository.findOpenBefore(
+                List.of(QuotationStatus.SENT, QuotationStatus.CONFIRMING), LocalDate.now());
+    }
+
+    /** 尚未完成(草稿,最新版) */
+    @Transactional(readOnly = true)
+    public List<Quotation> drafts() {
+        return quotationRepository.findOpenBefore(
+                List.of(QuotationStatus.DRAFT), LocalDate.now());
+    }
+
     private BigDecimal nz(BigDecimal v) { return v == null ? BigDecimal.ZERO : v; }
     private String trim(String s) { return s == null ? null : s.trim(); }
     private boolean isBlank(String s) { return s == null || s.isBlank(); }

@@ -110,6 +110,119 @@
         </div>
     </div>
 
+    <!-- ===== 報價(頁籤切換:即將到期 / 已過期 / 送出未回覆 / 尚未完成)===== -->
+    <div class="card mb-4" th:with="today=${T(java.time.LocalDate).now()}">
+        <div class="card-header"><i data-lucide="file-text"></i> 報價</div>
+        <ul class="nav nav-tabs px-3 pt-2" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#qtab-expiring" type="button">
+                    即將到期 <span class="badge rounded-pill text-bg-secondary" th:text="${#lists.size(stats.expiringQuotations)}">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#qtab-expired" type="button">
+                    已過期 <span class="badge rounded-pill text-bg-danger" th:text="${#lists.size(stats.expiredQuotations)}">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#qtab-noreply" type="button">
+                    送出後尚未回覆 <span class="badge rounded-pill text-bg-secondary" th:text="${#lists.size(stats.awaitingReplyQuotations)}">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#qtab-draft" type="button">
+                    尚未完成 <span class="badge rounded-pill text-bg-secondary" th:text="${#lists.size(stats.draftQuotations)}">0</span>
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <!-- 即將到期 -->
+            <div class="tab-pane fade show active" id="qtab-expiring" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th>報價單號</th><th>客戶</th><th>有效期限</th><th>倒數</th><th class="text-end amount">金額</th></tr></thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.expiringQuotations}"
+                            th:with="rem=${T(java.time.temporal.ChronoUnit).DAYS.between(today, q.validUntil)}">
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}" th:text="${q.quotationNumber} + ' v' + ${q.version}"></a></td>
+                            <td th:text="${q.customer.companyName}"></td>
+                            <td th:text="${#temporals.format(q.validUntil,'yyyy-MM-dd')}"></td>
+                            <td><span class="badge rounded-pill"
+                                      th:classappend="${rem <= 1} ? 'text-bg-danger' : (${rem <= 3} ? 'text-bg-warning' : 'text-bg-success')"
+                                      th:text="${rem <= 0} ? '今天到期' : ('還剩 ' + rem + ' 天')">還剩 N 天</span></td>
+                            <td class="text-end amount text-nowrap"><span class="text-muted small" th:text="${q.currency}"></span>
+                                <span th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.expiringQuotations)}"><td colspan="5" class="text-center text-muted py-3">目前沒有即將到期的報價</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 已過期 -->
+            <div class="tab-pane fade" id="qtab-expired" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th>報價單號</th><th>客戶</th><th>有效期限</th><th>已過</th><th class="text-end amount">金額</th></tr></thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.expiredQuotations}"
+                            th:with="over=${T(java.time.temporal.ChronoUnit).DAYS.between(q.validUntil, today)}">
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}" th:text="${q.quotationNumber} + ' v' + ${q.version}"></a></td>
+                            <td th:text="${q.customer.companyName}"></td>
+                            <td th:text="${#temporals.format(q.validUntil,'yyyy-MM-dd')}"></td>
+                            <td><span class="badge rounded-pill text-bg-danger" th:text="'已過 ' + ${over} + ' 天'">已過 N 天</span></td>
+                            <td class="text-end amount text-nowrap"><span class="text-muted small" th:text="${q.currency}"></span>
+                                <span th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.expiredQuotations)}"><td colspan="5" class="text-center text-muted py-3">目前沒有過期的報價</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 送出後尚未回覆 -->
+            <div class="tab-pane fade" id="qtab-noreply" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th>報價單號</th><th>客戶</th><th>報價日期</th><th>已送出</th><th class="text-end amount">金額</th></tr></thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.awaitingReplyQuotations}"
+                            th:with="d=${T(java.time.temporal.ChronoUnit).DAYS.between(q.quotationDate, today)}">
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}" th:text="${q.quotationNumber} + ' v' + ${q.version}"></a></td>
+                            <td th:text="${q.customer.companyName}"></td>
+                            <td th:text="${#temporals.format(q.quotationDate,'yyyy-MM-dd')}"></td>
+                            <td><span class="badge rounded-pill"
+                                      th:classappend="${d >= 14} ? 'text-bg-danger' : 'text-bg-warning'"
+                                      th:text="${d} + ' 天未回覆'">N 天未回覆</span></td>
+                            <td class="text-end amount text-nowrap"><span class="text-muted small" th:text="${q.currency}"></span>
+                                <span th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.awaitingReplyQuotations)}"><td colspan="5" class="text-center text-muted py-3">目前沒有等待客戶回覆的報價</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 尚未完成(草稿) -->
+            <div class="tab-pane fade" id="qtab-draft" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th>報價單號</th><th>客戶</th><th>報價日期</th><th>草稿放置</th><th class="text-end amount">金額</th></tr></thead>
+                        <tbody>
+                        <tr th:each="q : ${stats.draftQuotations}"
+                            th:with="d=${T(java.time.temporal.ChronoUnit).DAYS.between(q.quotationDate, today)}">
+                            <td><a th:href="@{/quotations/{id}(id=${q.id})}" th:text="${q.quotationNumber} + ' v' + ${q.version}"></a></td>
+                            <td th:text="${q.customer.companyName}"></td>
+                            <td th:text="${#temporals.format(q.quotationDate,'yyyy-MM-dd')}"></td>
+                            <td><span class="badge rounded-pill text-bg-secondary" th:text="'草稿 ' + ${d} + ' 天'">草稿 N 天</span></td>
+                            <td class="text-end amount text-nowrap"><span class="text-muted small" th:text="${q.currency}"></span>
+                                <span th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(stats.draftQuotations)}"><td colspan="5" class="text-center text-muted py-3">目前沒有未完成的草稿</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row g-3">
         <!-- 收訂中的公司(已收訂、待付尾款)-->
         <div class="col-lg-6">
@@ -191,31 +304,6 @@
                         </tr>
                         <tr th:if="${#lists.isEmpty(stats.recentQuotations)}">
                             <td colspan="4" class="text-center text-muted py-3">尚無報價單</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- 即將到期的報價單 -->
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header"><i data-lucide="hourglass"></i> 即將到期的報價單(7 天內)</div>
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle mb-0">
-                        <thead class="table-light">
-                        <tr><th>報價單號</th><th>客戶</th><th>有效期限</th><th>狀態</th></tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="q : ${stats.expiringQuotations}">
-                            <td><a th:href="@{/quotations/{id}(id=${q.id})}" th:text="${q.quotationNumber}"></a></td>
-                            <td th:text="${q.customer.companyName}"></td>
-                            <td class="text-danger" th:text="${#temporals.format(q.validUntil,'yyyy-MM-dd')}"></td>
-                            <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(stats.expiringQuotations)}">
-                            <td colspan="4" class="text-center text-muted py-3">近期無到期報價單</td>
                         </tr>
                         </tbody>
                     </table>

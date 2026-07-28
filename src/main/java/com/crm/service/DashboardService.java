@@ -52,7 +52,11 @@ public class DashboardService {
         d.setAcceptedCount(quotationService.countByStatus(QuotationStatus.ACCEPTED));
 
         d.setRecentQuotations(quotationService.recent());
+        // 首頁「報價」區四個頁籤
         d.setExpiringQuotations(quotationService.expiringSoon(EXPIRING_DAYS));
+        d.setExpiredQuotations(quotationService.expired());
+        d.setAwaitingReplyQuotations(quotationService.awaitingReply());
+        d.setDraftQuotations(quotationService.drafts());
         d.setRecentlyUpdatedCustomers(customerService.recentlyUpdated());
 
         // 客戶關懷提醒:超過設定天數未聯絡的客戶
