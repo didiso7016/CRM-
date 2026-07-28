@@ -224,7 +224,7 @@
     </div>
 
     <!-- ===== 交期(交貨日 7 天內 / 已過,已收訂/付清單)===== -->
-    <div class="card mb-4" th:if="${!#lists.isEmpty(stats.deliveryDueQuotations)}">
+    <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span><i data-lucide="truck"></i> 交期 <span class="text-muted small fw-normal">(交貨日 7 天內 / 已過)</span></span>
             <span class="badge rounded-pill text-bg-secondary" th:text="${#lists.size(stats.deliveryDueQuotations)}">0</span>
@@ -248,6 +248,11 @@
                     <td><span th:replace="~{fragments/status :: badge(${q.status})}"></span></td>
                     <td class="text-end amount text-nowrap"><span class="text-muted small" th:text="${q.currency}"></span>
                         <span th:text="${#numbers.formatDecimal(q.totalAmount,1,'COMMA',2,'POINT')}"></span></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(stats.deliveryDueQuotations)}">
+                    <td colspan="6" class="text-center text-muted py-3">
+                        目前沒有即將到交期的訂單。(在「已收訂/付清尾款」的報價單填「交貨日」,交期 7 天內就會出現在這)
+                    </td>
                 </tr>
                 </tbody>
             </table>
