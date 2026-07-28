@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 零件品項主檔。常用零件可直接帶入報價單;報價品項會複製一份快照,
- * 因此日後刪除或修改零件主檔不影響既有報價。
+ * 產品品項主檔。常用產品可直接帶入報價單;報價品項會複製一份快照,
+ * 因此日後刪除或修改產品主檔不影響既有報價。
  */
 @Entity
 @Table(name = "products",
@@ -29,7 +29,7 @@ public class Product {
     @Column(name = "customer_part_number", length = 80)
     private String customerPartNumber;
 
-    /** 零件名稱:必填 */
+    /** 產品名稱:必填 */
     @Column(nullable = false, length = 200)
     private String name;
 

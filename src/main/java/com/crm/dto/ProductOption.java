@@ -3,7 +3,7 @@ package com.crm.dto;
 import java.math.BigDecimal;
 
 /**
- * 供報價單表單前端 JS 使用的零件精簡資料(選擇零件時帶入品項欄位)。
+ * 供報價單表單前端 JS 使用的產品精簡資料(選擇產品時帶入品項欄位)。
  */
 public class ProductOption {
     private final Long id;

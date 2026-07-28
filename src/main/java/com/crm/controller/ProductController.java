@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * 零件管理控制器。
+ * 產品管理控制器。
  */
 @Controller
 @RequestMapping("/products")
@@ -41,7 +41,7 @@ public class ProductController {
         return "products/list";
     }
 
-    /** 零件詳細資料 + 歷史報價查詢 */
+    /** 產品詳細資料 + 歷史報價查詢 */
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         model.addAttribute("activeMenu", "products");
@@ -71,7 +71,7 @@ public class ProductController {
             return "products/form";
         }
         Product saved = productService.create(form);
-        ra.addFlashAttribute("flashSuccess", "零件「" + saved.getName() + "」已建立");
+        ra.addFlashAttribute("flashSuccess", "產品「" + saved.getName() + "」已建立");
         return "redirect:/products";
     }
 
@@ -96,21 +96,21 @@ public class ProductController {
             return "products/form";
         }
         Product saved = productService.update(id, form);
-        ra.addFlashAttribute("flashSuccess", "零件「" + saved.getName() + "」已更新");
+        ra.addFlashAttribute("flashSuccess", "產品「" + saved.getName() + "」已更新");
         return "redirect:/products";
     }
 
     @PostMapping("/{id}/deactivate")
     public String deactivate(@PathVariable Long id, RedirectAttributes ra) {
         productService.deactivate(id);
-        ra.addFlashAttribute("flashSuccess", "零件已停用");
+        ra.addFlashAttribute("flashSuccess", "產品已停用");
         return "redirect:/products";
     }
 
     @PostMapping("/{id}/activate")
     public String activate(@PathVariable Long id, RedirectAttributes ra) {
         productService.activate(id);
-        ra.addFlashAttribute("flashSuccess", "零件已重新啟用");
+        ra.addFlashAttribute("flashSuccess", "產品已重新啟用");
         return "redirect:/products";
     }
 

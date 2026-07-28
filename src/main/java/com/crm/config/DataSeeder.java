@@ -93,7 +93,7 @@ public class DataSeeder implements ApplicationRunner {
         contactService.create(contact(datong.getId(), "陳大明", "廠務", "廠長", "0955-666-777", "chen@datong-m.com", true));
         contactService.create(contact(jinggong.getId(), "林淑芬", "業務", "負責人", "0966-888-999", null, true));
 
-        // ---- 零件 ----
+        // ---- 產品 ----
         productService.create(product("PN-1001", "AS-B08", "六角承窩螺絲 M8x25", "M8x25", "SUS304", "鈍化", "PCS", "3.5", 500, 14));
         productService.create(product("PN-1002", "HY-F50", "不鏽鋼法蘭 DN50", "DN50 PN16", "SUS316", "拋光", "PCS", "185", 50, 21));
         productService.create(product("PN-1003", null, "精密軸承座 SNL-208", "內徑 40mm", "FC250", "烤漆", "SET", "420", 20, 28));
@@ -128,7 +128,7 @@ public class DataSeeder implements ApplicationRunner {
         contactLogService.record(log(datong.getId(), LocalDate.now().minusDays(40), ContactType.MEETING, "拜訪並取得詢價圖面"));
         contactLogService.record(log(jinggong.getId(), LocalDate.now(), ContactType.QUOTE, "寄送型錄與報價"));
 
-        System.out.println(">>> 已灌入示範資料(5 客戶 / 5 聯絡人 / 5 零件 / 4 報價 / 4 聯絡紀錄)");
+        System.out.println(">>> 已灌入示範資料(5 客戶 / 5 聯絡人 / 5 產品 / 4 報價 / 4 聯絡紀錄)");
     }
 
     // ===== 建構表單的小工具 =====

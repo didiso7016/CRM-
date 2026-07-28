@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 /**
- * 報價品項。建立時從零件主檔複製一份快照(料號、品名、規格等),
- * 因此日後零件主檔異動不影響既有報價;productId 僅為來源參考,無外鍵約束。
+ * 報價品項。建立時從產品主檔複製一份快照(料號、品名、規格等),
+ * 因此日後產品主檔異動不影響既有報價;productId 僅為來源參考,無外鍵約束。
  */
 @Entity
 @Table(name = "quotation_items",
@@ -26,7 +26,7 @@ public class QuotationItem {
     @Column(name = "sequence_number", nullable = false)
     private Integer sequenceNumber;
 
-    /** 來源零件 id(參考用,可為空;刪除品項不影響零件主檔) */
+    /** 來源產品 id(參考用,可為空;刪除品項不影響產品主檔) */
     @Column(name = "product_id")
     private Long productId;
 

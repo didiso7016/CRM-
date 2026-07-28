@@ -1,4 +1,4 @@
-// ===== 報價單表單:動態品項 + 帶入零件 + 即時金額試算 =====
+// ===== 報價單表單:動態品項 + 帶入產品 + 即時金額試算 =====
 (function () {
     const data = window.QUOTATION_DATA || {items: [], products: [], contacts: [], units: []};
     const products = data.products || [];
@@ -32,7 +32,7 @@
         return num.toLocaleString('zh-TW', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    // 零件下拉選項(供每列「帶入零件」)
+    // 產品下拉選項(供每列「帶入產品」)
     const productOptionsHtml = '<option value="">— 選擇 —</option>' +
         products.map(p => `<option value="${p.id}">${esc(p.internalPartNumber)} ${esc(p.name || '')}</option>`).join('');
 
@@ -56,7 +56,7 @@
                 <span class="qitem-seq seq"></span>
                 <span class="qitem-title">新品項</span>
                 <span class="qitem-pick">
-                    <label class="form-label">帶入零件</label>
+                    <label class="form-label">帶入產品</label>
                     <select class="form-select form-select-sm product-picker" style="min-width:220px">${productOptionsHtml}</select>
                     <button type="button" class="btn btn-sm btn-outline-danger del-btn" title="刪除此品項"><i data-lucide="trash-2"></i></button>
                 </span>
@@ -118,7 +118,7 @@
         }
         syncTitle();
 
-        // 事件:帶入零件
+        // 事件:帶入產品
         tr.querySelector('.product-picker').addEventListener('change', function () {
             const p = products.find(x => String(x.id) === this.value);
             if (!p) return;

@@ -17,7 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 零件商業邏輯:新增/編輯/停用、料號搜尋、內部料號重複檢查與歷史報價查詢。
+ * 產品商業邏輯:新增/編輯/停用、料號搜尋、內部料號重複檢查與歷史報價查詢。
  */
 @Service
 @Transactional
@@ -32,7 +32,7 @@ public class ProductService {
         this.quotationItemRepository = quotationItemRepository;
     }
 
-    /** 某零件的歷史報價:完整明細 + 最近一次 / 最低 / 已成交摘要 */
+    /** 某產品的歷史報價:完整明細 + 最近一次 / 最低 / 已成交摘要 */
     @Transactional(readOnly = true)
     public ProductPriceHistory priceHistory(Product product) {
         List<QuotationItem> items = quotationItemRepository.findPriceHistory(
@@ -72,7 +72,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Product getById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("找不到零件(id=" + id + ")"));
+                .orElseThrow(() -> new ResourceNotFoundException("找不到產品(id=" + id + ")"));
     }
 
     @Transactional(readOnly = true)

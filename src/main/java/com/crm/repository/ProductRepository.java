@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 零件資料存取。
+ * 產品資料存取。
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -41,6 +41,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                          @Param("onlyActive") boolean onlyActive,
                          Pageable pageable);
 
-    /** 報價單選擇零件時,只列出啟用中的 */
+    /** 報價單選擇產品時,只列出啟用中的 */
     List<Product> findByActiveTrueOrderByInternalPartNumberAsc();
 }

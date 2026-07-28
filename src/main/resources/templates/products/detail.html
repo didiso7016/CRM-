@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('零件 ' + ${product.internalPartNumber})}"></head>
+<head th:replace="~{fragments/layout :: head('產品 ' + ${product.internalPartNumber})}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <div th:replace="~{fragments/layout :: flash}"></div>
@@ -25,7 +25,7 @@
         <!-- 基本資料 -->
         <div class="col-lg-4">
             <div class="card h-100">
-                <div class="card-header"><i data-lucide="info"></i> 零件資料</div>
+                <div class="card-header"><i data-lucide="info"></i> 產品資料</div>
                 <div class="card-body">
                     <table class="table table-sm mb-0">
                         <tr><th class="text-muted" style="width:40%">內部料號</th><td th:text="${product.internalPartNumber}"></td></tr>
@@ -56,7 +56,7 @@
                 <div class="card-body">
                     <!-- 空狀態 -->
                     <div th:if="${priceHistory.isEmpty()}" class="text-center text-muted py-4">
-                        這顆零件目前沒有任何報價紀錄。
+                        這顆產品目前沒有任何報價紀錄。
                     </div>
 
                     <div th:unless="${priceHistory.isEmpty()}">

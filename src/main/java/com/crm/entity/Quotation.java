@@ -112,7 +112,7 @@ public class Quotation {
     @Column(name = "internal_notes", length = 1000)
     private String internalNotes;
 
-    /** 品項:隨報價單一併儲存與刪除,不影響零件主檔 */
+    /** 品項:隨報價單一併儲存與刪除,不影響產品主檔 */
     @OneToMany(mappedBy = "quotation", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sequenceNumber asc")
     private List<QuotationItem> items = new ArrayList<>();

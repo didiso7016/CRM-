@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 /**
- * 零件新增/編輯表單。
+ * 產品新增/編輯表單。
  */
 public class ProductForm {
 
@@ -21,7 +21,7 @@ public class ProductForm {
     @Size(max = 80)
     private String customerPartNumber;
 
-    @NotBlank(message = "零件名稱為必填")
+    @NotBlank(message = "產品名稱為必填")
     @Size(max = 200)
     private String name;
 

@@ -250,7 +250,7 @@ public class QuotationService {
             QuotationItem item = new QuotationItem();
             item.setSequenceNumber(seq++);
             item.setProductId(f.getProductId());
-            // 若選了零件但快照欄位未填,從零件主檔補齊
+            // 若選了產品但快照欄位未填,從產品主檔補齊
             fillSnapshotFromProduct(f);
             item.setInternalPartNumber(trim(f.getInternalPartNumber()));
             item.setCustomerPartNumber(trim(f.getCustomerPartNumber()));
