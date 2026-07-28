@@ -30,6 +30,9 @@ public class CustomerForm {
     @Size(max = 120)
     private String email;
 
+    @Size(max = 200)
+    private String website;
+
     private String address;
     private String country;
     private String city;
@@ -66,6 +69,9 @@ public class CustomerForm {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }

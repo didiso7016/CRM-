@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('開發:' + ${lead.companyName})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="mb-0">
+            <i data-lucide="user-search"></i> <span th:text="${lead.companyName}">公司</span>
+            <span th:if="${lead.priority}" class="badge align-middle"
+                  th:classappend="${lead.priority == 'A'} ? 'text-bg-success' : (${lead.priority == 'B'} ? 'text-bg-warning' : 'text-bg-secondary')"
+                  th:text="${lead.priority} + (${lead.score != null} ? ' · ' + ${lead.score} + ' 分' : '')"></span>
+            <span th:if="${lead.status}" class="badge text-bg-light border align-middle" th:text="${lead.status}"></span>
+        </h4>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/leads}"><i data-lucide="arrow-left"></i> 返回列表</a>
+            <a class="btn btn-outline-primary" th:href="@{/leads/{id}/edit(id=${lead.id})}">
+                <i data-lucide="pencil"></i> 編輯</a>
+            <!-- 尚未轉入:可轉為正式客戶 -->
+            <form th:unless="${lead.converted}" method="post" class="confirm-action"
+                  data-confirm-message="確定把這家轉為正式客戶?會建立一筆客戶資料並帶入基本資料。"
+                  th:action="@{/leads/{id}/convert(id=${lead.id})}">
+                <button class="btn btn-success" type="submit"><i data-lucide="user-check"></i> 轉為正式客戶</button>
+            </form>
+            <!-- 已轉入:連到客戶 -->
+            <a th:if="${lead.converted}" class="btn btn-outline-success"
+               th:href="@{/customers/{id}(id=${lead.convertedCustomerId})}">
+                <i data-lucide="external-link"></i> 查看正式客戶</a>
+            <form method="post" class="confirm-action" data-confirm-message="確定移除這筆開發資料?(會從清單隱藏)"
+                  th:action="@{/leads/{id}/deactivate(id=${lead.id})}">
+                <button class="btn btn-outline-danger" type="submit"><i data-lucide="trash-2"></i> 移除</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- 基本資料 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="info"></i> 基本資料</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="text-muted" style="width:35%">國家 / 城市</th>
+                            <td><span th:text="${lead.country}"></span>
+                                <span th:if="${lead.city}" th:text="' · ' + ${lead.city}"></span></td></tr>
+                        <tr><th class="text-muted">商業型態</th><td th:text="${lead.businessType}"></td></tr>
+                        <tr><th class="text-muted">官網</th>
+                            <td style="word-break:break-all"><a th:if="${lead.website}" th:href="${lead.website}"
+                                   target="_blank" th:text="${lead.website}"></a></td></tr>
+                        <tr><th class="text-muted">Email</th><td th:text="${lead.email}"></td></tr>
+                        <tr><th class="text-muted">電話 / Zalo</th><td th:text="${lead.phoneZalo}"></td></tr>
+                        <tr><th class="text-muted">聯絡方式</th><td th:text="${lead.contactRoute}"></td></tr>
+                        <tr><th class="text-muted">Source URL</th><td th:text="${lead.sourceUrl}"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 評分與分級 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="gauge"></i> 評分與分級</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="text-muted" style="width:35%">客戶類型</th><td th:text="${lead.leadType}"></td></tr>
+                        <tr><th class="text-muted">評分</th><td class="fw-bold" th:text="${lead.score}"></td></tr>
+                        <tr><th class="text-muted">優先級</th><td th:text="${lead.priority}"></td></tr>
+                        <tr><th class="text-muted">快速成交</th><td th:text="${lead.fastDeal}"></td></tr>
+                        <tr><th class="text-muted">查核程度</th><td th:text="${lead.verification}"></td></tr>
+                        <tr><th class="text-muted">品牌衝突</th><td th:text="${lead.brandConflict}"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 開發策略 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="target"></i> 開發策略</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="text-muted" style="width:35%">切入產品</th><td th:text="${lead.targetProduct}"></td></tr>
+                        <tr><th class="text-muted">客製化切入點</th><td th:text="${lead.customAngle}"></td></tr>
+                        <tr><th class="text-muted">建議主旨</th><td th:text="${lead.suggestedSubject}"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 開發進度 -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header"><i data-lucide="footprints"></i> 開發進度</div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="text-muted" style="width:35%">開發進度</th><td th:text="${lead.status}"></td></tr>
+                        <tr><th class="text-muted">首次開發</th>
+                            <td th:text="${lead.firstContactDate != null ? #temporals.format(lead.firstContactDate,'yyyy-MM-dd') : '—'}"></td></tr>
+                        <tr><th class="text-muted">最近開發</th>
+                            <td th:text="${lead.latestContactDate != null ? #temporals.format(lead.latestContactDate,'yyyy-MM-dd') : '—'}"></td></tr>
+                        <tr><th class="text-muted">下一步</th><td th:text="${lead.nextStep}"></td></tr>
+                        <tr><th class="text-muted">備註</th><td th:text="${lead.notes}"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

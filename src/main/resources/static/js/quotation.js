@@ -72,9 +72,9 @@
             </div>
             <hr class="qitem-divider">
             <div class="row g-2 align-items-end">
-                <div class="col-md-2 col-6"><label class="form-label">數量</label><input type="number" step="1" min="0" class="form-control form-control-sm text-end qty" name="items[${i}].quantity"></div>
+                <div class="col-md-2 col-6"><label class="form-label">數量 <span class="field-err text-danger fw-normal"></span></label><input type="number" step="1" min="0" class="form-control form-control-sm text-end qty" name="items[${i}].quantity"></div>
                 <div class="col-md-2 col-6"><label class="form-label">單位</label><input class="form-control form-control-sm" list="${unitDatalistId}" name="items[${i}].unit"></div>
-                <div class="col-md-2 col-6"><label class="form-label">單價</label><input type="number" step="0.1" min="0" class="form-control form-control-sm text-end price" name="items[${i}].unitPrice"></div>
+                <div class="col-md-2 col-6"><label class="form-label">單價 <span class="field-err text-danger fw-normal"></span></label><input type="number" step="0.1" min="0" class="form-control form-control-sm text-end price" name="items[${i}].unitPrice"></div>
                 <div class="col-md-2 col-6"><label class="form-label">折扣 %</label><input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-end disc" name="items[${i}].discountRate"></div>
                 <div class="col-md-4 col-12"><label class="form-label">金額</label><div class="qitem-amount amount-cell">0.00</div></div>
             </div>
@@ -142,7 +142,7 @@
             if (['.', ',', 'e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
         });
 
-        // 事件:數量/單價/折扣變更 → 即時修正格式 + 重算
+        // 事件:數量/單價/折扣變更 → 即時修正格式 + 即時驗證(欄位旁跳紅字)+ 重算
         tr.querySelectorAll('.qty, .price, .disc').forEach(inp => {
             inp.addEventListener('input', function () {
                 if (this.classList.contains('qty') && this.value.indexOf('.') !== -1) {
@@ -153,9 +153,13 @@
                     const p = this.value.split('.');
                     if (p[1] && p[1].length > 1) this.value = p[0] + '.' + p[1].slice(0, 1);
                 }
+                if (this.classList.contains('qty') || this.classList.contains('price')) markField(this, false);
                 recalcRow(tr);
                 recalcTotals();
             });
+            if (inp.classList.contains('qty') || inp.classList.contains('price')) {
+                inp.addEventListener('blur', function () { markField(this, false); });
+            }
         });
 
         // 事件:刪除
@@ -269,6 +273,71 @@
     // 幣別:金額試算區同步顯示
     if (currencyEl) currencyEl.addEventListener('change', syncTotalsCurrency);
     syncTotalsCurrency();
+
+    // 欄位即時驗證:數量、單價必須大於 0(strict=true 時空值也算不合格,供儲存時檢查)
+    function markField(el, strict) {
+        const v = parseFloat(el.value);
+        const bad = strict ? (el.value === '' || isNaN(v) || v <= 0)
+                           : (el.value !== '' && (isNaN(v) || v <= 0));
+        el.classList.toggle('is-invalid', bad); // 只給紅框(不佔高度)
+        const errSpan = el.parentElement.querySelector('.field-err');
+        if (errSpan) errSpan.textContent = bad ? '· 須大於 0' : '';
+        return bad;
+    }
+
+    // 儲存時再統一檢查一次:標紅不合格欄位、捲到第一個、不送出
+    (function () {
+        const form = document.getElementById('quotationForm');
+        if (!form) return;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (!submitBtn) return;
+        submitBtn.addEventListener('click', function (e) {
+            let firstInvalid = null;
+            let hasAny = false;
+            body.querySelectorAll('.qitem').forEach(function (card) {
+                const qtyEl = card.querySelector('.qty');
+                const priceEl = card.querySelector('.price');
+                const nameEl = card.querySelector('.pname');
+                const pnEl = card.querySelector('[name$=".internalPartNumber"]');
+                const nameVal = ((nameEl && nameEl.value) || '').trim();
+                const pnVal = ((pnEl && pnEl.value) || '').trim();
+                const qv = parseFloat(qtyEl.value);
+                const blank = !nameVal && !pnVal && (!qtyEl.value || qv === 0);
+                if (blank) { qtyEl.classList.remove('is-invalid'); priceEl.classList.remove('is-invalid'); return; }
+                hasAny = true;
+                const badQ = markField(qtyEl, true);
+                const badP = markField(priceEl, true);
+                if (!firstInvalid && badQ) firstInvalid = qtyEl;
+                if (!firstInvalid && badP) firstInvalid = priceEl;
+            });
+            if (!hasAny) {
+                e.preventDefault(); e.stopImmediatePropagation();
+                showItemErrors(['報價單至少要有一筆品項']);
+                return;
+            }
+            hideItemErrors();
+            if (firstInvalid) {
+                e.preventDefault(); e.stopImmediatePropagation();
+                firstInvalid.focus();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    })();
+
+    function showItemErrors(errs) {
+        const box = document.getElementById('itemErrors');
+        const list = document.getElementById('itemErrorList');
+        if (!box || !list) return;
+        list.innerHTML = errs.map(function (m) { return '<li>' + m + '</li>'; }).join('');
+        box.classList.remove('d-none');
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (window.lucide) { lucide.createIcons(); }
+    }
+
+    function hideItemErrors() {
+        const box = document.getElementById('itemErrors');
+        if (box) box.classList.add('d-none');
+    }
 
     ['overallDiscount', 'freight', 'otherFee', 'taxRate'].forEach(id => {
         const el = document.getElementById(id);

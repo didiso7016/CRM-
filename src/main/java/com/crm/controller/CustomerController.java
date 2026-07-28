@@ -205,6 +205,7 @@ public class CustomerController {
         f.setPhone(c.getPhone());
         f.setFax(c.getFax());
         f.setEmail(c.getEmail());
+        f.setWebsite(c.getWebsite());
         f.setAddress(c.getAddress());
         f.setCountry(c.getCountry());
         f.setCity(c.getCity());

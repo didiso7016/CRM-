@@ -41,6 +41,9 @@
     <a class="app-nav-link" th:classappend="${activeMenu=='customers'}?'active'" th:href="@{/customers}">
         <i data-lucide="users"></i> 客戶
     </a>
+    <a class="app-nav-link" th:classappend="${activeMenu=='leads'}?'active'" th:href="@{/leads}">
+        <i data-lucide="user-search"></i> 客戶開發
+    </a>
     <a class="app-nav-link" th:classappend="${activeMenu=='products'}?'active'" th:href="@{/products}">
         <i data-lucide="cog"></i> 產品
     </a>

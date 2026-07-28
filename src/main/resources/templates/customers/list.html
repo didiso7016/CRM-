@@ -64,6 +64,8 @@
                     <td>
                         <a th:href="@{/customers/{id}(id=${c.id})}" th:text="${c.companyName}"
                            class="text-decoration-none fw-semibold">公司</a>
+                        <a th:if="${c.website}" th:href="${c.website}" target="_blank" class="ms-1 text-muted"
+                           title="官網"><i data-lucide="external-link" style="width:13px;height:13px"></i></a>
                     </td>
                     <td>
                         <span th:text="${c.country}"></span>

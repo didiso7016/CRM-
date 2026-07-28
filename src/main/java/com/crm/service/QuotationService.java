@@ -105,9 +105,9 @@ public class QuotationService {
             } else if (item.getQuantity().remainder(BigDecimal.ONE).signum() != 0) {
                 errors.add("第 " + row + " 列:數量必須是整數(不可有小數)");
             }
-            if (item.getUnitPrice() != null && item.getUnitPrice().signum() < 0) {
-                errors.add("第 " + row + " 列:單價不得小於 0");
-            } else if (item.getUnitPrice() != null && item.getUnitPrice().stripTrailingZeros().scale() > 1) {
+            if (item.getUnitPrice() == null || item.getUnitPrice().signum() <= 0) {
+                errors.add("第 " + row + " 列:單價必須大於 0");
+            } else if (item.getUnitPrice().stripTrailingZeros().scale() > 1) {
                 errors.add("第 " + row + " 列:單價最多只能到小數點後 1 位");
             }
             BigDecimal disc = item.getDiscountRate();

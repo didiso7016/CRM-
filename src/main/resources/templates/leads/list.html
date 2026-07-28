@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('客戶開發')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0"><i data-lucide="user-search"></i> 客戶開發 / 潛在客戶</h4>
+        <a class="btn btn-primary" th:href="@{/leads/new}"><i data-lucide="user-plus"></i> 新增潛在客戶</a>
+    </div>
+
+    <!-- 搜尋列 -->
+    <form class="card card-body mb-3" method="get" th:action="@{/leads}">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label small text-muted">關鍵字(公司 / 城市 / 切入產品)</label>
+                <input type="text" class="form-control" name="keyword" th:value="${fKeyword}" placeholder="輸入關鍵字">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">開發進度</label>
+                <select class="form-select" name="status">
+                    <option value="">全部</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                            th:selected="${fStatus == s}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">優先級</label>
+                <select class="form-select" name="priority">
+                    <option value="">全部</option>
+                    <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}"
+                            th:selected="${fPriority == p}"></option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-outline-primary w-100" type="submit"><i data-lucide="search"></i> 搜尋</button>
+                <a class="btn btn-outline-secondary" th:href="@{/leads}" title="清除">清除</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>#</th><th>公司</th><th>國家/城市</th><th>客戶類型</th>
+                    <th class="text-end">評分</th><th>優先</th><th>快速</th>
+                    <th>開發進度</th><th>最近開發</th><th class="text-end">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="l, it : ${leads}" th:classappend="${l.converted} ? 'opacity-50' : ''">
+                    <td class="text-muted" th:text="${page.number * pageSize + it.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/leads/{id}(id=${l.id})}" class="text-decoration-none fw-semibold"
+                           th:text="${l.companyName}">公司</a>
+                        <a th:if="${l.website}" th:href="${l.website}" target="_blank" class="ms-1 text-muted"
+                           title="官網"><i data-lucide="external-link" style="width:13px;height:13px"></i></a>
+                    </td>
+                    <td>
+                        <span th:text="${l.country}"></span>
+                        <span th:if="${l.city}" class="text-muted" th:text="' · ' + ${l.city}"></span>
+                    </td>
+                    <td th:text="${l.leadType}"></td>
+                    <td class="text-end amount fw-bold" th:text="${l.score}"></td>
+                    <td>
+                        <span th:if="${l.priority}" class="badge"
+                              th:classappend="${l.priority == 'A'} ? 'text-bg-success' : (${l.priority == 'B'} ? 'text-bg-warning' : 'text-bg-secondary')"
+                              th:text="${l.priority}"></span>
+                    </td>
+                    <td th:text="${l.fastDeal}"></td>
+                    <td>
+                        <span th:if="${l.status}" class="badge"
+                              th:classappend="${l.status == '已寄信'} ? 'text-bg-primary' : (${l.status == '不適合'} ? 'text-bg-danger' : 'text-bg-secondary')"
+                              th:text="${l.status}"></span>
+                        <span th:if="${l.converted}" class="badge text-bg-success">已轉客戶</span>
+                    </td>
+                    <td th:text="${l.latestContactDate != null ? #temporals.format(l.latestContactDate,'yyyy-MM-dd') : '—'}"></td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/leads/{id}(id=${l.id})}" title="檢視">
+                            <i data-lucide="eye"></i></a>
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/leads/{id}/edit(id=${l.id})}" title="編輯">
+                            <i data-lucide="pencil"></i></a>
+                        <form th:if="${!l.converted}" method="post" class="d-inline confirm-action"
+                              data-confirm-message="確定把這家轉為正式客戶?會建立一筆客戶資料。"
+                              th:action="@{/leads/{id}/convert(id=${l.id})}">
+                            <button class="btn btn-sm btn-outline-success" type="submit" title="轉為正式客戶">
+                                <i data-lucide="user-check"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(leads)}">
+                    <td colspan="10" class="text-center text-muted py-4">查無開發資料</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 分頁 -->
+    <nav class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+        <span class="text-muted small">共 <span th:text="${page.totalElements}">0</span> 筆</span>
+        <ul class="pagination pagination-sm mb-0" th:if="${page.totalPages > 1}">
+            <li class="page-item" th:classappend="${page.first}?'disabled'">
+                <a class="page-link" th:href="@{/leads(page=${page.number-1},size=${pageSize},keyword=${fKeyword},status=${fStatus},priority=${fPriority})}">上一頁</a>
+            </li>
+            <li class="page-item disabled"><span class="page-link"
+                th:text="'第 ' + (${page.number+1}) + ' / ' + ${page.totalPages} + ' 頁'">第 1 頁</span></li>
+            <li class="page-item" th:classappend="${page.last}?'disabled'">
+                <a class="page-link" th:href="@{/leads(page=${page.number+1},size=${pageSize},keyword=${fKeyword},status=${fStatus},priority=${fPriority})}">下一頁</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

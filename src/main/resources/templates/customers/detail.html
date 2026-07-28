@@ -57,6 +57,9 @@
                         <tr><th class="text-muted">電話</th><td th:text="${customer.phone}"></td></tr>
                         <tr><th class="text-muted">傳真</th><td th:text="${customer.fax}"></td></tr>
                         <tr><th class="text-muted">Email</th><td th:text="${customer.email}"></td></tr>
+                        <tr><th class="text-muted">官網</th>
+                            <td style="word-break:break-all"><a th:if="${customer.website}" th:href="${customer.website}"
+                                   target="_blank" th:text="${customer.website}"></a></td></tr>
                         <tr><th class="text-muted">國家 / 城市</th>
                             <td>
                                 <span th:text="${customer.country}"></span>

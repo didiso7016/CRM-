@@ -131,6 +131,7 @@ public class CustomerService {
         c.setPhone(trim(form.getPhone()));
         c.setFax(trim(form.getFax()));
         c.setEmail(trim(form.getEmail()));
+        c.setWebsite(trim(form.getWebsite()));
         c.setAddress(trim(form.getAddress()));
         c.setCountry(trim(form.getCountry()));
         c.setCity(trim(form.getCity()));

@@ -42,6 +42,10 @@ public class Customer {
     @Column(length = 120)
     private String email;
 
+    /** 公司官網(可由客戶開發轉入時帶入) */
+    @Column(length = 200)
+    private String website;
+
     @Column(length = 300)
     private String address;
 
@@ -139,6 +143,9 @@ public class Customer {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }

@@ -172,6 +172,9 @@ main.container-fluid,main.container{max-width:1280px}
 .qitem-amount{background:var(--green-weak);border:1px solid var(--border);color:var(--green-ink);
   font-weight:700;text-align:right;font-variant-numeric:tabular-nums;border-radius:var(--radius-sm);
   padding:.25rem .5rem;display:flex;align-items:center;justify-content:flex-end;min-height:31px}
+/* 數量/單價即時驗證:只留紅框(去掉 Bootstrap 內建圖示,避免壓到數字),錯誤字放在欄位名稱旁 */
+.qitem .form-control.is-invalid{background-image:none;padding-right:.5rem}
+.qitem .field-err{font-size:.7rem;font-weight:400}
 
 /* ---------- 搜尋即時建議(autocomplete)---------- */
 .ac-menu{position:absolute;top:100%;left:0;right:0;z-index:1050;background:var(--surface);
