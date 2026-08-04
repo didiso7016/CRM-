@@ -47,7 +47,6 @@ REM ---- 4. Copy launcher and backup scripts ----
 echo [4/4] Copying launcher and backup scripts...
 copy /y start-crm.bat     dist\ >nul
 copy /y backup-crm.bat    dist\ >nul
-copy /y backup.bat        dist\ >nul
 copy /y restore-guide.txt dist\ >nul
 
 echo.

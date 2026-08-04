@@ -1,0 +1,8 @@
+# macOS / Linux 腳本必須用 LF 換行,否則在 Mac 上會出現
+# "bad interpreter: /bin/bash^M" 而無法執行。
+*.command  text eol=lf
+*.sh       text eol=lf
+
+# Windows 批次檔維持 CRLF
+*.bat      text eol=crlf
+*.cmd      text eol=crlf
